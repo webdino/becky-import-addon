@@ -89,7 +89,7 @@ static const nsModuleComponentInfo components[] = {
   { "Becky! Import Component", MJ_BECKYIMPORT_CID,
     "@mozilla.org/import/becky;1", BeckyImportConstructor,
     BeckyRegister, nsnull },
-  { "Becky! Import Component", MJ_BECKYIMPORT_SETTINGS_CID,
+  { "Becky! Import Settings Component", MJ_BECKYIMPORT_SETTINGS_CID,
     MJ_BECKYIMPORT_SETTINGS_CONTRACT_ID,
     BeckySettingsImporterConstructor,
     nsnull, nsnull }
