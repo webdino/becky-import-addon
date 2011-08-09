@@ -42,6 +42,14 @@
 
 #include <nsIImportSettings.h>
 
+#define MJ_BECKYIMPORT_SETTINGS_CONTRACT_ID \
+  "@mozilla-japan.org/import/becky/settings;1"
+
+#define MJ_BECKYIMPORT_SETTINGS_CID                 \
+{                                                   \
+  0xed9907d8, 0x7086, 0x482e,                       \
+  {0xbf, 0x8d, 0x5a, 0xcf, 0xf2, 0x3b, 0x7e, 0x7c}}
+
 class BeckySettingsImporter : public nsIImportSettings
 {
 public:

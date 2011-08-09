@@ -42,6 +42,14 @@
 
 #include <nsIImportAddressBooks.h>
 
+#define MJ_BECKYIMPORT_ADDRESSBOOKS_CONTRACT_ID \
+  "@mozilla-japan.org/import/becky/addressbooks;1"
+
+#define MJ_BECKYIMPORT_ADDRESSBOOKS_CID             \
+{                                                   \
+  0xcac8d716, 0xabee, 0x4be4,                       \
+  {0x81, 0x31, 0xd9, 0x0a, 0xff, 0x57, 0x1a, 0x20}}
+
 class BeckyAddressBookImporter : public nsIImportAddressBooks
 {
 public:

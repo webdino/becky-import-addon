@@ -42,6 +42,14 @@
 
 #include <nsIImportMail.h>
 
+#define MJ_BECKYIMPORT_MAIL_CONTRACT_ID \
+  "@mozilla-japan.org/import/becky/mail;1"
+
+#define MJ_BECKYIMPORT_MAIL_CID                     \
+{                                                   \
+  0x335b2634, 0xec60, 0x4389,                       \
+  {0x8b, 0x2d, 0x28, 0xd7, 0x02, 0xab, 0x83, 0x8c}}
+
 class BeckyMailImporter : public nsIImportMail
 {
 public:

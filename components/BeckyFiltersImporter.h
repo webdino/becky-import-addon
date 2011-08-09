@@ -42,6 +42,14 @@
 
 #include <nsIImportFilters.h>
 
+#define MJ_BECKYIMPORT_FILTERS_CONTRACT_ID \
+  "@mozilla-japan.org/import/becky/filters;1"
+
+#define MJ_BECKYIMPORT_FILTERS_CID                  \
+{                                                   \
+  0x464afea6, 0x8d49, 0x4c5d,                       \
+  {0x87, 0x8e, 0x81, 0xc8, 0x2a, 0xcf, 0x4d, 0x09}}
+
 class BeckyFiltersImporter : public nsIImportFilters
 {
 public:
