@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<RDF:RDF xmlns="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+         xmlns:em="http://www.mozilla.org/2004/em-rdf#"
+         xmlns:RDF="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+<RDF:Description RDF:about="urn:mozilla:install-manifest"
+                 em:id="@PACKAGE_NAME@@mozilla-japan.org"
+                 em:name="Becky! Import"
+                 em:version="@PACKAGE_VERSION@"
+                 em:unpack="true"
+                 em:iconURL="chrome://@PACKAGE_NAME@/content/icon.png">
+  <em:localized>
+    <RDF:Description em:locale="en-US"
+                     em:name="Becky! Import"
+                     em:description="Import of Becky! mail"
+                     em:creator="Mozlla Japan"
+                     em:homepageURL="http://www.mozilla-japan.org/"/>
+  </em:localized>
+  <em:localized>
+    <RDF:Description em:locale="ja"
+                     em:name="Becky! Import"
+                     em:description="Import of Becky! mail"
+                     em:homepageURL="http://www.mozilla-japan.org/"/>
+  </em:localized>
+  <em:targetApplication>
+    <RDF:Description em:id="{3550f703-e582-4d05-9a08-453d09bdfdc6}"
+                     em:minVersion="3.1"
+                     em:maxVersion="8.0*"/>
+  </em:targetApplication>
+  <em:targetPlatform>WINNT_x86-msvc</em:targetPlatform>
+  <em:targetPlatform>Linux_x86-gcc3</em:targetPlatform>
+  <em:targetPlatform>Linux_x86_64-gcc3</em:targetPlatform>
+</RDF:Description>
+</RDF:RDF>

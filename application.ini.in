@@ -1,0 +1,9 @@
+[App]
+Name=Becky! Import
+Version=@PACKAGE_VERSION@
+BuildID=20110811
+hiikezoe@mozilla-japan.org
+
+[Gecko]
+MinVersion=1.9.1
+MaxVersion=2.0.*
