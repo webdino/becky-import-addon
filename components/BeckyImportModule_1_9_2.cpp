@@ -48,12 +48,17 @@
 #include <nsCOMPtr.h>
 
 #include "BeckyMailImporter.h"
+#include "BeckySettingsImporter.h"
 #include "BeckyImport.h"
+#include "BeckyAddressBookImporter.h"
 #include "BeckyStringBundle.h"
 
 NS_GENERIC_FACTORY_CONSTRUCTOR(BeckyMailImporter)
+NS_GENERIC_FACTORY_CONSTRUCTOR(BeckySettingsImporter)
 NS_GENERIC_FACTORY_CONSTRUCTOR(BeckyImport)
 static NS_DEFINE_CID(kMJ_BECKYIMPORT_CID, MJ_BECKYIMPORT_CID);
+static NS_DEFINE_CID(kMJ_BECKYIMPORT_ADDRESSBOOKS_CID,
+                     MJ_BECKYIMPORT_ADDRESSBOOKS_CID);
 
 NS_METHOD
 BeckyRegister(nsIComponentManager *aCompManager,
@@ -83,7 +88,11 @@ BeckyRegister(nsIComponentManager *aCompManager,
 static const nsModuleComponentInfo components[] = {
   { "Becky! Import Component", MJ_BECKYIMPORT_CID,
     "@mozilla.org/import/becky;1", BeckyImportConstructor,
-    BeckyRegister, nsnull }
+    BeckyRegister, nsnull },
+  { "Becky! Import Component", MJ_BECKYIMPORT_SETTINGS_CID,
+    MJ_BECKYIMPORT_SETTINGS_CONTRACT_ID,
+    BeckySettingsImporterConstructor,
+    nsnull, nsnull }
 };
 
 static void
