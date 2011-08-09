@@ -37,8 +37,8 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-#ifndef BeckyAddressBookImporter_h___
-#define BeckyAddressBookImporter_h___
+#ifndef BeckyAddressBooksImporter_h___
+#define BeckyAddressBooksImporter_h___
 
 #include <nsIImportAddressBooks.h>
 
@@ -50,18 +50,18 @@
   0xcac8d716, 0xabee, 0x4be4,                       \
   {0x81, 0x31, 0xd9, 0x0a, 0xff, 0x57, 0x1a, 0x20}}
 
-class BeckyAddressBookImporter : public nsIImportAddressBooks
+class BeckyAddressBooksImporter : public nsIImportAddressBooks
 {
 public:
   NS_DECL_ISUPPORTS
   NS_DECL_NSIIMPORTADDRESSBOOKS
 
-  BeckyAddressBookImporter();
+  BeckyAddressBooksImporter();
 
   static nsresult Create(nsIImportAddressBooks** aImport);
 
 private:
-  ~BeckyAddressBookImporter();
+  ~BeckyAddressBooksImporter();
 };
 
-#endif /* BeckyAddressBookImporter_h___ */
+#endif /* BeckyAddressBooksImporter_h___ */

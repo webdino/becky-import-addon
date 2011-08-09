@@ -7,8 +7,8 @@ noinst_LTLIBRARIES = BeckyImport.la
 BeckyImport_la_SOURCES = 	        \
 	BeckyMailImporter.cpp           \
 	BeckyMailImporter.h             \
-	BeckyAddressBookImporter.cpp    \
-	BeckyAddressBookImporter.h      \
+	BeckyAddressBooksImporter.cpp   \
+	BeckyAddressBooksImporter.h     \
 	BeckySettingsImporter.cpp       \
 	BeckySettingsImporter.h         \
 	BeckyFiltersImporter.cpp        \

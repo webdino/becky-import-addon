@@ -50,7 +50,7 @@
 #include "BeckyMailImporter.h"
 #include "BeckySettingsImporter.h"
 #include "BeckyImport.h"
-#include "BeckyAddressBookImporter.h"
+#include "BeckyAddressBooksImporter.h"
 #include "BeckyStringBundle.h"
 
 NS_GENERIC_FACTORY_CONSTRUCTOR(BeckyMailImporter)

@@ -70,7 +70,7 @@
 
 #include "BeckyImport.h"
 #include "BeckyMailImporter.h"
-#include "BeckyAddressBookImporter.h"
+#include "BeckyAddressBooksImporter.h"
 #include "BeckySettingsImporter.h"
 #include "BeckyFiltersImporter.h"
 #include "BeckyStringBundle.h"
@@ -154,7 +154,7 @@ BeckyImport::GetAddressBookImportInterface(nsISupports **aInterface)
   // create the nsIImportMail interface and return it!
   nsIImportAddressBooks *address = nsnull;
   nsIImportGeneric *generic = nsnull;
-  nsresult rv = BeckyAddressBookImporter::Create(&address);
+  nsresult rv = BeckyAddressBooksImporter::Create(&address);
   if (NS_SUCCEEDED(rv)) {
     nsCOMPtr<nsIImportService> importService(do_GetService(NS_IMPORTSERVICE_CONTRACTID, &rv));
     if (NS_SUCCEEDED(rv)) {

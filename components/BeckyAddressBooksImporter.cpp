@@ -40,90 +40,90 @@
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif /* HAVE_CONFIG_H */
-#include "BeckyAddressBookImporter.h"
+#include "BeckyAddressBooksImporter.h"
 
-NS_IMPL_ISUPPORTS1(BeckyAddressBookImporter, nsIImportAddressBooks)
+NS_IMPL_ISUPPORTS1(BeckyAddressBooksImporter, nsIImportAddressBooks)
 
-BeckyAddressBookImporter::BeckyAddressBookImporter()
+BeckyAddressBooksImporter::BeckyAddressBooksImporter()
 {
   /* member initializers and constructor code */
 }
 
-BeckyAddressBookImporter::~BeckyAddressBookImporter()
+BeckyAddressBooksImporter::~BeckyAddressBooksImporter()
 {
   /* destructor code */
 }
 
 NS_IMETHODIMP
-BeckyAddressBookImporter::GetSupportsMultiple(PRBool *_retval NS_OUTPARAM)
+BeckyAddressBooksImporter::GetSupportsMultiple(PRBool *_retval NS_OUTPARAM)
 {
     return NS_ERROR_NOT_IMPLEMENTED;
 }
 
 NS_IMETHODIMP
-BeckyAddressBookImporter::GetAutoFind(PRUnichar **aDescription NS_OUTPARAM, PRBool *_retval NS_OUTPARAM)
+BeckyAddressBooksImporter::GetAutoFind(PRUnichar **aDescription NS_OUTPARAM, PRBool *_retval NS_OUTPARAM)
 {
     return NS_ERROR_NOT_IMPLEMENTED;
 }
 
 NS_IMETHODIMP
-BeckyAddressBookImporter::GetNeedsFieldMap(nsIFile *aLocation, PRBool *_retval NS_OUTPARAM)
+BeckyAddressBooksImporter::GetNeedsFieldMap(nsIFile *aLocation, PRBool *_retval NS_OUTPARAM)
 {
     return NS_ERROR_NOT_IMPLEMENTED;
 }
 
 NS_IMETHODIMP
-BeckyAddressBookImporter::GetDefaultLocation(nsIFile **aLocation NS_OUTPARAM,
-                                             PRBool *aFound NS_OUTPARAM,
-                                             PRBool *aUserVerify NS_OUTPARAM)
+BeckyAddressBooksImporter::GetDefaultLocation(nsIFile **aLocation NS_OUTPARAM,
+                                              PRBool *aFound NS_OUTPARAM,
+                                              PRBool *aUserVerify NS_OUTPARAM)
 {
     return NS_ERROR_NOT_IMPLEMENTED;
 }
 
 NS_IMETHODIMP
-BeckyAddressBookImporter::FindAddressBooks(nsIFile *aLocation,
-                                           nsISupportsArray **_retval NS_OUTPARAM)
+BeckyAddressBooksImporter::FindAddressBooks(nsIFile *aLocation,
+                                            nsISupportsArray **_retval NS_OUTPARAM)
 {
     return NS_ERROR_NOT_IMPLEMENTED;
 }
 
 NS_IMETHODIMP
-BeckyAddressBookImporter::InitFieldMap(nsIImportFieldMap *aFieldMap)
+BeckyAddressBooksImporter::InitFieldMap(nsIImportFieldMap *aFieldMap)
 {
     return NS_ERROR_NOT_IMPLEMENTED;
 }
 
 NS_IMETHODIMP
-BeckyAddressBookImporter::ImportAddressBook(nsIImportABDescriptor *aSource,
-                                            nsIAddrDatabase *aDestination,
-                                            nsIImportFieldMap *aFieldMap,
-                                            nsISupports *aSupportService,
+BeckyAddressBooksImporter::ImportAddressBook(nsIImportABDescriptor *aSource,
+                                             nsIAddrDatabase *aDestination,
+                                             nsIImportFieldMap *aFieldMap,
+                                             nsISupports *aSupportService,
 #ifdef MOZ_IMPORTADDRESSBOOK_NEED_ISADDRLOCHOME
-                                            PRBool aIsAddrLocHome,
+                                             PRBool aIsAddrLocHome,
 #endif
-                                            PRUnichar **aErrorLog NS_OUTPARAM,
-                                            PRUnichar **aSuccessLog NS_OUTPARAM,
-                                            PRBool *aFatalError NS_OUTPARAM)
+                                             PRUnichar **aErrorLog NS_OUTPARAM,
+                                             PRUnichar **aSuccessLog NS_OUTPARAM,
+                                             PRBool *aFatalError NS_OUTPARAM)
 {
     return NS_ERROR_NOT_IMPLEMENTED;
 }
 
 NS_IMETHODIMP
-BeckyAddressBookImporter::GetImportProgress(PRUint32 *_retval NS_OUTPARAM)
+BeckyAddressBooksImporter::GetImportProgress(PRUint32 *_retval NS_OUTPARAM)
 {
     return NS_ERROR_NOT_IMPLEMENTED;
 }
 
 NS_IMETHODIMP
-BeckyAddressBookImporter::SetSampleLocation(nsIFile *aLocation)
+BeckyAddressBooksImporter::SetSampleLocation(nsIFile *aLocation)
 {
     return NS_ERROR_NOT_IMPLEMENTED;
 }
 
 NS_IMETHODIMP
-BeckyAddressBookImporter::GetSampleData(PRInt32 aRecordNumber,
-                                        PRBool *aRecordExists NS_OUTPARAM,
-                                        PRUnichar **_retval NS_OUTPARAM)
+BeckyAddressBooksImporter::GetSampleData(PRInt32 aRecordNumber,
+                                         PRBool *aRecordExists NS_OUTPARAM,
+                                         PRUnichar **_retval NS_OUTPARAM)
 {
     return NS_ERROR_NOT_IMPLEMENTED;
 }
