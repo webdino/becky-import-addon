@@ -49,12 +49,15 @@
 
 #include "BeckyMailImporter.h"
 #include "BeckySettingsImporter.h"
-#include "BeckyImport.h"
+#include "BeckyFiltersImporter.h"
 #include "BeckyAddressBooksImporter.h"
+#include "BeckyImport.h"
 #include "BeckyStringBundle.h"
 
 NS_GENERIC_FACTORY_CONSTRUCTOR(BeckyMailImporter)
 NS_GENERIC_FACTORY_CONSTRUCTOR(BeckySettingsImporter)
+NS_GENERIC_FACTORY_CONSTRUCTOR(BeckyFiltersImporter)
+NS_GENERIC_FACTORY_CONSTRUCTOR(BeckyAddressBooksImporter)
 NS_GENERIC_FACTORY_CONSTRUCTOR(BeckyImport)
 static NS_DEFINE_CID(kMJ_BECKYIMPORT_CID, MJ_BECKYIMPORT_CID);
 static NS_DEFINE_CID(kMJ_BECKYIMPORT_ADDRESSBOOKS_CID,
@@ -92,6 +95,18 @@ static const nsModuleComponentInfo components[] = {
   { "Becky! Import Settings Component", MJ_BECKYIMPORT_SETTINGS_CID,
     MJ_BECKYIMPORT_SETTINGS_CONTRACT_ID,
     BeckySettingsImporterConstructor,
+    nsnull, nsnull },
+  { "Becky! Import Filters Component", MJ_BECKYIMPORT_FILTERS_CID,
+    MJ_BECKYIMPORT_FILTERS_CONTRACT_ID,
+    BeckyFiltersImporterConstructor,
+    nsnull, nsnull },
+  { "Becky! Import Address Books Component", MJ_BECKYIMPORT_ADDRESSBOOKS_CID,
+    MJ_BECKYIMPORT_ADDRESSBOOKS_CONTRACT_ID,
+    BeckyAddressBooksImporterConstructor,
+    nsnull, nsnull },
+  { "Becky! Import Mail Component", MJ_BECKYIMPORT_MAIL_CID,
+    MJ_BECKYIMPORT_MAIL_CONTRACT_ID,
+    BeckyMailImporterConstructor,
     nsnull, nsnull }
 };
 
