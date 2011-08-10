@@ -73,3 +73,15 @@ BeckyFiltersImporter::Import(PRUnichar **aError NS_OUTPARAM, PRBool *_retval NS_
 {
   return NS_ERROR_NOT_IMPLEMENTED;
 }
+
+nsresult
+BeckyFiltersImporter::Create(nsIImportFilters** aImport)
+{
+  NS_ENSURE_ARG_POINTER(aImport);
+  *aImport = new BeckyFiltersImporter();
+  if (!*aImport)
+    return NS_ERROR_OUT_OF_MEMORY;
+
+  NS_ADDREF(*aImport);
+  return NS_OK;
+}
