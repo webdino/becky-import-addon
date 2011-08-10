@@ -78,10 +78,6 @@ nsresult
 BeckyFiltersImporter::Create(nsIImportFilters** aImport)
 {
   NS_ENSURE_ARG_POINTER(aImport);
-  *aImport = new BeckyFiltersImporter();
-  if (!*aImport)
-    return NS_ERROR_OUT_OF_MEMORY;
-
-  NS_ADDREF(*aImport);
+  NS_IF_ADDREF(*aImport = new BeckyFiltersImporter());
   return NS_OK;
 }

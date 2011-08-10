@@ -132,10 +132,6 @@ nsresult
 BeckyAddressBooksImporter::Create(nsIImportAddressBooks** aImport)
 {
   NS_ENSURE_ARG_POINTER(aImport);
-  *aImport = new BeckyAddressBooksImporter();
-  if (!*aImport)
-    return NS_ERROR_OUT_OF_MEMORY;
-
-  NS_ADDREF(*aImport);
+  NS_IF_ADDREF(*aImport = new BeckyAddressBooksImporter());
   return NS_OK;
 }

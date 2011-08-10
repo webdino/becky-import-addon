@@ -93,10 +93,6 @@ nsresult
 BeckyMailImporter::Create(nsIImportMail** aImport)
 {
   NS_ENSURE_ARG_POINTER(aImport);
-  *aImport = new BeckyMailImporter();
-  if (!*aImport)
-    return NS_ERROR_OUT_OF_MEMORY;
-
-  NS_ADDREF(*aImport);
+  NS_IF_ADDREF(*aImport = new BeckyMailImporter());
   return NS_OK;
 }
