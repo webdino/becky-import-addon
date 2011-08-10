@@ -75,7 +75,7 @@ BeckySettingsImporter::Import(nsIMsgAccount **aLocalMailAccount NS_OUTPARAM,
   return NS_ERROR_NOT_IMPLEMENTED;
 }
 
-NS_METHOD
+nsresult
 BeckySettingsImporter::Create(nsIImportSettings** aImport)
 {
   NS_ENSURE_ARG_POINTER(aImport);

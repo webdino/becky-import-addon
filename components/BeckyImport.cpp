@@ -119,7 +119,7 @@ BeckyImport::GetSupportsUpgrade(PRBool *aUpgrade)
   return NS_OK;
 }
 
-NS_METHOD
+nsresult
 BeckyImport::GetMailImportInterface(nsISupports **aInterface)
 {
   nsIImportMail *importer = nsnull;
@@ -148,7 +148,7 @@ BeckyImport::GetMailImportInterface(nsISupports **aInterface)
   return rv;
 }
 
-NS_METHOD
+nsresult
 BeckyImport::GetAddressBookImportInterface(nsISupports **aInterface)
 {
   // create the nsIImportMail interface and return it!
@@ -170,7 +170,7 @@ BeckyImport::GetAddressBookImportInterface(nsISupports **aInterface)
   return rv;
 }
 
-NS_METHOD
+nsresult
 BeckyImport::GetSettingsImportInterface(nsISupports **aInterface)
 {
   nsIImportSettings *settings = nsnull;
@@ -181,7 +181,7 @@ BeckyImport::GetSettingsImportInterface(nsISupports **aInterface)
   return rv;
 }
 
-NS_METHOD
+nsresult
 BeckyImport::GetFiltersImportInterface(nsISupports **aInterface)
 {
   nsIImportFilters *filters = nsnull;
