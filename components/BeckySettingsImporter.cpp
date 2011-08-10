@@ -74,3 +74,18 @@ BeckySettingsImporter::Import(nsIMsgAccount **aLocalMailAccount NS_OUTPARAM,
 {
     return NS_ERROR_NOT_IMPLEMENTED;
 }
+
+NS_METHOD
+BeckySettingsImporter::Create(nsIImportSettings** aImport)
+{
+    NS_PRECONDITION(aImport != nsnull, "null ptr");
+    if (!aImport)
+        return NS_ERROR_NULL_POINTER;
+
+    *aImport = new BeckySettingsImporter();
+    if (!*aImport)
+        return NS_ERROR_OUT_OF_MEMORY;
+
+    NS_ADDREF(*aImport);
+    return NS_OK;
+}
