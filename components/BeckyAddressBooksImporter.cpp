@@ -57,19 +57,19 @@ BeckyAddressBooksImporter::~BeckyAddressBooksImporter()
 NS_IMETHODIMP
 BeckyAddressBooksImporter::GetSupportsMultiple(PRBool *_retval NS_OUTPARAM)
 {
-    return NS_ERROR_NOT_IMPLEMENTED;
+  return NS_ERROR_NOT_IMPLEMENTED;
 }
 
 NS_IMETHODIMP
 BeckyAddressBooksImporter::GetAutoFind(PRUnichar **aDescription NS_OUTPARAM, PRBool *_retval NS_OUTPARAM)
 {
-    return NS_ERROR_NOT_IMPLEMENTED;
+  return NS_ERROR_NOT_IMPLEMENTED;
 }
 
 NS_IMETHODIMP
 BeckyAddressBooksImporter::GetNeedsFieldMap(nsIFile *aLocation, PRBool *_retval NS_OUTPARAM)
 {
-    return NS_ERROR_NOT_IMPLEMENTED;
+  return NS_ERROR_NOT_IMPLEMENTED;
 }
 
 NS_IMETHODIMP
@@ -77,20 +77,20 @@ BeckyAddressBooksImporter::GetDefaultLocation(nsIFile **aLocation NS_OUTPARAM,
                                               PRBool *aFound NS_OUTPARAM,
                                               PRBool *aUserVerify NS_OUTPARAM)
 {
-    return NS_ERROR_NOT_IMPLEMENTED;
+  return NS_ERROR_NOT_IMPLEMENTED;
 }
 
 NS_IMETHODIMP
 BeckyAddressBooksImporter::FindAddressBooks(nsIFile *aLocation,
                                             nsISupportsArray **_retval NS_OUTPARAM)
 {
-    return NS_ERROR_NOT_IMPLEMENTED;
+  return NS_ERROR_NOT_IMPLEMENTED;
 }
 
 NS_IMETHODIMP
 BeckyAddressBooksImporter::InitFieldMap(nsIImportFieldMap *aFieldMap)
 {
-    return NS_ERROR_NOT_IMPLEMENTED;
+  return NS_ERROR_NOT_IMPLEMENTED;
 }
 
 NS_IMETHODIMP
@@ -105,19 +105,19 @@ BeckyAddressBooksImporter::ImportAddressBook(nsIImportABDescriptor *aSource,
                                              PRUnichar **aSuccessLog NS_OUTPARAM,
                                              PRBool *aFatalError NS_OUTPARAM)
 {
-    return NS_ERROR_NOT_IMPLEMENTED;
+  return NS_ERROR_NOT_IMPLEMENTED;
 }
 
 NS_IMETHODIMP
 BeckyAddressBooksImporter::GetImportProgress(PRUint32 *_retval NS_OUTPARAM)
 {
-    return NS_ERROR_NOT_IMPLEMENTED;
+  return NS_ERROR_NOT_IMPLEMENTED;
 }
 
 NS_IMETHODIMP
 BeckyAddressBooksImporter::SetSampleLocation(nsIFile *aLocation)
 {
-    return NS_ERROR_NOT_IMPLEMENTED;
+  return NS_ERROR_NOT_IMPLEMENTED;
 }
 
 NS_IMETHODIMP
@@ -125,6 +125,6 @@ BeckyAddressBooksImporter::GetSampleData(PRInt32 aRecordNumber,
                                          PRBool *aRecordExists NS_OUTPARAM,
                                          PRUnichar **_retval NS_OUTPARAM)
 {
-    return NS_ERROR_NOT_IMPLEMENTED;
+  return NS_ERROR_NOT_IMPLEMENTED;
 }
 

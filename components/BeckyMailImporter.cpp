@@ -56,14 +56,14 @@ BeckyMailImporter::GetDefaultLocation(nsIFile **aLocation NS_OUTPARAM,
                                       PRBool *aFound NS_OUTPARAM,
                                       PRBool *aUserVerify NS_OUTPARAM)
 {
-    return NS_ERROR_NOT_IMPLEMENTED;
+  return NS_ERROR_NOT_IMPLEMENTED;
 }
 
 NS_IMETHODIMP
 BeckyMailImporter::FindMailboxes(nsIFile *aLocation,
                                  nsISupportsArray **_retval NS_OUTPARAM)
 {
-    return NS_ERROR_NOT_IMPLEMENTED;
+  return NS_ERROR_NOT_IMPLEMENTED;
 }
 
 NS_IMETHODIMP
@@ -73,19 +73,19 @@ BeckyMailImporter::ImportMailbox(nsIImportMailboxDescriptor *aSource,
                                  PRUnichar **aSuccessLog NS_OUTPARAM,
                                  PRBool *aFatalError NS_OUTPARAM)
 {
-    return NS_ERROR_NOT_IMPLEMENTED;
+  return NS_ERROR_NOT_IMPLEMENTED;
 }
 
 NS_IMETHODIMP
 BeckyMailImporter::GetImportProgress(PRUint32 *_retval NS_OUTPARAM)
 {
-    return NS_ERROR_NOT_IMPLEMENTED;
+  return NS_ERROR_NOT_IMPLEMENTED;
 }
 
 NS_IMETHODIMP
 BeckyMailImporter::TranslateFolderName(const nsAString & aFolderName,
                                        nsAString & _retval NS_OUTPARAM)
 {
-    return NS_ERROR_NOT_IMPLEMENTED;
+  return NS_ERROR_NOT_IMPLEMENTED;
 }
 

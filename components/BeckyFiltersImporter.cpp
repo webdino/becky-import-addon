@@ -59,17 +59,17 @@ BeckyFiltersImporter::AutoLocate(PRUnichar **aDescription NS_OUTPARAM,
                                  nsIFile **aLocation NS_OUTPARAM,
                                  PRBool *_retval NS_OUTPARAM)
 {
-    return NS_ERROR_NOT_IMPLEMENTED;
+  return NS_ERROR_NOT_IMPLEMENTED;
 }
 
 NS_IMETHODIMP
 BeckyFiltersImporter::SetLocation(nsIFile *aLocation)
 {
-    return NS_ERROR_NOT_IMPLEMENTED;
+  return NS_ERROR_NOT_IMPLEMENTED;
 }
 
 NS_IMETHODIMP
 BeckyFiltersImporter::Import(PRUnichar **aError NS_OUTPARAM, PRBool *_retval NS_OUTPARAM)
 {
-    return NS_ERROR_NOT_IMPLEMENTED;
+  return NS_ERROR_NOT_IMPLEMENTED;
 }

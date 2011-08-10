@@ -59,30 +59,30 @@ BeckySettingsImporter::AutoLocate(PRUnichar **aDescription NS_OUTPARAM,
                                   nsIFile **aLocation NS_OUTPARAM,
                                   PRBool *_retval NS_OUTPARAM)
 {
-    return NS_ERROR_NOT_IMPLEMENTED;
+  return NS_ERROR_NOT_IMPLEMENTED;
 }
 
 NS_IMETHODIMP
 BeckySettingsImporter::SetLocation(nsIFile *aLocation)
 {
-    return NS_ERROR_NOT_IMPLEMENTED;
+  return NS_ERROR_NOT_IMPLEMENTED;
 }
 
 NS_IMETHODIMP
 BeckySettingsImporter::Import(nsIMsgAccount **aLocalMailAccount NS_OUTPARAM,
                               PRBool *_retval NS_OUTPARAM)
 {
-    return NS_ERROR_NOT_IMPLEMENTED;
+  return NS_ERROR_NOT_IMPLEMENTED;
 }
 
 NS_METHOD
 BeckySettingsImporter::Create(nsIImportSettings** aImport)
 {
-    NS_ENSURE_ARG_POINTER(aImport);
-    *aImport = new BeckySettingsImporter();
-    if (!*aImport)
-        return NS_ERROR_OUT_OF_MEMORY;
+  NS_ENSURE_ARG_POINTER(aImport);
+  *aImport = new BeckySettingsImporter();
+  if (!*aImport)
+    return NS_ERROR_OUT_OF_MEMORY;
 
-    NS_ADDREF(*aImport);
-    return NS_OK;
+  NS_ADDREF(*aImport);
+  return NS_OK;
 }
