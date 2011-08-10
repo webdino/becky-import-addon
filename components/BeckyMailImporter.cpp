@@ -89,3 +89,14 @@ BeckyMailImporter::TranslateFolderName(const nsAString & aFolderName,
   return NS_ERROR_NOT_IMPLEMENTED;
 }
 
+nsresult
+BeckyMailImporter::Create(nsIImportMail** aImport)
+{
+  NS_ENSURE_ARG_POINTER(aImport);
+  *aImport = new BeckyMailImporter();
+  if (!*aImport)
+    return NS_ERROR_OUT_OF_MEMORY;
+
+  NS_ADDREF(*aImport);
+  return NS_OK;
+}
