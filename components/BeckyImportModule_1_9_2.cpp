@@ -63,7 +63,7 @@ static NS_DEFINE_CID(kMJ_BECKYIMPORT_CID, MJ_BECKYIMPORT_CID);
 static NS_DEFINE_CID(kMJ_BECKYIMPORT_ADDRESSBOOKS_CID,
                      MJ_BECKYIMPORT_ADDRESSBOOKS_CID);
 
-NS_METHOD
+nsresult
 BeckyRegister(nsIComponentManager *aCompManager,
               nsIFile *aPath,
               const char *aRegistryLocation,
