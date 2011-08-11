@@ -37,16 +37,6 @@ function testCreate() {
   assert.isDefined(gSettings);
 }
 
-function createExpectedAccount() {
-  var expected = Cc["@mozilla.org/messenger/account;1"].createInstance(Ci.nsIMsgAccount);
-  expected.key = "becky-import-test-account";
-  var incomingServer = Cc["@mozilla.org/messenger/server;1?type=pop3"].createInstance(Ci.nsIMsgIncomingServer);
-  incomingServer.key = "server2";
-  expected.incomingServer = incomingServer;
-
-  return expected;
-}
-
 testSetLocation.description = "SetLocation test";
 testSetLocation.priority = 'must';
 function testSetLocation() {
@@ -58,6 +48,16 @@ function testSetLocation() {
     },
     {}
   );
+}
+
+function createExpectedAccount() {
+  var expected = Cc["@mozilla.org/messenger/account;1"].createInstance(Ci.nsIMsgAccount);
+  expected.key = "becky-import-test-account";
+  var incomingServer = Cc["@mozilla.org/messenger/server;1?type=pop3"].createInstance(Ci.nsIMsgIncomingServer);
+  incomingServer.key = "server2";
+  expected.incomingServer = incomingServer;
+
+  return expected;
 }
 
 testImport.description = "import test";
