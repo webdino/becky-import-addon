@@ -53,7 +53,8 @@
 
 nsIStringBundle *BeckyStringBundle::mBundle = nsnull;
 
-nsIStringBundle *BeckyStringBundle::GetStringBundle(void)
+nsIStringBundle *
+BeckyStringBundle::GetStringBundle(void)
 {
   if (mBundle)
     return mBundle;
@@ -71,7 +72,8 @@ nsIStringBundle *BeckyStringBundle::GetStringBundle(void)
   return sBundle;
 }
 
-nsIStringBundle *BeckyStringBundle::GetStringBundleProxy(void)
+nsIStringBundle *
+BeckyStringBundle::GetStringBundleProxy(void)
 {
   if (!mBundle)
     return nsnull;
@@ -84,15 +86,16 @@ nsIStringBundle *BeckyStringBundle::GetStringBundleProxy(void)
   return strProxy;
 }
 
-void BeckyStringBundle::GetStringByID(PRInt32 stringID, nsString& result, nsIStringBundle *pBundle)
+void
+BeckyStringBundle::GetStringByID(PRInt32 stringID, nsString& result, nsIStringBundle *pBundle)
 {
-
   PRUnichar *ptrv = GetStringByID(stringID, pBundle);
   result = ptrv;
   FreeString(ptrv);
 }
 
-PRUnichar *BeckyStringBundle::GetStringByID(PRInt32 stringID, nsIStringBundle *pBundle)
+PRUnichar *
+BeckyStringBundle::GetStringByID(PRInt32 stringID, nsIStringBundle *pBundle)
 {
   if (!pBundle)
     pBundle = GetStringBundle();
@@ -113,7 +116,8 @@ PRUnichar *BeckyStringBundle::GetStringByID(PRInt32 stringID, nsIStringBundle *p
   return ToNewUnicode(resultString);
 }
 
-void BeckyStringBundle::Cleanup(void)
+void
+BeckyStringBundle::Cleanup(void)
 {
   if (mBundle)
     mBundle->Release();
