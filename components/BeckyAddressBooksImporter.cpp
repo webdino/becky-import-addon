@@ -128,10 +128,3 @@ BeckyAddressBooksImporter::GetSampleData(PRInt32 aRecordNumber,
   return NS_ERROR_NOT_IMPLEMENTED;
 }
 
-nsresult
-BeckyAddressBooksImporter::Create(nsIImportAddressBooks** aImport)
-{
-  NS_ENSURE_ARG_POINTER(aImport);
-  NS_IF_ADDREF(*aImport = new BeckyAddressBooksImporter());
-  return NS_OK;
-}

@@ -58,8 +58,6 @@ public:
 
   BeckyFiltersImporter();
 
-  static nsresult Create(nsIImportFilters** aImport);
-
 private:
   ~BeckyFiltersImporter();
 };

@@ -122,73 +122,74 @@ BeckyImport::GetSupportsUpgrade(PRBool *aUpgrade)
 nsresult
 BeckyImport::GetMailImportInterface(nsISupports **aInterface)
 {
-  nsIImportMail *importer = nsnull;
-  nsIImportGeneric *generic = nsnull;
-
-  nsresult rv = BeckyMailImporter::Create(&importer);
+  nsresult rv;
+  nsCOMPtr<nsIImportMail> importer;
+  importer = do_CreateInstance(MJ_BECKYIMPORT_MAIL_CONTRACT_ID, &rv);
   if (NS_SUCCEEDED(rv)) {
     nsCOMPtr<nsIImportService> importService(do_GetService(NS_IMPORTSERVICE_CONTRACTID, &rv));
     if (NS_SUCCEEDED(rv)) {
-      rv = importService->CreateNewGenericMail(&generic);
+      nsCOMPtr<nsIImportGeneric> generic;
+      rv = importService->CreateNewGenericMail(getter_AddRefs(generic));
       if (NS_SUCCEEDED(rv)) {
-        generic->SetData("importerInterface", importer);
         nsString name;
         BeckyStringBundle::GetStringByID(BECKYIMPORT_NAME, name);
+        NS_ENSURE_SUCCESS(rv, rv);
+
         nsCOMPtr<nsISupportsString> nameString(do_CreateInstance(NS_SUPPORTS_STRING_CONTRACTID, &rv));
-        if (NS_SUCCEEDED(rv)) {
-          nameString->SetData(name);
-          generic->SetData("name", nameString);
-          rv = generic->QueryInterface(kISupportsIID, (void **)aInterface);
-        }
+        NS_ENSURE_SUCCESS(rv, rv);
+
+        nameString->SetData(name);
+        generic->SetData("name", nameString);
+        generic->SetData("mailInterface", importer);
+
+        rv = CallQueryInterface(generic, aInterface);
       }
     }
   }
-  NS_IF_RELEASE(importer);
-  NS_IF_RELEASE(generic);
   return rv;
 }
 
 nsresult
 BeckyImport::GetAddressBookImportInterface(nsISupports **aInterface)
 {
-  // create the nsIImportMail interface and return it!
-  nsIImportAddressBooks *address = nsnull;
-  nsIImportGeneric *generic = nsnull;
-  nsresult rv = BeckyAddressBooksImporter::Create(&address);
+  nsresult rv;
+  nsCOMPtr<nsIImportAddressBooks> importer;
+  importer = do_CreateInstance(MJ_BECKYIMPORT_ADDRESSBOOKS_CONTRACT_ID, &rv);
   if (NS_SUCCEEDED(rv)) {
     nsCOMPtr<nsIImportService> importService(do_GetService(NS_IMPORTSERVICE_CONTRACTID, &rv));
     if (NS_SUCCEEDED(rv)) {
-      rv = importService->CreateNewGenericAddressBooks(&generic);
+      nsCOMPtr<nsIImportGeneric> generic;
+      rv = importService->CreateNewGenericAddressBooks(getter_AddRefs(generic));
       if (NS_SUCCEEDED(rv)) {
-        generic->SetData("addressInterface", address);
-        rv = generic->QueryInterface(kISupportsIID, (void **)aInterface);
+        generic->SetData("addressInterface", importer);
+        rv = CallQueryInterface(generic, aInterface);
       }
     }
   }
-  NS_IF_RELEASE(address);
-  NS_IF_RELEASE(generic);
   return rv;
 }
 
 nsresult
 BeckyImport::GetSettingsImportInterface(nsISupports **aInterface)
 {
-  nsIImportSettings *settings = nsnull;
-  nsresult rv = BeckySettingsImporter::Create(&settings);
+  nsresult rv;
+  nsCOMPtr<nsIImportSettings> importer;
+  importer = do_CreateInstance(MJ_BECKYIMPORT_SETTINGS_CONTRACT_ID, &rv);
   if (NS_SUCCEEDED(rv))
-    settings->QueryInterface(kISupportsIID, (void **)aInterface);
-  NS_IF_RELEASE(settings);
+    rv = CallQueryInterface(importer, aInterface);
+
   return rv;
 }
 
 nsresult
 BeckyImport::GetFiltersImportInterface(nsISupports **aInterface)
 {
-  nsIImportFilters *filters = nsnull;
-  nsresult rv = BeckyFiltersImporter::Create(&filters);
+  nsresult rv;
+  nsCOMPtr<nsIImportFilters> importer;
+  importer = do_CreateInstance(MJ_BECKYIMPORT_FILTERS_CONTRACT_ID, &rv);
   if (NS_SUCCEEDED(rv))
-    filters->QueryInterface(kISupportsIID, (void **)aInterface);
-  NS_IF_RELEASE(filters);
+    rv = CallQueryInterface(importer, aInterface);
+
   return rv;
 }
 

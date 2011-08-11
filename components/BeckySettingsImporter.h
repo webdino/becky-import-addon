@@ -59,8 +59,6 @@ public:
 
   BeckySettingsImporter();
 
-  static nsresult Create(nsIImportSettings** aImport);
-
 private:
   ~BeckySettingsImporter();
   nsCOMPtr<nsIFile> mLocation;

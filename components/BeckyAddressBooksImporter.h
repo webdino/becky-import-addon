@@ -58,8 +58,6 @@ public:
 
   BeckyAddressBooksImporter();
 
-  static nsresult Create(nsIImportAddressBooks** aImport);
-
 private:
   ~BeckyAddressBooksImporter();
 };

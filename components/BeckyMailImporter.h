@@ -58,8 +58,6 @@ public:
 
   BeckyMailImporter();
 
-  static nsresult Create(nsIImportMail** aImport);
-
 private:
   ~BeckyMailImporter();
 };

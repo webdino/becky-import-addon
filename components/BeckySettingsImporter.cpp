@@ -131,10 +131,3 @@ BeckySettingsImporter::Import(nsIMsgAccount **aLocalMailAccount NS_OUTPARAM,
   return NS_OK;
 }
 
-nsresult
-BeckySettingsImporter::Create(nsIImportSettings** aImport)
-{
-  NS_ENSURE_ARG_POINTER(aImport);
-  NS_IF_ADDREF(*aImport = new BeckySettingsImporter());
-  return NS_OK;
-}
