@@ -41,6 +41,7 @@
 #define BeckySettingsImporter_h___
 
 #include <nsIImportSettings.h>
+#include <nsILocalFile.h>
 
 #define MJ_BECKYIMPORT_SETTINGS_CONTRACT_ID \
   "@mozilla-japan.org/import/becky/settings;1"
@@ -62,6 +63,7 @@ public:
 
 private:
   ~BeckySettingsImporter();
+  nsCOMPtr<nsIFile> mLocation;
 };
 
 #endif /* BeckySettingsImporter_h___ */

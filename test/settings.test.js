@@ -47,10 +47,23 @@ function createExpectedAccount() {
   return expected;
 }
 
+testSetLocation.description = "SetLocation test";
+testSetLocation.priority = 'must';
+function testSetLocation() {
+  testCreate();
+  assert.notRaises(
+    Cr.NS_ERROR_FAILURE,
+    function() {
+      gSettings.SetLocation(utils.normalizeToFile(utils.baseURL));
+    },
+    {}
+  );
+}
+
 testImport.description = "import test";
 testImport.priority = 'must';
 function testImport() {
-  testCreate();
+  testSetLocation();
   var container = {};
   assert.isTrue(gSettings.Import(container));
   assert.isDefined(container.value);

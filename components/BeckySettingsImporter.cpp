@@ -70,7 +70,8 @@ BeckySettingsImporter::AutoLocate(PRUnichar **aDescription NS_OUTPARAM,
 NS_IMETHODIMP
 BeckySettingsImporter::SetLocation(nsIFile *aLocation)
 {
-  return NS_ERROR_NOT_IMPLEMENTED;
+  mLocation = aLocation;
+  return NS_OK;
 }
 
 nsresult
