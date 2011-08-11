@@ -41,13 +41,7 @@ testSetLocation.description = "SetLocation test";
 testSetLocation.priority = 'must';
 function testSetLocation() {
   testCreate();
-  assert.notRaises(
-    Cr.NS_ERROR_FAILURE,
-    function() {
-      gSettings.SetLocation(utils.normalizeToFile(utils.baseURL));
-    },
-    {}
-  );
+  gSettings.SetLocation(utils.normalizeToFile(utils.baseURL));
 }
 
 function createExpectedAccount() {
