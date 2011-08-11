@@ -104,6 +104,9 @@ NS_IMETHODIMP
 BeckySettingsImporter::Import(nsIMsgAccount **aLocalMailAccount NS_OUTPARAM,
                               PRBool *_retval NS_OUTPARAM)
 {
+  NS_ENSURE_ARG_POINTER(aLocalMailAccount);
+  NS_ENSURE_ARG_POINTER(_retval);
+
   nsresult rv;
   nsAutoString userName, serverName;
 
