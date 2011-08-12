@@ -73,13 +73,16 @@ BeckyMailImporter::ImportMailbox(nsIImportMailboxDescriptor *aSource,
                                  PRUnichar **aSuccessLog NS_OUTPARAM,
                                  PRBool *aFatalError NS_OUTPARAM)
 {
+  mReadBytes = 0;
   return NS_ERROR_NOT_IMPLEMENTED;
 }
 
 NS_IMETHODIMP
 BeckyMailImporter::GetImportProgress(PRUint32 *_retval NS_OUTPARAM)
 {
-  return NS_ERROR_NOT_IMPLEMENTED;
+  NS_ENSURE_ARG_POINTER(_retval);
+  *_retval = mReadBytes;
+  return NS_OK;
 }
 
 NS_IMETHODIMP

@@ -60,6 +60,8 @@ public:
 
 private:
   ~BeckyMailImporter();
+
+  PRUint32 mReadBytes;
 };
 
 #endif /* BeckyMailImporter_h___ */

@@ -44,3 +44,10 @@ function testTranslateFolderName() {
   assert.equals("Unsent Messages", gMail.TranslateFolderName("unsent"));
 }
 
+testGetImportProgress.description = "GetImportProgress test";
+testGetImportProgress.priority = 'must';
+function testGetImportProgress() {
+  testCreate();
+  assert.equals(0, gMail.GetImportProgress());
+}
+
