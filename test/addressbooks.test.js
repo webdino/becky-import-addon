@@ -28,6 +28,19 @@ function testGetNeedsFieldMap() {
   assert.isFalse(gAddressBooks.GetNeedsFieldMap(utils.normalizeToFile(utils.baseURL)));
 }
 
+testInitFieldMap.description = "InitFieldMap instance test";
+testInitFieldMap.priority = 'must';
+function testInitFieldMap() {
+  testCreate();
+  assert.raises(
+    Cr.NS_ERROR_FAILURE,
+    function () {
+      gAddressBooks.InitFieldMap({});
+    },
+    {}
+  );
+}
+
 testSetSampleLocation.description = "SetSampleLocation instance test";
 testSetSampleLocation.priority = 'must';
 function testSetSampleLocation() {

@@ -91,7 +91,7 @@ BeckyAddressBooksImporter::FindAddressBooks(nsIFile *aLocation,
 NS_IMETHODIMP
 BeckyAddressBooksImporter::InitFieldMap(nsIImportFieldMap *aFieldMap)
 {
-  return NS_ERROR_NOT_IMPLEMENTED;
+  return NS_ERROR_FAILURE;
 }
 
 NS_IMETHODIMP
