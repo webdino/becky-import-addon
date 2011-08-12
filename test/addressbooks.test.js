@@ -21,3 +21,23 @@ function testGetSupportsMultiple() {
   assert.isFalse(gAddressBooks.GetSupportsMultiple());
 }
 
+testSetSampleLocation.description = "SetSampleLocation instance test";
+testSetSampleLocation.priority = 'must';
+function testSetSampleLocation() {
+  testCreate();
+  gAddressBooks.SetSampleLocation(utils.normalizeToFile(utils.baseURL));
+}
+
+testGetSampleData.description = "GetSampleData instance test";
+testGetSampleData.priority = 'must';
+function testGetSampleData() {
+  testSetSampleLocation();
+  assert.raises(
+    Cr.NS_ERROR_FAILURE,
+    function() {
+      gAddressBooks.GetSampleData(1, {});
+    },
+    {}
+  );
+}
+

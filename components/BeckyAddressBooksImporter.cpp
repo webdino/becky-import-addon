@@ -118,7 +118,7 @@ BeckyAddressBooksImporter::GetImportProgress(PRUint32 *_retval NS_OUTPARAM)
 NS_IMETHODIMP
 BeckyAddressBooksImporter::SetSampleLocation(nsIFile *aLocation)
 {
-  return NS_ERROR_NOT_IMPLEMENTED;
+  return NS_OK;
 }
 
 NS_IMETHODIMP
@@ -126,6 +126,6 @@ BeckyAddressBooksImporter::GetSampleData(PRInt32 aRecordNumber,
                                          PRBool *aRecordExists NS_OUTPARAM,
                                          PRUnichar **_retval NS_OUTPARAM)
 {
-  return NS_ERROR_NOT_IMPLEMENTED;
+  return NS_ERROR_FAILURE;
 }
 
