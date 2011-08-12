@@ -90,7 +90,7 @@ NS_IMPL_ISUPPORTS1(BeckyImport, nsIImportModule)
 NS_IMETHODIMP
 BeckyImport::GetName(PRUnichar **aName)
 {
-  NS_ENSURE_ARG_POINTER(*aName);
+  NS_ENSURE_ARG_POINTER(aName);
   *aName = BeckyStringBundle::GetStringByID(BECKYIMPORT_NAME);
   return NS_OK;
 }
@@ -98,7 +98,7 @@ BeckyImport::GetName(PRUnichar **aName)
 NS_IMETHODIMP
 BeckyImport::GetDescription(PRUnichar **aDescription)
 {
-  NS_ENSURE_ARG_POINTER(*aDescription);
+  NS_ENSURE_ARG_POINTER(aDescription);
   *aDescription = BeckyStringBundle::GetStringByID(BECKYIMPORT_DESCRIPTION);
   return NS_OK;
 }
@@ -106,7 +106,7 @@ BeckyImport::GetDescription(PRUnichar **aDescription)
 NS_IMETHODIMP
 BeckyImport::GetSupports(char **aSupports)
 {
-  NS_ENSURE_ARG_POINTER(*aSupports);
+  NS_ENSURE_ARG_POINTER(aSupports);
   *aSupports = strdup(kBeckySupportsString);
   return NS_OK;
 }
