@@ -21,6 +21,13 @@ function testGetSupportsMultiple() {
   assert.isFalse(gAddressBooks.GetSupportsMultiple());
 }
 
+testGetNeedsFieldMap.description = "GetNeedsFieldMap instance test";
+testGetNeedsFieldMap.priority = 'must';
+function testGetNeedsFieldMap() {
+  testCreate();
+  assert.isFalse(gAddressBooks.GetNeedsFieldMap(utils.normalizeToFile(utils.baseURL)));
+}
+
 testSetSampleLocation.description = "SetSampleLocation instance test";
 testSetSampleLocation.priority = 'must';
 function testSetSampleLocation() {
