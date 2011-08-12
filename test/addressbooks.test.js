@@ -14,3 +14,10 @@ function testCreate() {
   assert.isDefined(gAddressBooks);
 }
 
+testGetSupportsMultiple.description = "GetSupportsMultiple instance test";
+testGetSupportsMultiple.priority = 'must';
+function testGetSupportsMultiple() {
+  testCreate();
+  assert.isFalse(gAddressBooks.GetSupportsMultiple());
+}
+

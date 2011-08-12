@@ -57,7 +57,8 @@ BeckyAddressBooksImporter::~BeckyAddressBooksImporter()
 NS_IMETHODIMP
 BeckyAddressBooksImporter::GetSupportsMultiple(PRBool *_retval NS_OUTPARAM)
 {
-  return NS_ERROR_NOT_IMPLEMENTED;
+  *_retval = PR_FALSE;
+  return NS_OK;
 }
 
 NS_IMETHODIMP
