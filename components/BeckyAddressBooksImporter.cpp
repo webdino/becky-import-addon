@@ -45,6 +45,7 @@
 NS_IMPL_ISUPPORTS1(BeckyAddressBooksImporter, nsIImportAddressBooks)
 
 BeckyAddressBooksImporter::BeckyAddressBooksImporter()
+: mReadBytes(0)
 {
   /* member initializers and constructor code */
 }
@@ -106,13 +107,16 @@ BeckyAddressBooksImporter::ImportAddressBook(nsIImportABDescriptor *aSource,
                                              PRUnichar **aSuccessLog NS_OUTPARAM,
                                              PRBool *aFatalError NS_OUTPARAM)
 {
+  mReadBytes = 0;
   return NS_ERROR_NOT_IMPLEMENTED;
 }
 
 NS_IMETHODIMP
 BeckyAddressBooksImporter::GetImportProgress(PRUint32 *_retval NS_OUTPARAM)
 {
-  return NS_ERROR_NOT_IMPLEMENTED;
+  NS_ENSURE_ARG_POINTER(_retval);
+  *_retval = mReadBytes;
+  return NS_OK;
 }
 
 NS_IMETHODIMP

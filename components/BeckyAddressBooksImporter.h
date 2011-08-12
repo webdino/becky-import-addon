@@ -60,6 +60,8 @@ public:
 
 private:
   ~BeckyAddressBooksImporter();
+
+  PRUint32 mReadBytes;
 };
 
 #endif /* BeckyAddressBooksImporter_h___ */

@@ -61,3 +61,10 @@ function testGetSampleData() {
   );
 }
 
+testGetImportProgress.description = "GetImportProgress test";
+testGetImportProgress.priority = 'must';
+function testGetImportProgress() {
+  testCreate();
+  assert.equals(0, gAddressBooks.GetImportProgress());
+}
+
