@@ -18,14 +18,14 @@ testName.description = "name test";
 testName.priority = 'must';
 function testName() {
   testCreate();
-  assert.equals("becky", gModule.name);
+  assert.equals("Becky! Internet Mail", gModule.name);
 }
 
 testDescription.description = "description test";
 testDescription.priority = 'must';
 function testDescription() {
   testCreate();
-  assert.equals("becky", gModule.description);
+  assert.equals("Import Local Mail from Becky! Internet Mail", gModule.description);
 }
 
 testSupports.description = "supports test";

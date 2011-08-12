@@ -49,7 +49,7 @@
 #include <nsIURI.h>
 #include <nsServiceManagerUtils.h>
 
-#define BECKY_MESSAGES_URL       "chrome://messenger/locale/beckyImportMessages.properties"
+#define BECKY_MESSAGES_URL       "chrome://becky-import/locale/beckyImportMessages.properties"
 
 nsIStringBundle *BeckyStringBundle::mBundle = nsnull;
 

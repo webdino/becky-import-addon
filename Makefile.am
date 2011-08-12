@@ -7,9 +7,10 @@ noinst_DATA = deploy xpi
 
 JAR_TARGET_FILES = locale
 
-XPI_TARGET_FILES = 					\
+XPI_TARGET_FILES = 				\
 	install.rdf				\
 	platform				\
+	chrome				        \
 	chrome.manifest
 
 if PLATFORM_WINNT
@@ -24,6 +25,9 @@ deploy:
 	 platform/$(PLATFORM)_$(CPU)-$(COMPILER)/components/)
 
 xpi:
-	(rm -f $(PACKAGE_NAME)-$(PACKAGE_VERSION).xpi && \
+	(rm -rf chrome && \
+	 mkdir -p chrome && \
+	 zip -q -r -9 chrome/$(PACKAGE_NAME).jar $(JAR_TARGET_FILES) -x \*.git/\* && \
+	 rm -f $(PACKAGE_NAME)-$(PACKAGE_VERSION).xpi && \
 	 zip -q -r -9 $(PACKAGE_NAME)-$(PACKAGE_VERSION).xpi $(XPI_TARGET_FILES) -x \*.git/\* )
 

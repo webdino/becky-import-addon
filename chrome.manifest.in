@@ -1,1 +1,3 @@
 resource @PACKAGE_NAME@-modules modules/
+
+locale @PACKAGE_NAME@ en-US jar:chrome/@PACKAGE_NAME@.jar!/locale/en-US/
