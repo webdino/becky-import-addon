@@ -14,3 +14,27 @@ function testCreate() {
   assert.isDefined(gFilters);
 }
 
+testAutoLocate.description = "AutoLocate instance test";
+testAutoLocate.priority = 'must';
+function testAutoLocate() {
+  testCreate();
+  var location = {};
+  var description = {};
+  assert.isTrue(gFilters.AutoLocate(description, location));
+}
+
+testSetLocation.description = "SetLocation test";
+testSetLocation.priority = 'must';
+function testSetLocation() {
+  testCreate();
+  gFilters.SetLocation(utils.normalizeToFile(utils.baseURL));
+}
+
+testImport.description = "Import test";
+testImport.priority = 'must';
+function testImport() {
+  testSetLocation();
+  var errorString = {}
+  assert.isTrue(gFilters.Import(errorString));
+}
+
