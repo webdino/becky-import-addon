@@ -38,10 +38,10 @@ testTranslateFolderName.description = "TranslateFolderName test";
 testTranslateFolderName.priority = 'must';
 function testTranslateFolderName() {
   testCreate();
-  assert.equals("Sent", gMail.TranslateFolderName("sent"));
-  assert.equals("Trash", gMail.TranslateFolderName("trash"));
-  assert.equals("Inbox", gMail.TranslateFolderName("inbox"));
-  assert.equals("Unsent Messages", gMail.TranslateFolderName("unsent"));
+  assert.equals("Sent", gMail.translateFolderName("sent"));
+  assert.equals("Trash", gMail.translateFolderName("trash"));
+  assert.equals("Inbox", gMail.translateFolderName("inbox"));
+  assert.equals("Unsent Messages", gMail.translateFolderName("unsent"));
 }
 
 testGetImportProgress.description = "GetImportProgress test";
