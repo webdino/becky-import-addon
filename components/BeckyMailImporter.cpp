@@ -37,6 +37,8 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
+#include <nsStringGlue.h>
+
 #include "BeckyMailImporter.h"
 
 NS_IMPL_ISUPPORTS1(BeckyMailImporter, nsIImportMail)
@@ -89,6 +91,18 @@ NS_IMETHODIMP
 BeckyMailImporter::TranslateFolderName(const nsAString & aFolderName,
                                        nsAString & _retval NS_OUTPARAM)
 {
-  return NS_ERROR_NOT_IMPLEMENTED;
+  if (aFolderName.LowerCaseEqualsLiteral("trash")) {
+    _retval = NS_LITERAL_STRING(kDestTrashFolderName);
+  } else if (aFolderName.LowerCaseEqualsLiteral("inbox")) {
+    _retval = NS_LITERAL_STRING(kDestInboxFolderName);
+  } else if (aFolderName.LowerCaseEqualsLiteral("sent")) {
+    _retval = NS_LITERAL_STRING(kDestSentFolderName);
+  } else if (aFolderName.LowerCaseEqualsLiteral("unsent")) {
+    _retval = NS_LITERAL_STRING(kDestUnsentMessagesFolderName);
+  } else {
+    _retval = aFolderName;
+  }
+
+  return NS_OK;
 }
 
