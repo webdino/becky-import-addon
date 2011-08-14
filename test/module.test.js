@@ -42,3 +42,47 @@ function testSupportsUpgrade() {
   assert.isTrue(gModule.supportsUpgrade);
 }
 
+testMailInterface.description = "mail interface test";
+testMailInterface.priority = 'must';
+function testMailInterface() {
+  testCreate();
+  var generic = gModule.GetImportInterface("mail");
+  assert.isDefined(generic);
+  assert.isInstanceOf(Ci.nsIImportGeneric, generic);
+
+  var mail = generic.GetData("mailInterface");
+  assert.isDefined(mail);
+  assert.isInstanceOf(Ci.nsIImportMail, mail);
+}
+
+testAddressBooksInterface.description = "addressbooks interface test";
+testAddressBooksInterface.priority = 'must';
+function testAddressBooksInterface() {
+  testCreate();
+  var generic = gModule.GetImportInterface("addressbook");
+  assert.isDefined(generic);
+  assert.isInstanceOf(Ci.nsIImportGeneric, generic);
+
+  var addressBooks = generic.GetData("addressInterface");
+  assert.isDefined(addressBooks);
+  assert.isInstanceOf(Ci.nsIImportAddressBooks, addressBooks);
+}
+
+testFiltersInterface.description = "filters interface test";
+testFiltersInterface.priority = 'must';
+function testFiltersInterface() {
+  testCreate();
+  var interface = gModule.GetImportInterface("filters");
+  assert.isDefined(interface);
+  assert.isInstanceOf(Ci.nsIImportFilters, interface);
+}
+
+testSettingsInterface.description = "settings interface test";
+testSettingsInterface.priority = 'must';
+function testSettingsInterface() {
+  testCreate();
+  var interface = gModule.GetImportInterface("settings");
+  assert.isDefined(interface);
+  assert.isInstanceOf(Ci.nsIImportSettings, interface);
+}
+
