@@ -8,7 +8,7 @@ function setUp() {
 
 function tearDown() {
   if (actualAccount) {
-    var accountManager = Cc["@mozilla.org/messenger/account-manager;1"].getService(Ci.nsIMsgAccountManager);
+    let accountManager = Cc["@mozilla.org/messenger/account-manager;1"].getService(Ci.nsIMsgAccountManager);
     accountManager.removeAccount(actualAccount);
   }
 }
@@ -45,9 +45,9 @@ function testSetLocation() {
 }
 
 function createExpectedAccount() {
-  var expected = Cc["@mozilla.org/messenger/account;1"].createInstance(Ci.nsIMsgAccount);
+  let expected = Cc["@mozilla.org/messenger/account;1"].createInstance(Ci.nsIMsgAccount);
   expected.key = "becky-import-test-account";
-  var incomingServer = Cc["@mozilla.org/messenger/server;1?type=pop3"].createInstance(Ci.nsIMsgIncomingServer);
+  let incomingServer = Cc["@mozilla.org/messenger/server;1?type=pop3"].createInstance(Ci.nsIMsgIncomingServer);
   incomingServer.key = "server2";
   expected.incomingServer = incomingServer;
 
@@ -58,12 +58,12 @@ testImport.description = "import test";
 testImport.priority = 'must';
 function testImport() {
   testSetLocation();
-  var container = {};
+  let container = {};
   assert.isTrue(gSettings.Import(container));
   assert.isDefined(container.value);
 
   actualAccount = container.value;
-  var expected = createExpectedAccount();
+  let expected = createExpectedAccount();
   assert.equalAccount(expected, actualAccount);
 }
 

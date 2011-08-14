@@ -18,8 +18,8 @@ testAutoLocate.description = "AutoLocate instance test";
 testAutoLocate.priority = 'must';
 function testAutoLocate() {
   testCreate();
-  var location = {};
-  var description = {};
+  let location = {};
+  let description = {};
   assert.isTrue(gFilters.AutoLocate(description, location));
 }
 
@@ -34,7 +34,7 @@ testImport.description = "Import test";
 testImport.priority = 'must';
 function testImport() {
   testSetLocation();
-  var errorString = {}
+  let errorString = {}
   assert.isTrue(gFilters.Import(errorString));
 }
 

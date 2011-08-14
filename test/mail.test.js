@@ -18,9 +18,9 @@ testGetDefaultLocation.description = "GetDefaultLocation test";
 testGetDefaultLocation.priority = 'must';
 function testGetDefaultLocation() {
   testCreate();
-  var userVerify = {};
-  var found = {};
-  var location = {};
+  let userVerify = {};
+  let found = {};
+  let location = {};
   gMail.GetDefaultLocation(location, found, userVerify);
   assert.isTrue(userVerify.value);
   assert.isTrue(userVerify.found);
@@ -30,7 +30,7 @@ testFindMailboxes.description = "FindMailboxes test";
 testFindMailboxes.priority = 'must';
 function testFindMailboxes() {
   testCreate();
-  var mailboxes = gMail.FindMailboxes(utils.normalizeToFile(utils.baseURL));
+  let mailboxes = gMail.FindMailboxes(utils.normalizeToFile(utils.baseURL));
   assert.isDefined(mailboxes);
 }
 
