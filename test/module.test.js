@@ -72,17 +72,17 @@ testFiltersInterface.description = "filters interface test";
 testFiltersInterface.priority = 'must';
 function testFiltersInterface() {
   testCreate();
-  let interface = gModule.GetImportInterface("filters");
-  assert.isDefined(interface);
-  assert.isInstanceOf(Ci.nsIImportFilters, interface);
+  let filters = gModule.GetImportInterface("filters");
+  assert.isDefined(filters);
+  assert.isInstanceOf(Ci.nsIImportFilters, filters);
 }
 
 testSettingsInterface.description = "settings interface test";
 testSettingsInterface.priority = 'must';
 function testSettingsInterface() {
   testCreate();
-  let interface = gModule.GetImportInterface("settings");
-  assert.isDefined(interface);
-  assert.isInstanceOf(Ci.nsIImportSettings, interface);
+  let settings = gModule.GetImportInterface("settings");
+  assert.isDefined(settings);
+  assert.isInstanceOf(Ci.nsIImportSettings, settings);
 }
 
