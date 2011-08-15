@@ -92,20 +92,16 @@ static const nsModuleComponentInfo components[] = {
     BeckyRegister, nsnull },
   { "Becky! Import Settings Component", MJ_BECKYIMPORT_SETTINGS_CID,
     MJ_BECKYIMPORT_SETTINGS_CONTRACT_ID,
-    BeckySettingsImporterConstructor,
-    nsnull, nsnull },
+    BeckySettingsImporterConstructor },
   { "Becky! Import Filters Component", MJ_BECKYIMPORT_FILTERS_CID,
     MJ_BECKYIMPORT_FILTERS_CONTRACT_ID,
-    BeckyFiltersImporterConstructor,
-    nsnull, nsnull },
+    BeckyFiltersImporterConstructor },
   { "Becky! Import Address Books Component", MJ_BECKYIMPORT_ADDRESSBOOKS_CID,
     MJ_BECKYIMPORT_ADDRESSBOOKS_CONTRACT_ID,
-    BeckyAddressBooksImporterConstructor,
-    nsnull, nsnull },
+    BeckyAddressBooksImporterConstructor },
   { "Becky! Import Mail Component", MJ_BECKYIMPORT_MAIL_CID,
     MJ_BECKYIMPORT_MAIL_CONTRACT_ID,
-    BeckyMailImporterConstructor,
-    nsnull, nsnull }
+    BeckyMailImporterConstructor }
 };
 
 static void
