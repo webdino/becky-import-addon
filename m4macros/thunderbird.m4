@@ -31,7 +31,7 @@ AC_DEFUN([MJ_CHECK_NSIIMPORTADDRESSBOOKS_INTERFACE],
   CXXFLAGS="$CXXFLAGS $AM_CXXFLAGS"
   CPPFLAGS="$XPCOM_CFLAGS"
 
-  AC_MSG_CHECKING([check nsIImportAddressBooks::ImportAddressBook method arguments])
+  AC_MSG_CHECKING([nsIImportAddressBooks::ImportAddressBook method arguments])
   AC_COMPILE_IFELSE(
         [AC_LANG_PROGRAM(
                 [[#include <nsIImportAddressBooks.h>]],
