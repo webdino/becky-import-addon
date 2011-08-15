@@ -20,6 +20,10 @@ assert.equalIncomingServer = function(expected, actual) {
   assert.equals(expected.port, actual.port);
   assert.equals(expected.username, actual.username);
   assert.equals(expected.password, actual.password);
+  assert.equals(expected.isSecure, actual.isSecure);
+  assert.equals(expected.authMethod, actual.authMethod);
+  assert.equals(expected.socketType, actual.socketType);
+  assert.equals(expected.emptyTrashOnExit, actual.emptyTrashOnExit);
 }
 
 assert.equalAccount = function(expected, actual) {
