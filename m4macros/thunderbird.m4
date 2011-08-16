@@ -52,13 +52,13 @@ AC_DEFUN([MJ_CHECK_NSIIMPORTADDRESSBOOKS_INTERFACE],
                 [[nsIImportAddressBooks *p;
                 p->ImportAddressBook(nsnull, nsnull, nsnull, nsnull, PR_TRUE, nsnull, nsnull, nsnull);]]
                 )],
-        [AC_DEFINE([MOZ_IMPORTADDRESSBOOK_NEED_ISADDRLOCHOME],[1],[Define if ImportAdressBook method needs isAddrLogHome]) no_importaddressbook_need_isaddrlochome=yes],
-        [no_importaddressbook_need_isaddrlochome=no])
-  AC_MSG_RESULT([$no_importaddressbook_need_isaddrlochome])
+        [AC_DEFINE([MOZ_IMPORTADDRESSBOOK_NEED_ISADDRLOCHOME],[1],[Define if ImportAdressBook method needs isAddrLocHome]) importaddressbook_need_isaddrlochome=yes],
+        [importaddressbook_need_isaddrlochome=no])
+  AC_MSG_RESULT([$importaddressbook_need_isaddrlochome])
   CPPFLAGS=$_SAVE_CPPFLAGS
   CXXFLAGS=$_SAVE_CXXFLAGS
 
-  if test "x$no_importaddressbook_need_isaddrlochome" = "xyes"; then
+  if test "x$importaddressbook_need_isaddrlochome" = "xyes"; then
     THUNDERBIRD_MACROS="MOZ_IMPORTADDRESSBOOK_NEED_ISADDRLOCHOME"
     AC_SUBST(THUNDERBIRD_MACROS)
   fi
