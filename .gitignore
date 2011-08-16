@@ -1,6 +1,11 @@
 components/*.o
 components/*.so
 components/BeckyImport/BeckyImport.vcproj
+components/BeckyImport/BeckyImport.vcproj.*
+components/BeckyImport/Debug
+components/BeckyImport/Release
+components/BeckyImport/BeckyImport.ncb
+components/BeckyImport/BeckyImport.suo
 *.xpi
 Makefile
 aclocal.m4
