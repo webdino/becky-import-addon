@@ -8,12 +8,13 @@ AC_DEFUN([AC_CHECK_THUNDERBIRD_BUILD_ENVIRONMENT],
       THUNDERBIRD_BUILT_DIR=`cd "$THUNDERBIRD_BUILT_DIR" && pwd`
       XPCOM_LDFLAGS="-L$THUNDERBIRD_BUILT_DIR/mozilla/dist/lib"
       XPCOM_CFLAGS="-fshort-wchar"
+      XPCOM_CFLAGS="$XPCOM_CFLAGS -DXPCOM_GLUE_USE_NSPR"
       XPCOM_CFLAGS="$XPCOM_CFLAGS -I$THUNDERBIRD_BUILT_DIR/mozilla/dist/include/mozilla"
       XPCOM_CFLAGS="$XPCOM_CFLAGS -I$THUNDERBIRD_BUILT_DIR/mozilla/dist/include"
   else
       AC_MSG_ERROR([--with-thunderbird-built-dir must specify a path])
   fi
-  XPCOM_LIBS="-lxpcomglue_s -lnspr4 -lplds4"
+  XPCOM_LIBS="-lxpcomglue -lxpcom -lnspr4 -lplds4"
 
   MJ_CHECK_NSIIMPORTADDRESSBOOKS_INTERFACE
   AC_SUBST(XPCOM_LIBS)
