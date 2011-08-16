@@ -58,9 +58,9 @@ public:
   NS_DECL_NSIIMPORTSETTINGS
 
   BeckySettingsImporter();
+  virtual ~BeckySettingsImporter();
 
 private:
-  ~BeckySettingsImporter();
   nsCOMPtr<nsIFile> mLocation;
 };
 

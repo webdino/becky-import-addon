@@ -57,9 +57,9 @@ public:
   NS_DECL_NSIIMPORTFILTERS
 
   BeckyFiltersImporter();
+  virtual ~BeckyFiltersImporter();
 
 private:
-  ~BeckyFiltersImporter();
 };
 
 #endif /* BeckyFiltersImporter_h___ */

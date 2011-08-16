@@ -57,10 +57,9 @@ public:
   NS_DECL_NSIIMPORTADDRESSBOOKS
 
   BeckyAddressBooksImporter();
+  virtual ~BeckyAddressBooksImporter();
 
 private:
-  ~BeckyAddressBooksImporter();
-
   PRUint32 mReadBytes;
 };
 

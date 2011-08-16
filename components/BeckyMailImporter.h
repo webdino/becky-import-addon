@@ -57,10 +57,9 @@ public:
   NS_DECL_NSIIMPORTMAIL
 
   BeckyMailImporter();
+  virtual ~BeckyMailImporter();
 
 private:
-  ~BeckyMailImporter();
-
   PRUint32 mReadBytes;
 };
 
