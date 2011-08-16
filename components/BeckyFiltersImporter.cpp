@@ -40,6 +40,9 @@
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif /* HAVE_CONFIG_H */
+
+#include <mozilla-config.h>
+
 #include "BeckyFiltersImporter.h"
 
 NS_IMPL_ISUPPORTS1(BeckyFiltersImporter, nsIImportFilters)

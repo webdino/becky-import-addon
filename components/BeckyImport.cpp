@@ -41,6 +41,7 @@
 #include "config.h"
 #endif /* HAVE_CONFIG_H */
 
+#include <mozilla-config.h>
 #include <nscore.h>
 #include <nsIServiceManager.h>
 #include <nsIImportService.h>

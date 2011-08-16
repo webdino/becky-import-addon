@@ -37,6 +37,7 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
+#include <mozilla-config.h>
 #include <nsStringGlue.h>
 
 #include "BeckyMailImporter.h"

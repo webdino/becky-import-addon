@@ -41,6 +41,7 @@
 #include "config.h"
 #endif /* HAVE_CONFIG_H */
 
+#include <mozilla-config.h>
 #include <nsMsgBaseCID.h>
 #include <nsIMsgAccountManager.h>
 #include <nsServiceManagerUtils.h>
