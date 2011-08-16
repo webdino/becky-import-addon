@@ -39,6 +39,7 @@
 #include "config.h"
 #endif /* HAVE_CONFIG_H */
 
+#include <mozilla-config.h>
 #include <prprf.h>
 #include <prmem.h>
 #include <nsCOMPtr.h>
