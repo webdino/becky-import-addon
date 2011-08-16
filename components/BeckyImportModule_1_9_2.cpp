@@ -61,7 +61,7 @@ NS_GENERIC_FACTORY_CONSTRUCTOR(BeckyAddressBooksImporter)
 NS_GENERIC_FACTORY_CONSTRUCTOR(BeckyImport)
 static NS_DEFINE_CID(kMJ_BECKYIMPORT_CID, MJ_BECKYIMPORT_CID);
 
-nsresult
+static nsresult
 BeckyRegister(nsIComponentManager *aCompManager,
               nsIFile *aPath,
               const char *aRegistryLocation,
