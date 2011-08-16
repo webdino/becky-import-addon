@@ -25,7 +25,8 @@ BeckyImport_la_LIBADD = 	\
 BeckyImport_la_LDFLAGS = 	\
         -rpath `pwd`/.libs      \
 	-avoid-version		\
-	-export-dynamic $(no_undefined)		\
+	-export-dynamic         \
+        -no-undefined           \
 	-module 		\
 	$(platform_ldflags)	\
 	$(XPCOM_LDFLAGS)
