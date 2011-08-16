@@ -52,6 +52,7 @@ install.rdf
 application.ini
 chrome.manifest
 components/Makefile
+components/BeckyImport/BeckyImport.vcproj
 ])
 
 AC_OUTPUT
