@@ -110,6 +110,6 @@ importModuleDtor(nsIModule* self)
   BeckyStringBundle::Cleanup();
 }
 
-NS_IMPL_NSGETMODULE_WITH_DTOR(nsImportServiceModule,
+NS_IMPL_NSGETMODULE_WITH_DTOR(BeckyImportServiceModule,
                               components,
                               importModuleDtor) 
