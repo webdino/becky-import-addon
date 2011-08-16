@@ -1,5 +1,6 @@
 components/*.o
 components/*.so
+components/BeckyImport/BeckyImport.vcproj
 *.xpi
 Makefile
 aclocal.m4
