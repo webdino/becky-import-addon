@@ -14,7 +14,7 @@ AC_DEFUN([AC_CHECK_THUNDERBIRD_BUILD_ENVIRONMENT],
   else
       AC_MSG_ERROR([--with-thunderbird-built-dir must specify a path])
   fi
-  XPCOM_LIBS="-lxpcomglue -lxpcom -lnspr4 -lplds4"
+  XPCOM_LIBS="-lxpcomglue_s -lxpcom -lnspr4 -lplds4"
 
   MJ_CHECK_NSIIMPORTADDRESSBOOKS_INTERFACE
   AC_SUBST(XPCOM_LIBS)
