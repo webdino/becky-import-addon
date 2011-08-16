@@ -43,11 +43,12 @@
 #include <prmem.h>
 #include <nsCOMPtr.h>
 #include <nsIStringBundle.h>
-#include <BeckyStringBundle.h>
 #include <nsIServiceManager.h>
 #include <nsIProxyObjectManager.h>
 #include <nsIURI.h>
 #include <nsServiceManagerUtils.h>
+
+#include "BeckyStringBundle.h"
 
 #define BECKY_MESSAGES_URL       "chrome://becky-import/locale/beckyImportMessages.properties"
 
