@@ -68,3 +68,16 @@ function testGetImportProgress() {
   assert.equals(0, gAddressBooks.GetImportProgress());
 }
 
+testGetDefaultLocation.description = "GetDefaultLocation test";
+testGetDefaultLocation.priority = 'must';
+function testGetDefaultLocation() {
+  testCreate();
+  var location = {};
+  var found = {};
+  var userVerify = {};
+  gAddressBooks.GetDefaultLocation(location, found, userVerify);
+
+  assert.isFalse(found.value);
+  assert.isTrue(userVerify.value);
+}
+

@@ -42,6 +42,10 @@
 #endif /* HAVE_CONFIG_H */
 
 #include <mozilla-config.h>
+#include <nsCOMPtr.h>
+#include <nsComponentManagerUtils.h>
+#include <nsILocalFile.h>
+#include <nsStringGlue.h>
 
 #include "BeckyAddressBooksImporter.h"
 
@@ -82,7 +86,25 @@ BeckyAddressBooksImporter::GetDefaultLocation(nsIFile **aLocation NS_OUTPARAM,
                                               PRBool *aFound NS_OUTPARAM,
                                               PRBool *aUserVerify NS_OUTPARAM)
 {
-  return NS_ERROR_NOT_IMPLEMENTED;
+  NS_ENSURE_ARG_POINTER(aFound);
+  NS_ENSURE_ARG_POINTER(aLocation);
+  NS_ENSURE_ARG_POINTER(aUserVerify);
+
+  *aLocation = nsnull;
+  *aFound = PR_FALSE;
+  *aUserVerify = PR_TRUE;
+
+  nsCOMPtr<nsILocalFile> folder(do_CreateInstance(NS_LOCAL_FILE_CONTRACTID));
+  if (folder) {
+    nsresult rv = folder->InitWithNativePath(NS_LITERAL_CSTRING("C:\\Becky!"));
+    if (NS_SUCCEEDED(rv)) {
+      *aFound = PR_TRUE;
+      *aUserVerify = PR_FALSE;
+      CallQueryInterface(folder, aLocation);
+    }
+  }
+
+  return NS_OK;
 }
 
 NS_IMETHODIMP
