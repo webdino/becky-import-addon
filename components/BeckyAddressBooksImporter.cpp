@@ -93,7 +93,7 @@ FindUserDirectory(nsIFile **aLocation NS_OUTPARAM)
   NS_ENSURE_SUCCESS(rv, rv);
 
   nsCOMPtr<nsISimpleEnumerator> entries;
-  folder->GetDirectoryEntries(getter_AddRefs(entries));
+  rv = folder->GetDirectoryEntries(getter_AddRefs(entries));
   if (NS_SUCCEEDED(rv)) {
     PRBool more;
     nsCOMPtr<nsISupports> entry;
