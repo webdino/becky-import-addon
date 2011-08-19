@@ -236,6 +236,7 @@ NS_IMETHODIMP
 BeckyAddressBooksImporter::FindAddressBooks(nsIFile *aLocation,
                                             nsISupportsArray **_retval NS_OUTPARAM)
 {
+  NS_ENSURE_ARG_POINTER(aLocation);
   NS_ENSURE_ARG_POINTER(_retval);
 
   nsresult rv;
