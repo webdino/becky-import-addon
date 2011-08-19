@@ -96,6 +96,6 @@ function testFindAddressBooks() {
   descriptor = addressBooks.QueryElementAt(0, Ci.nsIImportABDescriptor);
   assert.isDefined(descriptor);
 
-  assert.equals("test.bab", descriptor.preferredName);
+  assert.equals("addressbooks", descriptor.preferredName);
 }
 

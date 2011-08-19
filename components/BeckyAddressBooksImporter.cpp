@@ -190,8 +190,11 @@ AppendAddressBookDescriptor(nsIFile *aEntry, nsISupportsArray *aCollected)
   descriptor->SetSize(size);
   descriptor->SetAbFile(aEntry);
 
+  nsCOMPtr<nsIFile> parent;
+  rv = aEntry->GetParent(getter_AddRefs(parent));
+  NS_ENSURE_SUCCESS(rv, rv);
   nsAutoString name;
-  aEntry->GetLeafName(name);
+  parent->GetLeafName(name);
   descriptor->SetPreferredName(name);
 
   nsCOMPtr<nsISupports> interface;
