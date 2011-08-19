@@ -100,10 +100,13 @@ FindUserDirectory(nsIFile **aLocation NS_OUTPARAM)
     while (NS_SUCCEEDED(entries->HasMoreElements(&more)) && more) {
       rv = entries->GetNext(getter_AddRefs(entry));
       nsCOMPtr<nsIFile> userDirectory = do_QueryInterface(entry);
-      PRBool exists;
-      if (NS_SUCCEEDED(userDirectory->Exists(&exists)) && exists) {
-        return NS_OK;
-      }
+
+      PRBool isDirectory = PR_FALSE;
+      rv = userDirectory->IsDirectory(&isDirectory);
+      NS_ENSURE_SUCCESS(rv, rv);
+
+      if (isDirectory)
+        return CallQueryInterface(userDirectory, aLocation);
     }
   }
 
