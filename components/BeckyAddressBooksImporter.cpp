@@ -46,6 +46,7 @@
 #include <nsComponentManagerUtils.h>
 #include <nsILocalFile.h>
 #include <nsISimpleEnumerator.h>
+#include <nsIDirectoryEnumerator.h>
 #include <nsStringGlue.h>
 
 #include "BeckyAddressBooksImporter.h"
@@ -94,19 +95,21 @@ FindUserDirectory(nsIFile **aLocation NS_OUTPARAM)
 
   nsCOMPtr<nsISimpleEnumerator> entries;
   rv = folder->GetDirectoryEntries(getter_AddRefs(entries));
-  if (NS_SUCCEEDED(rv)) {
-    PRBool more;
-    nsCOMPtr<nsISupports> entry;
-    while (NS_SUCCEEDED(entries->HasMoreElements(&more)) && more) {
-      rv = entries->GetNext(getter_AddRefs(entry));
-      nsCOMPtr<nsIFile> userDirectory = do_QueryInterface(entry);
+  NS_ENSURE_SUCCESS(rv, rv);
 
+  nsCOMPtr<nsIDirectoryEnumerator> files;
+  files = do_QueryInterface(entries);
+  if (files) {
+    PRBool more;
+    nsCOMPtr<nsIFile> entry;
+    while (NS_SUCCEEDED(entries->HasMoreElements(&more)) && more) {
+      rv = files->GetNextFile(getter_AddRefs(entry));
       PRBool isDirectory = PR_FALSE;
-      rv = userDirectory->IsDirectory(&isDirectory);
+      rv = entry->IsDirectory(&isDirectory);
       NS_ENSURE_SUCCESS(rv, rv);
 
       if (isDirectory)
-        return CallQueryInterface(userDirectory, aLocation);
+        return CallQueryInterface(entry, aLocation);
     }
   }
 
