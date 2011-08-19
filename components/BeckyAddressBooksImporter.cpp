@@ -119,8 +119,7 @@ FindAddressBookDirectory(nsIFile **aAddressBookDirectory)
     return rv;
 
   rv = userDirectory->AppendNative(NS_LITERAL_CSTRING("AddrBook"));
-  if (NS_FAILED(rv))
-    return rv;
+  NS_ENSURE_SUCCESS(rv, rv);
 
   PRBool exists;
   rv = userDirectory->Exists(&exists);
