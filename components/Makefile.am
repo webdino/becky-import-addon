@@ -15,6 +15,8 @@ BeckyImport_la_SOURCES = 	        \
 	BeckyFiltersImporter.h          \
 	BeckyStringBundle.cpp           \
 	BeckyStringBundle.h             \
+	BeckyVCardAddress.cpp           \
+	BeckyVCardAddress.h             \
 	BeckyImport.cpp                 \
 	BeckyImport.h                   \
 	BeckyImportModule_1_9_2.cpp
