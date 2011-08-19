@@ -45,6 +45,7 @@
 #include <nsCOMPtr.h>
 #include <nsComponentManagerUtils.h>
 #include <nsILocalFile.h>
+#include <nsISimpleEnumerator.h>
 #include <nsStringGlue.h>
 
 #include "BeckyAddressBooksImporter.h"
@@ -81,6 +82,56 @@ BeckyAddressBooksImporter::GetNeedsFieldMap(nsIFile *aLocation, PRBool *_retval 
   return NS_OK;
 }
 
+static nsresult
+FindUserDirectory(nsIFile **aLocation NS_OUTPARAM)
+{
+  nsresult rv;
+  nsCOMPtr<nsILocalFile> folder = do_CreateInstance(NS_LOCAL_FILE_CONTRACTID, &rv);
+  NS_ENSURE_SUCCESS(rv, rv);
+
+  rv = folder->InitWithNativePath(NS_LITERAL_CSTRING("C:\\Becky!"));
+  NS_ENSURE_SUCCESS(rv, rv);
+
+  nsCOMPtr<nsISimpleEnumerator> entries;
+  folder->GetDirectoryEntries(getter_AddRefs(entries));
+  if (NS_SUCCEEDED(rv)) {
+    PRBool more;
+    nsCOMPtr<nsISupports> entry;
+    while (NS_SUCCEEDED(entries->HasMoreElements(&more)) && more) {
+      rv = entries->GetNext(getter_AddRefs(entry));
+      nsCOMPtr<nsIFile> userDirectory = do_QueryInterface(entry);
+      PRBool exists;
+      if (NS_SUCCEEDED(userDirectory->Exists(&exists)) && exists) {
+        return NS_OK;
+      }
+    }
+  }
+
+  return NS_ERROR_FILE_NOT_FOUND;
+}
+
+static nsresult
+FindAddressBookDirectory(nsIFile **aAddressBookDirectory)
+{
+  nsCOMPtr<nsIFile> userDirectory;
+  nsresult rv = FindUserDirectory(getter_AddRefs(userDirectory));
+  if (NS_FAILED(rv))
+    return rv;
+
+  rv = userDirectory->AppendNative(NS_LITERAL_CSTRING("AddrBook"));
+  if (NS_FAILED(rv))
+    return rv;
+
+  PRBool exists;
+  rv = userDirectory->Exists(&exists);
+  if (NS_FAILED(rv))
+    return rv;
+  if (!exists)
+    return NS_ERROR_FILE_NOT_FOUND;
+
+  return CallQueryInterface(userDirectory, aAddressBookDirectory);
+}
+
 NS_IMETHODIMP
 BeckyAddressBooksImporter::GetDefaultLocation(nsIFile **aLocation NS_OUTPARAM,
                                               PRBool *aFound NS_OUTPARAM,
@@ -94,14 +145,9 @@ BeckyAddressBooksImporter::GetDefaultLocation(nsIFile **aLocation NS_OUTPARAM,
   *aFound = PR_FALSE;
   *aUserVerify = PR_TRUE;
 
-  nsCOMPtr<nsILocalFile> folder(do_CreateInstance(NS_LOCAL_FILE_CONTRACTID));
-  if (folder) {
-    nsresult rv = folder->InitWithNativePath(NS_LITERAL_CSTRING("C:\\Becky!"));
-    if (NS_SUCCEEDED(rv)) {
-      *aFound = PR_TRUE;
-      *aUserVerify = PR_FALSE;
-      CallQueryInterface(folder, aLocation);
-    }
+  if (NS_SUCCEEDED(FindAddressBookDirectory(aLocation))) {
+    *aFound = PR_TRUE;
+    *aUserVerify = PR_FALSE;
   }
 
   return NS_OK;
