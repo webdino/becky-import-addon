@@ -81,3 +81,21 @@ function testGetDefaultLocation() {
   assert.isTrue(userVerify.value);
 }
 
+testFindAddressBooks.description = "FindAddressBooks test";
+testFindAddressBooks.priority = 'must';
+function testFindAddressBooks() {
+  testCreate();
+
+  var location = utils.normalizeToFile(utils.baseURL + 'fixtures/addressbooks');
+  var addressBooks = gAddressBooks.FindAddressBooks(location);
+
+  assert.isDefined(addressBooks);
+  assert.equals(1, addressBooks.Count());
+
+  var descriptor;
+  descriptor = addressBooks.QueryElementAt(0, Ci.nsIImportABDescriptor);
+  assert.isDefined(descriptor);
+
+  assert.equals("test.bab", descriptor.preferredName);
+}
+

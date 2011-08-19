@@ -44,10 +44,16 @@
 #include <mozilla-config.h>
 #include <nsCOMPtr.h>
 #include <nsComponentManagerUtils.h>
+#include <nsServiceManagerUtils.h>
 #include <nsILocalFile.h>
 #include <nsISimpleEnumerator.h>
 #include <nsIDirectoryEnumerator.h>
+#include <nsISupportsArray.h>
 #include <nsStringGlue.h>
+#include <nsAbBaseCID.h>
+#include <nsIAbManager.h>
+#include <nsIImportService.h>
+#include <nsIImportABDescriptor.h>
 
 #include "BeckyAddressBooksImporter.h"
 
@@ -158,11 +164,93 @@ BeckyAddressBooksImporter::GetDefaultLocation(nsIFile **aLocation NS_OUTPARAM,
   return NS_OK;
 }
 
+static nsresult
+CreateAddressBookDescriptor(nsIImportABDescriptor **aDescriptor)
+{
+  nsresult rv;
+  nsCOMPtr<nsIImportService> importService;
+
+  importService = do_GetService(NS_IMPORTSERVICE_CONTRACTID, &rv);
+  NS_ENSURE_SUCCESS(rv, rv);
+
+  return importService->CreateNewABDescriptor(aDescriptor);
+}
+
+static nsresult
+AppendAddressBookDescriptor(nsIFile *aEntry, nsISupportsArray *aCollected)
+{
+  nsresult rv;
+  nsCOMPtr<nsIImportABDescriptor> descriptor;
+  rv = CreateAddressBookDescriptor(getter_AddRefs(descriptor));
+  if (NS_FAILED(rv))
+    return rv;
+
+  PRInt64 size;
+  aEntry->GetFileSize(&size);
+  descriptor->SetSize(size);
+  descriptor->SetAbFile(aEntry);
+
+  nsAutoString name;
+  aEntry->GetLeafName(name);
+  descriptor->SetPreferredName(name);
+
+  nsCOMPtr<nsISupports> interface;
+  interface = do_QueryInterface(descriptor, &rv);
+  NS_ENSURE_SUCCESS(rv, rv);
+
+  return aCollected->AppendElement(interface);
+}
+
+static nsresult
+CollectAddressBooks(nsIFile *aDirectory, nsISupportsArray *aCollected)
+{
+  nsresult rv;
+  nsCOMPtr<nsISimpleEnumerator> entries;
+
+  rv = aDirectory->GetDirectoryEntries(getter_AddRefs(entries));
+  NS_ENSURE_SUCCESS(rv, rv);
+
+  nsCOMPtr<nsIDirectoryEnumerator> files;
+  files = do_QueryInterface(entries);
+  if (files) {
+    PRBool more;
+    nsCOMPtr<nsIFile> entry;
+    while (NS_SUCCEEDED(entries->HasMoreElements(&more)) && more) {
+      rv = files->GetNextFile(getter_AddRefs(entry));
+      PRBool isDirectory = PR_FALSE;
+      rv = entry->IsDirectory(&isDirectory);
+      NS_ENSURE_SUCCESS(rv, rv);
+
+      if (isDirectory) {
+        rv = CollectAddressBooks(entry, aCollected);
+      } else {
+        rv = AppendAddressBookDescriptor(entry, aCollected);
+      }
+    }
+  }
+
+  return NS_OK;
+}
+
 NS_IMETHODIMP
 BeckyAddressBooksImporter::FindAddressBooks(nsIFile *aLocation,
                                             nsISupportsArray **_retval NS_OUTPARAM)
 {
-  return NS_ERROR_NOT_IMPLEMENTED;
+  NS_ENSURE_ARG_POINTER(_retval);
+
+  nsresult rv;
+  nsCOMPtr<nsISupportsArray> array;
+
+  rv = NS_NewISupportsArray(getter_AddRefs(array));
+  NS_ENSURE_SUCCESS(rv, rv);
+
+  rv = CollectAddressBooks(aLocation, array);
+  if (NS_FAILED(rv))
+    return rv;
+
+  array.swap(*_retval);
+
+  return NS_OK;
 }
 
 NS_IMETHODIMP
