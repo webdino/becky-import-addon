@@ -104,19 +104,19 @@ FindUserDirectory(nsIFile **aLocation NS_OUTPARAM)
   NS_ENSURE_SUCCESS(rv, rv);
 
   nsCOMPtr<nsIDirectoryEnumerator> files;
-  files = do_QueryInterface(entries);
-  if (files) {
-    PRBool more;
-    nsCOMPtr<nsIFile> entry;
-    while (NS_SUCCEEDED(entries->HasMoreElements(&more)) && more) {
-      rv = files->GetNextFile(getter_AddRefs(entry));
-      PRBool isDirectory = PR_FALSE;
-      rv = entry->IsDirectory(&isDirectory);
-      NS_ENSURE_SUCCESS(rv, rv);
+  files = do_QueryInterface(entries, &rv);
+  NS_ENSURE_SUCCESS(rv, rv);
 
-      if (isDirectory)
-        return CallQueryInterface(entry, aLocation);
-    }
+  PRBool more;
+  nsCOMPtr<nsIFile> entry;
+  while (NS_SUCCEEDED(entries->HasMoreElements(&more)) && more) {
+    rv = files->GetNextFile(getter_AddRefs(entry));
+    PRBool isDirectory = PR_FALSE;
+    rv = entry->IsDirectory(&isDirectory);
+    NS_ENSURE_SUCCESS(rv, rv);
+
+    if (isDirectory)
+      return CallQueryInterface(entry, aLocation);
   }
 
   return NS_ERROR_FILE_NOT_FOUND;
