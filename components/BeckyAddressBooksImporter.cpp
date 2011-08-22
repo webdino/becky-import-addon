@@ -200,6 +200,11 @@ AppendAddressBookDescriptor(nsIFile *aEntry, nsISupportsArray *aCollected)
 
   PRInt64 size;
   aEntry->GetFileSize(&size);
+  if (size > PR_UINT32_MAX) {
+    NS_WARNING("Overflowed file size. Could not handle over 4GB address book");
+    size = PR_UINT32_MAX;
+  }
+
   descriptor->SetSize(size);
   descriptor->SetAbFile(aEntry);
 
