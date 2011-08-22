@@ -99,8 +99,6 @@ BeckyVCardAddress::ImportAddresses(nsIFile *aSource,
       NS_ENSURE_SUCCESS(rv, rv);
 
       rv = aDatabase->CreateNewCardAndAddToDB(cardFromVCard, PR_FALSE, nsnull);
-      NS_ENSURE_SUCCESS(rv, rv);
-
       if (NS_FAILED(rv)) {
         IMPORT_LOG0("*** Error processing vCard record.\n");
       }
