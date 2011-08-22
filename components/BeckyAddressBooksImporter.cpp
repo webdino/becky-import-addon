@@ -207,12 +207,15 @@ AppendAddressBookDescriptor(nsIFile *aEntry, nsISupportsArray *aCollected)
 }
 
 static nsresult
-CollectAddressBooks(nsIFile *aDirectory, nsISupportsArray *aCollected)
+CollectAddressBooks(nsIFile *aTarget, nsISupportsArray *aCollected)
 {
-  nsresult rv;
-  nsCOMPtr<nsISimpleEnumerator> entries;
+  PRBool isDirectory = PR_FALSE;
+  nsresult rv = aTarget->IsDirectory(&isDirectory);
+  if (!isDirectory)
+    return AppendAddressBookDescriptor(aTarget, aCollected);
 
-  rv = aDirectory->GetDirectoryEntries(getter_AddRefs(entries));
+  nsCOMPtr<nsISimpleEnumerator> entries;
+  rv = aTarget->GetDirectoryEntries(getter_AddRefs(entries));
   NS_ENSURE_SUCCESS(rv, rv);
 
   nsCOMPtr<nsIDirectoryEnumerator> files;
@@ -222,15 +225,9 @@ CollectAddressBooks(nsIFile *aDirectory, nsISupportsArray *aCollected)
     nsCOMPtr<nsIFile> entry;
     while (NS_SUCCEEDED(entries->HasMoreElements(&more)) && more) {
       rv = files->GetNextFile(getter_AddRefs(entry));
-      PRBool isDirectory = PR_FALSE;
-      rv = entry->IsDirectory(&isDirectory);
       NS_ENSURE_SUCCESS(rv, rv);
-
-      if (isDirectory) {
-        rv = CollectAddressBooks(entry, aCollected);
-      } else {
-        rv = AppendAddressBookDescriptor(entry, aCollected);
-      }
+      rv = CollectAddressBooks(entry, aCollected);
+      NS_ENSURE_SUCCESS(rv, rv);
     }
   }
 
