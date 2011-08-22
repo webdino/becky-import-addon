@@ -54,6 +54,7 @@
 #include <nsIAbManager.h>
 #include <nsIImportService.h>
 #include <nsIImportABDescriptor.h>
+#include <nsMsgUtils.h>
 
 #include "BeckyAddressBooksImporter.h"
 #include "BeckyVCardAddress.h"
