@@ -3,11 +3,15 @@
 var description = 'AddressBooks component tests'
 var gImporter;
 var gAddressBooks;
+var gMDB;
 
 function setUp() {
+  gMDB = null;
 }
 
 function tearDown() {
+  if (gMDB && gMDB.exists())
+    gMDB.remove(false);
 }
 
 testCreate.description = "create instance test";
@@ -102,6 +106,16 @@ function testFindAddressBooks() {
   assert.equals("addressbooks", descriptor.preferredName);
 }
 
+function createMDB() {
+  var destination =
+    Cc["@mozilla.org/addressbook/carddatabase;1"].getService(Ci.nsIAddrDatabase);
+  assert.isDefined(destination);
+  gMDB = utils.normalizeToFile(utils.baseURL + 'fixtures/db/test.mdb');
+  destination.openMDB(gMDB, true);
+
+  return destination;
+}
+
 testImportAddressBook.description = "ImportAddressBook test";
 testImportAddressBook.priority = 'must';
 function testImportAddressBook() {
@@ -109,9 +123,8 @@ function testImportAddressBook() {
 
   var descriptor = gAddressBooks.QueryElementAt(0, Ci.nsIImportABDescriptor);
   assert.isDefined(descriptor);
-  var destination =
-    Cc["@mozilla.org/addressbook/carddatabase;1"].getService(Ci.nsIAddrDatabase);
-  assert.isDefined(destination);
+
+  var destination = createMDB();
   gImporter.ImportAddressBook(descriptor,
                               destination,
                               null,
