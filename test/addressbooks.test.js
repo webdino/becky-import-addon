@@ -1,4 +1,5 @@
 var description = 'AddressBooks component tests'
+var gImporter;
 var gAddressBooks;
 
 function setUp() {
@@ -10,22 +11,22 @@ function tearDown() {
 testCreate.description = "create instance test";
 testCreate.priority = 'must';
 function testCreate() {
-  gAddressBooks = Cc["@mozilla-japan.org/import/becky/addressbooks;1"].getService(Ci.nsIImportAddressBooks);
-  assert.isDefined(gAddressBooks);
+  gImporter = Cc["@mozilla-japan.org/import/becky/addressbooks;1"].getService(Ci.nsIImportAddressBooks);
+  assert.isDefined(gImporter);
 }
 
 testGetSupportsMultiple.description = "GetSupportsMultiple instance test";
 testGetSupportsMultiple.priority = 'must';
 function testGetSupportsMultiple() {
   testCreate();
-  assert.isFalse(gAddressBooks.GetSupportsMultiple());
+  assert.isFalse(gImporter.GetSupportsMultiple());
 }
 
 testGetNeedsFieldMap.description = "GetNeedsFieldMap instance test";
 testGetNeedsFieldMap.priority = 'must';
 function testGetNeedsFieldMap() {
   testCreate();
-  assert.isFalse(gAddressBooks.GetNeedsFieldMap(utils.normalizeToFile(utils.baseURL)));
+  assert.isFalse(gImporter.GetNeedsFieldMap(utils.normalizeToFile(utils.baseURL)));
 }
 
 testInitFieldMap.description = "InitFieldMap instance test";
@@ -35,7 +36,7 @@ function testInitFieldMap() {
   assert.raises(
     Cr.NS_ERROR_FAILURE,
     function () {
-      gAddressBooks.InitFieldMap({});
+      gImporter.InitFieldMap({});
     },
     {}
   );
@@ -45,7 +46,7 @@ testSetSampleLocation.description = "SetSampleLocation instance test";
 testSetSampleLocation.priority = 'must';
 function testSetSampleLocation() {
   testCreate();
-  gAddressBooks.SetSampleLocation(utils.normalizeToFile(utils.baseURL));
+  gImporter.SetSampleLocation(utils.normalizeToFile(utils.baseURL));
 }
 
 testGetSampleData.description = "GetSampleData instance test";
@@ -55,7 +56,7 @@ function testGetSampleData() {
   assert.raises(
     Cr.NS_ERROR_FAILURE,
     function() {
-      gAddressBooks.GetSampleData(1, {});
+      gImporter.GetSampleData(1, {});
     },
     {}
   );
@@ -65,7 +66,7 @@ testGetImportProgress.description = "GetImportProgress test";
 testGetImportProgress.priority = 'must';
 function testGetImportProgress() {
   testCreate();
-  assert.equals(0, gAddressBooks.GetImportProgress());
+  assert.equals(0, gImporter.GetImportProgress());
 }
 
 testGetDefaultLocation.description = "GetDefaultLocation test";
@@ -75,7 +76,7 @@ function testGetDefaultLocation() {
   var location = {};
   var found = {};
   var userVerify = {};
-  gAddressBooks.GetDefaultLocation(location, found, userVerify);
+  gImporter.GetDefaultLocation(location, found, userVerify);
 
   assert.isFalse(found.value);
   assert.isTrue(userVerify.value);
@@ -87,13 +88,13 @@ function testFindAddressBooks() {
   testCreate();
 
   var location = utils.normalizeToFile(utils.baseURL + 'fixtures/addressbooks');
-  var addressBooks = gAddressBooks.FindAddressBooks(location);
+  gAddressBooks = gImporter.FindAddressBooks(location);
 
-  assert.isDefined(addressBooks);
-  assert.equals(1, addressBooks.Count());
+  assert.isDefined(gAddressBooks);
+  assert.equals(1, gAddressBooks.Count());
 
   var descriptor;
-  descriptor = addressBooks.QueryElementAt(0, Ci.nsIImportABDescriptor);
+  descriptor = gAddressBooks.QueryElementAt(0, Ci.nsIImportABDescriptor);
   assert.isDefined(descriptor);
 
   assert.equals("addressbooks", descriptor.preferredName);
