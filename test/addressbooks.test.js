@@ -133,5 +133,9 @@ function testImportAddressBook() {
                               {},
                               {},
                               {});
+  var container = {};
+  destination.getCardCount(container);
+  assert.isDefined(container.value);
+  assert.equals(1, container.value);
 }
 
