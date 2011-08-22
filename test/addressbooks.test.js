@@ -1,3 +1,5 @@
+/* vim: set ts=2 et sw=2 tw=80: */
+
 var description = 'AddressBooks component tests'
 var gImporter;
 var gAddressBooks;
@@ -98,5 +100,26 @@ function testFindAddressBooks() {
   assert.isDefined(descriptor);
 
   assert.equals("addressbooks", descriptor.preferredName);
+}
+
+testImportAddressBook.description = "ImportAddressBook test";
+testImportAddressBook.priority = 'must';
+function testImportAddressBook() {
+  testFindAddressBooks();
+
+  var descriptor = gAddressBooks.QueryElementAt(0, Ci.nsIImportABDescriptor);
+  assert.isDefined(descriptor);
+  var destination =
+    Cc["@mozilla.org/addressbook/carddatabase;1"].getService(Ci.nsIAddrDatabase);
+  assert.isDefined(destination);
+  gImporter.ImportAddressBook(descriptor,
+                              destination,
+                              null,
+                              null,
+                              false,
+                              {},
+                              {},
+                              {});
+
 }
 
