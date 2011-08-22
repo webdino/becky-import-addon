@@ -57,6 +57,7 @@
 #include <nsMsgUtils.h>
 
 #include "BeckyAddressBooksImporter.h"
+#include "BeckyStringBundle.h"
 #include "BeckyVCardAddress.h"
 
 NS_IMPL_ISUPPORTS1(BeckyAddressBooksImporter, nsIImportAddressBooks)
@@ -83,7 +84,16 @@ BeckyAddressBooksImporter::GetSupportsMultiple(PRBool *_retval NS_OUTPARAM)
 NS_IMETHODIMP
 BeckyAddressBooksImporter::GetAutoFind(PRUnichar **aDescription NS_OUTPARAM, PRBool *_retval NS_OUTPARAM)
 {
-  return NS_ERROR_NOT_IMPLEMENTED;
+  NS_ENSURE_ARG_POINTER(aDescription);
+  NS_ENSURE_ARG_POINTER(_retval);
+
+  nsString description;
+  BeckyStringBundle::GetStringByID(BECKYIMPORT_DESCRIPTION, description);
+
+  *aDescription = ToNewUnicode(description);
+  *_retval = PR_FALSE;
+
+  return NS_OK;
 }
 
 NS_IMETHODIMP
