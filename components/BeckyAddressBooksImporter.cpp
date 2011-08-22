@@ -205,7 +205,7 @@ AppendAddressBookDescriptor(nsIFile *aEntry, nsISupportsArray *aCollected)
     size = PR_UINT32_MAX;
   }
 
-  descriptor->SetSize(size);
+  descriptor->SetSize(static_cast<PRUint32>(size));
   descriptor->SetAbFile(aEntry);
 
   nsCOMPtr<nsIFile> parent;
