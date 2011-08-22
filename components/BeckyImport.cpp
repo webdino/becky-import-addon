@@ -126,27 +126,28 @@ BeckyImport::GetMailImportInterface(nsISupports **aInterface)
   nsresult rv;
   nsCOMPtr<nsIImportMail> importer;
   importer = do_CreateInstance(MJ_BECKYIMPORT_MAIL_CONTRACT_ID, &rv);
+  NS_ENSURE_SUCCESS(rv,rv );
+
+  nsCOMPtr<nsIImportService> importService(do_GetService(NS_IMPORTSERVICE_CONTRACTID, &rv));
+  NS_ENSURE_SUCCESS(rv,rv );
+
+  nsCOMPtr<nsIImportGeneric> generic;
+  rv = importService->CreateNewGenericMail(getter_AddRefs(generic));
   if (NS_SUCCEEDED(rv)) {
-    nsCOMPtr<nsIImportService> importService(do_GetService(NS_IMPORTSERVICE_CONTRACTID, &rv));
-    if (NS_SUCCEEDED(rv)) {
-      nsCOMPtr<nsIImportGeneric> generic;
-      rv = importService->CreateNewGenericMail(getter_AddRefs(generic));
-      if (NS_SUCCEEDED(rv)) {
-        nsString name;
-        BeckyStringBundle::GetStringByID(BECKYIMPORT_NAME, name);
-        NS_ENSURE_SUCCESS(rv, rv);
+    nsString name;
+    BeckyStringBundle::GetStringByID(BECKYIMPORT_NAME, name);
+    NS_ENSURE_SUCCESS(rv, rv);
 
-        nsCOMPtr<nsISupportsString> nameString(do_CreateInstance(NS_SUPPORTS_STRING_CONTRACTID, &rv));
-        NS_ENSURE_SUCCESS(rv, rv);
+    nsCOMPtr<nsISupportsString> nameString(do_CreateInstance(NS_SUPPORTS_STRING_CONTRACTID, &rv));
+    NS_ENSURE_SUCCESS(rv, rv);
 
-        nameString->SetData(name);
-        generic->SetData("name", nameString);
-        generic->SetData("mailInterface", importer);
+    nameString->SetData(name);
+    generic->SetData("name", nameString);
+    generic->SetData("mailInterface", importer);
 
-        rv = CallQueryInterface(generic, aInterface);
-      }
-    }
+    rv = CallQueryInterface(generic, aInterface);
   }
+
   return rv;
 }
 
@@ -156,17 +157,18 @@ BeckyImport::GetAddressBookImportInterface(nsISupports **aInterface)
   nsresult rv;
   nsCOMPtr<nsIImportAddressBooks> importer;
   importer = do_CreateInstance(MJ_BECKYIMPORT_ADDRESSBOOKS_CONTRACT_ID, &rv);
+  NS_ENSURE_SUCCESS(rv, rv);
+
+  nsCOMPtr<nsIImportService> importService(do_GetService(NS_IMPORTSERVICE_CONTRACTID, &rv));
+  NS_ENSURE_SUCCESS(rv, rv);
+
+  nsCOMPtr<nsIImportGeneric> generic;
+  rv = importService->CreateNewGenericAddressBooks(getter_AddRefs(generic));
   if (NS_SUCCEEDED(rv)) {
-    nsCOMPtr<nsIImportService> importService(do_GetService(NS_IMPORTSERVICE_CONTRACTID, &rv));
-    if (NS_SUCCEEDED(rv)) {
-      nsCOMPtr<nsIImportGeneric> generic;
-      rv = importService->CreateNewGenericAddressBooks(getter_AddRefs(generic));
-      if (NS_SUCCEEDED(rv)) {
-        generic->SetData("addressInterface", importer);
-        rv = CallQueryInterface(generic, aInterface);
-      }
-    }
+    generic->SetData("addressInterface", importer);
+    rv = CallQueryInterface(generic, aInterface);
   }
+
   return rv;
 }
 
