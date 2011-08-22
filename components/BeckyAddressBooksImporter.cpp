@@ -56,6 +56,7 @@
 #include <nsIImportABDescriptor.h>
 
 #include "BeckyAddressBooksImporter.h"
+#include "BeckyVCardAddress.h"
 
 NS_IMPL_ISUPPORTS1(BeckyAddressBooksImporter, nsIImportAddressBooks)
 
@@ -275,8 +276,26 @@ BeckyAddressBooksImporter::ImportAddressBook(nsIImportABDescriptor *aSource,
                                              PRUnichar **aSuccessLog NS_OUTPARAM,
                                              PRBool *aFatalError NS_OUTPARAM)
 {
+  NS_ENSURE_ARG_POINTER(aSource);
+  NS_ENSURE_ARG_POINTER(aDestination);
+  NS_ENSURE_ARG_POINTER(aErrorLog);
+  NS_ENSURE_ARG_POINTER(aSuccessLog);
+  NS_ENSURE_ARG_POINTER(aFatalError);
+
   mReadBytes = 0;
-  return NS_ERROR_NOT_IMPLEMENTED;
+
+  nsCOMPtr<nsIFile> file;
+  nsresult rv = aSource->GetAbFile(getter_AddRefs(file));
+  if (NS_FAILED(rv))
+    return rv;
+
+  nsAutoString error;
+  rv = BeckyVCardAddress::ImportAddresses(file, aDestination, error, &mReadBytes);
+  if (!error.IsEmpty()) {
+    *aErrorLog = ToNewUnicode(error);
+  }
+
+  return rv;
 }
 
 NS_IMETHODIMP
