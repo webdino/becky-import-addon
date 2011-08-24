@@ -83,9 +83,9 @@ testGetDefaultLocation.description = "GetDefaultLocation test";
 testGetDefaultLocation.priority = 'must';
 function testGetDefaultLocation() {
   testCreate();
-  var location = {};
-  var found = {};
-  var userVerify = {};
+  let location = {};
+  let found = {};
+  let userVerify = {};
   gImporter.GetDefaultLocation(location, found, userVerify);
 
   assert.isFalse(found.value);
@@ -97,13 +97,13 @@ testFindAddressBooks.priority = 'must';
 function testFindAddressBooks() {
   testCreate();
 
-  var location = utils.normalizeToFile(utils.baseURL + 'fixtures/addressbooks');
+  let location = utils.normalizeToFile(utils.baseURL + 'fixtures/addressbooks');
   gAddressBooks = gImporter.FindAddressBooks(location);
 
   assert.isDefined(gAddressBooks);
   assert.equals(1, gAddressBooks.Count());
 
-  var descriptor;
+  let descriptor;
   descriptor = gAddressBooks.QueryElementAt(0, Ci.nsIImportABDescriptor);
   assert.isDefined(descriptor);
 
@@ -111,7 +111,7 @@ function testFindAddressBooks() {
 }
 
 function createMDB() {
-  var destination =
+  let destination =
     Cc["@mozilla.org/addressbook/carddatabase;1"].getService(Ci.nsIAddrDatabase);
   assert.isDefined(destination);
   gMDB = utils.normalizeToFile(utils.baseURL + 'fixtures/db/test.mdb');
@@ -125,10 +125,10 @@ testImportAddressBook.priority = 'must';
 function testImportAddressBook() {
   testFindAddressBooks();
 
-  var descriptor = gAddressBooks.QueryElementAt(0, Ci.nsIImportABDescriptor);
+  let descriptor = gAddressBooks.QueryElementAt(0, Ci.nsIImportABDescriptor);
   assert.isDefined(descriptor);
 
-  var destination = createMDB();
+  let destination = createMDB();
   gImporter.ImportAddressBook(descriptor,
                               destination,
                               null,
@@ -137,14 +137,14 @@ function testImportAddressBook() {
                               {},
                               {},
                               {});
-  var container = {};
+  let container = {};
   destination.getCardCount(container);
   assert.isDefined(container.value);
   assert.equals(1, container.value);
 
-  var cards = destination.enumerateCards(null);
+  let cards = destination.enumerateCards(null);
   assert.isDefined(cards);
-  var card = cards.getNext().QueryInterface(Ci.nsIAbCard);
+  let card = cards.getNext().QueryInterface(Ci.nsIAbCard);
   assert.equalAbCard("begin%3Avcard%0D%0Afn%3Bquoted-printable%3A%3DE3%3D81%3D84%3DE3%3D81%3D91%3DE3%3D81%3D9E%3DE3%3D81%3D88%3DE3%3D81%3DA7%3DE3%3D81%3D99%0D%0An%3Bquoted-printable%3Bquoted-printable%3A%3DE6%3DB1%3DA0%3DE6%3DB7%3DBB%3B%3DE6%3DB5%3DA9%3DE4%3DB9%3D8B%0D%0Aorg%3AGnome%3Blibrsvg%20maintainer%0D%0Aadr%3Bquoted-printable%3Bquoted-printable%3Bquoted-printable%3Bquoted-printable%3A%3B%3B%3DE7%3D9A%3D87%3DE5%3DB1%3D85%3B%3DE5%3D8D%3D83%3DE4%3DBB%3DA3%3DE7%3D94%3DB0%3DE5%3D8C%3DBA%3B%3DE6%3D9D%3DB1%3DE4%3DBA%3DAC%3B111%3B%3DE6%3D97%3DA5%3DE6%3D9C%3DAC%0D%0Aemail%3Binternet%3Ahiikezoe%40gnome.org%0D%0Atel%3Bwork%3A11-1111-1111%0D%0Atel%3Bhome%3Ahiikezoe%40gnome.org%0D%0Atel%3Bcell%3A090-0000-0000%0D%0Aversion%3A2.1%0D%0Aend%3Avcard%0D%0A%0D%0A", card);
 }
 

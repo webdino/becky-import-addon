@@ -61,8 +61,8 @@ testAutoLocate.description = "AutoLocate test";
 testAutoLocate.priority = 'must';
 function testAutoLocate() {
   testCreate();
-  var descriptionContainer = {};
-  var fileContainer = {};
+  let descriptionContainer = {};
+  let fileContainer = {};
   assert.isFalse(gSettings.AutoLocate(descriptionContainer, fileContainer));
 }
 
