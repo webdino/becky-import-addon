@@ -1,15 +1,21 @@
 var description = 'Setting component tests'
 var gSettings;
 var actualAccount;
+var expectedAccount;
 
 function setUp() {
   actuaAccount = null;
+  expectedAccount = null;
 }
 
 function tearDown() {
   if (actualAccount) {
     let accountManager = Cc["@mozilla.org/messenger/account-manager;1"].getService(Ci.nsIMsgAccountManager);
     accountManager.removeAccount(actualAccount);
+  }
+  if (expectedAccount) {
+    let accountManager = Cc["@mozilla.org/messenger/account-manager;1"].getService(Ci.nsIMsgAccountManager);
+    accountManager.removeAccount(expectedAccount);
   }
 }
 
@@ -19,18 +25,28 @@ assert.equalIncomingServer = function(expected, actual) {
   assert.equals(expected.hostName, actual.hostName);
   assert.equals(expected.port, actual.port);
   assert.equals(expected.username, actual.username);
-  assert.equals(expected.password, actual.password);
   assert.equals(expected.isSecure, actual.isSecure);
   assert.equals(expected.authMethod, actual.authMethod);
   assert.equals(expected.socketType, actual.socketType);
   assert.equals(expected.emptyTrashOnExit, actual.emptyTrashOnExit);
 }
 
+assert.equalIdentity = function(expected, actual) {
+  assert.isInstanceOf(Ci.nsIMsgIdentity, actual);
+  assert.equals(expected.fullName, actual.fullName);
+  assert.equals(expected.email, actual.email);
+}
+
+assert.equalIdentities = function(expected, actual) {
+  assert.isInstanceOf(Ci.nsISupportsArray, actual);
+  assert.equals(expected.Count(), actual.Count());
+}
+
 assert.equalAccount = function(expected, actual) {
   assert.isInstanceOf(Ci.nsIMsgAccount, actual);
   assert.equalIncomingServer(expected.incomingServer, actual.incomingServer);
-  assert.equals(expected.identities, actual.identities);
-  assert.equals(expected.defaultIdentity, actual.defaultIdentity);
+  assert.equalIdentities(expected.identities, actual.identities);
+  assert.equalIdentity(expected.defaultIdentity, actual.defaultIdentity);
   assert.equals(expected.toString(), actual.toString());
 }
 
@@ -45,15 +61,35 @@ testSetLocation.description = "SetLocation test";
 testSetLocation.priority = 'must';
 function testSetLocation() {
   testCreate();
-  gSettings.SetLocation(utils.normalizeToFile(utils.baseURL));
+  gSettings.SetLocation(utils.normalizeToFile(utils.baseURL + 'fixtures/settings/Mailbox.ini'));
+}
+
+function createExpectedIncomingServer() {
+  let incomingServer = Cc["@mozilla.org/messenger/server;1?type=imap"].createInstance(Ci.nsIMsgIncomingServer);
+  incomingServer.key = "server2";
+  incomingServer.type = "imap";
+  incomingServer.hostName = "mail-server.expample.com";
+  incomingServer.port = 993;
+  incomingServer.username = "lonesome";
+  incomingServer.socketType = Ci.nsMsgSocketType.SSL;
+  incomingServer.authMethod = Ci.nsMsgAuthMethod.passwordCleartext;
+  return incomingServer;
+}
+
+function createExpectedIdentity() {
+  let expected = Cc["@mozilla.org/messenger/identity;1"].createInstance(Ci.nsIMsgIdentity);
+  expected.key = "id1";
+  expected.fullName = "ジョージ";
+  expected.email = "lonesome@example.com";
+
+  return expected;
 }
 
 function createExpectedAccount() {
   let expected = Cc["@mozilla.org/messenger/account;1"].createInstance(Ci.nsIMsgAccount);
   expected.key = "becky-import-test-account";
-  let incomingServer = Cc["@mozilla.org/messenger/server;1?type=pop3"].createInstance(Ci.nsIMsgIncomingServer);
-  incomingServer.key = "server2";
-  expected.incomingServer = incomingServer;
+  expected.incomingServer = createExpectedIncomingServer();
+  expected.addIdentity(createExpectedIdentity());
 
   return expected;
 }
@@ -67,7 +103,7 @@ function testImport() {
   assert.isDefined(container.value);
 
   actualAccount = container.value;
-  let expected = createExpectedAccount();
-  assert.equalAccount(expected, actualAccount);
+  expectedAccount = createExpectedAccount();
+  assert.equalAccount(expectedAccount, actualAccount);
 }
 
