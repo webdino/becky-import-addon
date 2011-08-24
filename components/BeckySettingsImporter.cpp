@@ -43,14 +43,21 @@
 
 #include <mozilla-config.h>
 #include <nsMsgBaseCID.h>
+#include <nsMsgCompCID.h>
 #include <nsIMsgAccountManager.h>
 #include <nsServiceManagerUtils.h>
+#include <nsIINIParser.h>
+#include <nsISmtpService.h>
+#include <nsISmtpServer.h>
+#include <nsIStringEnumerator.h>
+#include <nsMsgI18N.h>
 
 #include "BeckySettingsImporter.h"
 
 NS_IMPL_ISUPPORTS1(BeckySettingsImporter, nsIImportSettings)
 
 BeckySettingsImporter::BeckySettingsImporter()
+: mLocation(nsnull)
 {
   /* member initializers and constructor code */
 }
@@ -76,8 +83,52 @@ BeckySettingsImporter::SetLocation(nsIFile *aLocation)
 }
 
 nsresult
-GetIncomingServer(const nsString &aUserName,
-                  const nsString &aServerName,
+BeckySettingsImporter::CreateParser(nsIINIParser **aParser)
+{
+  if (!mLocation)
+    return NS_ERROR_FILE_NOT_FOUND;
+
+  nsresult rv;
+  nsCOMPtr<nsIINIParserFactory> factory;
+  factory = do_GetService("@mozilla.org/xpcom/ini-processor-factory;1", &rv);
+  NS_ENSURE_SUCCESS(rv, rv);
+
+  nsCOMPtr<nsILocalFile> file = do_QueryInterface(mLocation);
+  nsCOMPtr<nsIINIParser> parser;
+  rv = factory->CreateINIParser(file, getter_AddRefs(parser));
+  NS_IF_ADDREF(*aParser = parser);
+
+  return rv;
+}
+
+static nsresult
+GetSmtpServer(const nsCString &aUserName,
+              const nsCString &aServerName,
+              nsISmtpServer **aServer)
+{
+  nsresult rv;
+
+  nsCOMPtr<nsISmtpService> smtpService;
+  smtpService = do_GetService(NS_SMTPSERVICE_CONTRACTID, &rv);
+  NS_ENSURE_SUCCESS(rv, rv);
+
+  nsCOMPtr<nsISmtpServer> server;
+  rv = smtpService->FindServer(aUserName.get(),
+                               aServerName.get(),
+                               getter_AddRefs(server));
+
+  if (NS_FAILED(rv) || !server) {
+    rv = smtpService->CreateSmtpServer(getter_AddRefs(server));
+  }
+  NS_IF_ADDREF(*aServer = server);
+
+  return rv;
+}
+
+static nsresult
+GetIncomingServer(const nsCString &aUserName,
+                  const nsCString &aServerName,
+                  const nsCString &aProtocol,
                   nsIMsgIncomingServer **aServer)
 {
   nsresult rv;
@@ -85,20 +136,215 @@ GetIncomingServer(const nsString &aUserName,
   NS_ENSURE_SUCCESS(rv, rv);
 
   nsCOMPtr<nsIMsgIncomingServer> incomingServer;
-  rv = accountManager->FindServer(NS_ConvertUTF16toUTF8(aUserName),
-                                  NS_ConvertUTF16toUTF8(aServerName),
-                                  NS_LITERAL_CSTRING("pop3"),
+  rv = accountManager->FindServer(aUserName,
+                                  aServerName,
+                                  aProtocol,
                                   getter_AddRefs(incomingServer));
 
   if (NS_FAILED(rv) || !incomingServer) {
-    rv = accountManager->CreateIncomingServer(NS_ConvertUTF16toUTF8(aUserName),
-                                              NS_ConvertUTF16toUTF8(aServerName),
-                                              NS_LITERAL_CSTRING("pop3"),
+    rv = accountManager->CreateIncomingServer(aUserName,
+                                              aServerName,
+                                              aProtocol,
                                               getter_AddRefs(incomingServer));
   }
   NS_IF_ADDREF(*aServer = incomingServer);
 
+  return rv;
+}
+
+static nsresult
+CreateSmtpServer(nsIINIParser *aParser,
+                 nsISmtpServer **aServer)
+{
+  nsresult rv;
+  nsCAutoString userName, serverName;
+
+  aParser->GetString(NS_LITERAL_CSTRING("Account"),
+                     NS_LITERAL_CSTRING("SMTPServer"),
+                     serverName);
+  aParser->GetString(NS_LITERAL_CSTRING("Account"),
+                     NS_LITERAL_CSTRING("UserID"),
+                     userName);
+
+  nsCOMPtr<nsISmtpServer> server;
+  rv = GetSmtpServer(userName, serverName, getter_AddRefs(server));
+  NS_ENSURE_SUCCESS(rv, rv);
+
+  nsCAutoString value;
+  aParser->GetString(NS_LITERAL_CSTRING("Account"),
+                     NS_LITERAL_CSTRING("SMTPPort"),
+                     value);
+  nsresult errorCode;
+  PRInt32 port = static_cast<PRInt32>(value.ToInteger(&errorCode, 10));
+  server->SetPort(port);
+
+  PRBool isSecure = PR_FALSE;
+  aParser->GetString(NS_LITERAL_CSTRING("Account"),
+                     NS_LITERAL_CSTRING("SSLSMTP"),
+                     value);
+  if (value.EqualsLiteral("1")) {
+    isSecure = PR_TRUE;
+  }
+  if (isSecure)
+    server->SetSocketType(nsMsgSocketType::SSL);
+
+  aParser->GetString(NS_LITERAL_CSTRING("Account"),
+                     NS_LITERAL_CSTRING("SMTPAUTH"),
+                     value);
+  if (value.EqualsLiteral("1")) {
+  }
+
+  NS_IF_ADDREF(*aServer = server);
+
   return NS_OK;
+}
+
+static nsresult
+CreateIncomingServer(nsIINIParser *aParser,
+                     nsIMsgIncomingServer **aServer)
+{
+  nsCAutoString userName, serverName;
+  aParser->GetString(NS_LITERAL_CSTRING("Account"),
+                     NS_LITERAL_CSTRING("MailServer"),
+                     serverName);
+  aParser->GetString(NS_LITERAL_CSTRING("Account"),
+                     NS_LITERAL_CSTRING("UserID"),
+                     userName);
+
+  nsCAutoString value;
+  aParser->GetString(NS_LITERAL_CSTRING("Account"),
+                     NS_LITERAL_CSTRING("Protocol"),
+                     value);
+  nsCString protocol;
+  if (value.EqualsLiteral("0")) {
+    protocol = NS_LITERAL_CSTRING("pop3");
+  } else if (value.EqualsLiteral("1")) {
+    protocol = NS_LITERAL_CSTRING("imap");
+  } else {
+    protocol = NS_LITERAL_CSTRING("pop3");
+  }
+
+  nsresult rv;
+  nsCOMPtr<nsIMsgIncomingServer> server;
+  rv = GetIncomingServer(userName, serverName, protocol, getter_AddRefs(server));
+  NS_ENSURE_SUCCESS(rv, rv);
+
+  PRBool isSecure = PR_FALSE;
+  PRInt32 port = 0;
+  nsresult errorCode;
+  if (value.EqualsLiteral("0")) {
+    protocol = NS_LITERAL_CSTRING("pop");
+    aParser->GetString(NS_LITERAL_CSTRING("Account"),
+                       NS_LITERAL_CSTRING("POP3Port"),
+                       value);
+    port = static_cast<PRInt32>(value.ToInteger(&errorCode, 10));
+    aParser->GetString(NS_LITERAL_CSTRING("Account"),
+                       NS_LITERAL_CSTRING("SSLPOP"),
+                       value);
+    if (value.EqualsLiteral("1")) {
+      isSecure = PR_TRUE;
+    }
+    aParser->GetString(NS_LITERAL_CSTRING("Account"),
+                       NS_LITERAL_CSTRING("POP3Auth"),
+                       value); // 0: plain, 1: APOP, 2: CRAM-MD5, 3: NTLM
+    aParser->GetString(NS_LITERAL_CSTRING("Account"),
+                       NS_LITERAL_CSTRING("LeaveServer"),
+                       value);
+  } else if (value.EqualsLiteral("1")) {
+    protocol = NS_LITERAL_CSTRING("imap");
+    aParser->GetString(NS_LITERAL_CSTRING("Account"),
+                       NS_LITERAL_CSTRING("IMAP4Port"),
+                       value);
+    port = static_cast<PRInt32>(value.ToInteger(&errorCode, 10));
+    aParser->GetString(NS_LITERAL_CSTRING("Account"),
+                       NS_LITERAL_CSTRING("SSLIMAP"),
+                       value);
+    if (value.EqualsLiteral("1")) {
+      isSecure = PR_TRUE;
+    }
+  }
+
+  server->SetPort(port);
+  if (isSecure)
+    server->SetSocketType(nsMsgSocketType::SSL);
+
+  NS_IF_ADDREF(*aServer = server);
+
+  return NS_OK;
+}
+
+static nsresult
+CreateIdentity(nsIINIParser *aParser,
+               nsIMsgIdentity **aIdentity)
+{
+  nsCAutoString email, nativeFullName, nativeIdentityName;
+  nsAutoString fullName, identityName;
+
+  aParser->GetString(NS_LITERAL_CSTRING("Account"),
+                     NS_LITERAL_CSTRING("Name"),
+                     nativeIdentityName);
+  if (!nativeIdentityName.IsEmpty()) {
+    nsMsgI18NConvertToUnicode("Shift_JIS",
+                              nativeIdentityName,
+                              identityName);
+  }
+
+  aParser->GetString(NS_LITERAL_CSTRING("Account"),
+                     NS_LITERAL_CSTRING("YourName"),
+                     nativeFullName);
+  if (!nativeFullName.IsEmpty()) {
+    nsMsgI18NConvertToUnicode("Shift_JIS",
+                              nativeFullName,
+                              fullName);
+  }
+
+  aParser->GetString(NS_LITERAL_CSTRING("Account"),
+                     NS_LITERAL_CSTRING("MailAddress"),
+                     email);
+
+  nsresult rv;
+  nsCOMPtr<nsIMsgAccountManager> accountManager =
+    do_GetService(NS_MSGACCOUNTMANAGER_CONTRACTID, &rv);
+  NS_ENSURE_SUCCESS(rv, rv);
+
+  nsCOMPtr<nsIMsgIdentity> identity;
+  rv = accountManager->CreateIdentity(getter_AddRefs(identity));
+  NS_ENSURE_SUCCESS(rv, rv);
+
+  identity->SetIdentityName(identityName);
+  identity->SetFullName(fullName);
+  identity->SetEmail(email);
+
+  NS_IF_ADDREF(*aIdentity = identity);
+
+  return NS_OK;
+}
+
+static nsresult
+CreateAccount(nsIMsgIdentity *aIdentity,
+              nsIMsgIncomingServer *aIncomingServer,
+              nsIMsgAccount **aAccount)
+{
+  nsresult rv;
+  nsCOMPtr<nsIMsgAccountManager> accountManager =
+    do_GetService(NS_MSGACCOUNTMANAGER_CONTRACTID, &rv);
+  NS_ENSURE_SUCCESS(rv, rv);
+
+  nsCOMPtr<nsIMsgAccount> account;
+  rv = accountManager->CreateAccount(getter_AddRefs(account));
+  NS_ENSURE_SUCCESS(rv, rv);
+
+  rv = account->AddIdentity(aIdentity);
+  if (NS_FAILED(rv))
+    return rv;
+
+  rv = account->SetIncomingServer(aIncomingServer);
+  if (NS_FAILED(rv))
+    return rv;
+
+  NS_ADDREF(*aAccount = account);
+
+  return rv;
 }
 
 NS_IMETHODIMP
@@ -108,26 +354,30 @@ BeckySettingsImporter::Import(nsIMsgAccount **aLocalMailAccount NS_OUTPARAM,
   NS_ENSURE_ARG_POINTER(aLocalMailAccount);
   NS_ENSURE_ARG_POINTER(_retval);
 
-  nsresult rv;
-  nsAutoString userName, serverName;
+  nsCOMPtr<nsIINIParser> parser;
+  nsresult rv = CreateParser(getter_AddRefs(parser));
+  if (NS_FAILED(rv))
+    return rv;
 
   nsCOMPtr<nsIMsgIncomingServer> incomingServer;
-  rv = GetIncomingServer(userName, serverName, getter_AddRefs(incomingServer));
-  NS_ENSURE_SUCCESS(rv, rv);
+  rv = CreateIncomingServer(parser, getter_AddRefs(incomingServer));
+  if (NS_FAILED(rv))
+    return rv;
 
-  nsCOMPtr<nsIMsgAccountManager> accountManager =
-    do_GetService(NS_MSGACCOUNTMANAGER_CONTRACTID, &rv);
+  nsCOMPtr<nsISmtpServer> smtpServer;
+  rv = CreateSmtpServer(parser, getter_AddRefs(smtpServer));
+  if (NS_FAILED(rv))
+    return rv;
 
-  nsCOMPtr<nsIMsgIncomingServer> localFoldersServer;
-  accountManager->GetLocalFoldersServer(getter_AddRefs(localFoldersServer));
-
-  nsCOMPtr<nsIMsgAccount> localFoldersAccount;
-  accountManager->FindAccountForServer(localFoldersServer,
-                                       getter_AddRefs(localFoldersAccount));
+  nsCOMPtr<nsIMsgIdentity> identity;
+  rv = CreateIdentity(parser, getter_AddRefs(identity));
+  if (NS_FAILED(rv))
+    return rv;
 
   nsCOMPtr<nsIMsgAccount> account;
-  rv = accountManager->CreateAccount(getter_AddRefs(account));
-  rv = account->SetIncomingServer(incomingServer);
+  rv = CreateAccount(identity, incomingServer, getter_AddRefs(account));
+  if (NS_FAILED(rv))
+    return rv;
 
   if (aLocalMailAccount)
     account.forget(aLocalMailAccount);

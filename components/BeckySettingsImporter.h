@@ -51,6 +51,8 @@
   0xed9907d8, 0x7086, 0x482e,                       \
   {0xbf, 0x8d, 0x5a, 0xcf, 0xf2, 0x3b, 0x7e, 0x7c}}
 
+class nsIINIParser;
+
 class BeckySettingsImporter : public nsIImportSettings
 {
 public:
@@ -62,6 +64,8 @@ public:
 
 private:
   nsCOMPtr<nsIFile> mLocation;
+
+  nsresult CreateParser(nsIINIParser **aParser);
 };
 
 #endif /* BeckySettingsImporter_h___ */
