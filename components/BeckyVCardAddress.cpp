@@ -145,7 +145,7 @@ BeckyVCardAddress::ReadRecord(nsILineInputStream *aLineStream,
   }
 
   nsCAutoString utf8String;
-  converter->ConvertStringToUTF8(line, "Shift_JIS", PR_FALSE, utf8String);
+  converter->ConvertStringToUTF8(line, "CP932", PR_FALSE, utf8String);
   aRecord.Append(utf8String);
 
   // read until END:VCARD
@@ -157,7 +157,7 @@ BeckyVCardAddress::ReadRecord(nsILineInputStream *aLineStream,
     }
     rv = aLineStream->ReadLine(line, &more);
     aRecord.AppendLiteral(MSG_LINEBREAK);
-    converter->ConvertStringToUTF8(line, "Shift_JIS", PR_FALSE, utf8String);
+    converter->ConvertStringToUTF8(line, "CP932", PR_FALSE, utf8String);
     aRecord.Append(utf8String);
   } while (!line.Equals(NS_LITERAL_CSTRING("END:VCARD"), CaseInsensitiveCompare));
 
