@@ -68,14 +68,14 @@
 NS_IMPL_ISUPPORTS1(BeckySettingsImporter, nsIImportSettings)
 
 BeckySettingsImporter::BeckySettingsImporter()
-: mLocation(nsnull)
+: mLocation(nsnull),
+  mConvertedFile(nsnull)
 {
   /* member initializers and constructor code */
 }
 
 BeckySettingsImporter::~BeckySettingsImporter()
 {
-  /* destructor code */
 }
 
 static
@@ -188,8 +188,7 @@ BeckySettingsImporter::CreateParser(nsIINIParser **aParser)
     return NS_ERROR_FILE_NOT_FOUND;
 
   nsresult rv;
-  nsCOMPtr<nsIFile> convertedFile;
-  rv = ConvertToUTF8File(mLocation, getter_AddRefs(convertedFile));
+  rv = ConvertToUTF8File(mLocation, getter_AddRefs(mConvertedFile));
   if (NS_FAILED(rv))
     return rv;
 
@@ -197,7 +196,7 @@ BeckySettingsImporter::CreateParser(nsIINIParser **aParser)
   factory = do_GetService("@mozilla.org/xpcom/ini-processor-factory;1", &rv);
   NS_ENSURE_SUCCESS(rv, rv);
 
-  nsCOMPtr<nsILocalFile> file = do_QueryInterface(convertedFile);
+  nsCOMPtr<nsILocalFile> file = do_QueryInterface(mConvertedFile);
   nsCOMPtr<nsIINIParser> parser;
   rv = factory->CreateINIParser(file, getter_AddRefs(parser));
   NS_IF_ADDREF(*aParser = parser);
@@ -438,6 +437,25 @@ CreateAccount(nsIMsgIdentity *aIdentity,
   return rv;
 }
 
+nsresult
+BeckySettingsImporter::RemoveConvertedFile()
+{
+  if (mConvertedFile) {
+    PRBool exists;
+    mConvertedFile->Exists(&exists);
+    if (exists)
+      mConvertedFile->Remove(PR_FALSE);
+    NS_RELEASE(mConvertedFile);
+  }
+  return NS_OK;
+}
+
+#define NS_RETURN_IF_FAILED_WITH_REMOVE_CONVERTED_FILE(expr, rv) \
+  if (NS_FAILED(expr)) {                                         \
+    RemoveConvertedFile();                                       \
+    return rv;                                                   \
+  }
+
 NS_IMETHODIMP
 BeckySettingsImporter::Import(nsIMsgAccount **aLocalMailAccount NS_OUTPARAM,
                               PRBool *_retval NS_OUTPARAM)
@@ -447,29 +465,25 @@ BeckySettingsImporter::Import(nsIMsgAccount **aLocalMailAccount NS_OUTPARAM,
 
   nsCOMPtr<nsIINIParser> parser;
   nsresult rv = CreateParser(getter_AddRefs(parser));
-  if (NS_FAILED(rv))
-    return rv;
+  NS_RETURN_IF_FAILED_WITH_REMOVE_CONVERTED_FILE(rv, rv);
 
   nsCOMPtr<nsIMsgIncomingServer> incomingServer;
   rv = CreateIncomingServer(parser, getter_AddRefs(incomingServer));
-  if (NS_FAILED(rv))
-    return rv;
+  NS_RETURN_IF_FAILED_WITH_REMOVE_CONVERTED_FILE(rv, rv);
 
   nsCOMPtr<nsISmtpServer> smtpServer;
   rv = CreateSmtpServer(parser, getter_AddRefs(smtpServer));
-  if (NS_FAILED(rv))
-    return rv;
+  NS_RETURN_IF_FAILED_WITH_REMOVE_CONVERTED_FILE(rv, rv);
 
   nsCOMPtr<nsIMsgIdentity> identity;
   rv = CreateIdentity(parser, getter_AddRefs(identity));
-  if (NS_FAILED(rv))
-    return rv;
+  NS_RETURN_IF_FAILED_WITH_REMOVE_CONVERTED_FILE(rv, rv);
 
   nsCOMPtr<nsIMsgAccount> account;
   rv = CreateAccount(identity, incomingServer, getter_AddRefs(account));
-  if (NS_FAILED(rv))
-    return rv;
+  NS_RETURN_IF_FAILED_WITH_REMOVE_CONVERTED_FILE(rv, rv);
 
+  RemoveConvertedFile();
   if (aLocalMailAccount)
     account.forget(aLocalMailAccount);
   *_retval = PR_TRUE;

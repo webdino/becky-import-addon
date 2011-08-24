@@ -64,8 +64,10 @@ public:
 
 private:
   nsCOMPtr<nsIFile> mLocation;
+  nsCOMPtr<nsIFile> mConvertedFile;
 
   nsresult CreateParser(nsIINIParser **aParser);
+  nsresult RemoveConvertedFile();
 };
 
 #endif /* BeckySettingsImporter_h___ */
