@@ -49,11 +49,10 @@
 #include <nsIFile.h>
 #include <nsIInputStream.h>
 #include <nsILineInputStream.h>
-#include <nsIUTF8ConverterService.h>
-#include <nsUConvCID.h>
 #include <msgCore.h>
 
 #include "BeckyVCardAddress.h"
+#include "BeckyUtils.h"
 
 nsresult
 BeckyVCardAddress::ImportAddresses(nsIFile *aSource,
@@ -130,9 +129,6 @@ BeckyVCardAddress::ReadRecord(nsILineInputStream *aLineStream,
   nsresult rv;
   nsCAutoString line;
 
-  nsCOMPtr<nsIUTF8ConverterService> converter;
-  converter = do_GetService(NS_UTF8CONVERTERSERVICE_CONTRACTID);
-
   aRecord.Truncate();
 
   // read BEGIN:VCARD
@@ -145,7 +141,7 @@ BeckyVCardAddress::ReadRecord(nsILineInputStream *aLineStream,
   }
 
   nsCAutoString utf8String;
-  converter->ConvertStringToUTF8(line, "CP932", PR_FALSE, utf8String);
+  BeckyUtils::ConvertStringToUTF8(line, utf8String);
   aRecord.Append(utf8String);
 
   // read until END:VCARD
@@ -157,7 +153,7 @@ BeckyVCardAddress::ReadRecord(nsILineInputStream *aLineStream,
     }
     rv = aLineStream->ReadLine(line, &more);
     aRecord.AppendLiteral(MSG_LINEBREAK);
-    converter->ConvertStringToUTF8(line, "CP932", PR_FALSE, utf8String);
+    BeckyUtils::ConvertStringToUTF8(line, utf8String);
     aRecord.Append(utf8String);
   } while (!line.Equals(NS_LITERAL_CSTRING("END:VCARD"), CaseInsensitiveCompare));
 

@@ -47,6 +47,9 @@
 #include <nsServiceManagerUtils.h>
 #include <nsComponentManagerUtils.h>
 #include <nsStringGlue.h>
+#include <nsIUTF8ConverterService.h>
+#include <nsUConvCID.h>
+#include <nsNativeCharsetUtils.h>
 
 #include "BeckyUtils.h"
 
@@ -81,5 +84,18 @@ BeckyUtils::FindUserDirectory(nsIFile **aLocation NS_OUTPARAM)
   }
 
   return NS_ERROR_FILE_NOT_FOUND;
+}
+
+nsresult
+BeckyUtils::ConvertStringToUTF8(const nsACString& aOriginal,
+                                nsACString& _retval NS_OUTPARAM)
+{
+#ifdef XP_WIN
+  return NS_CopyNativeToUnicode(aOriginal, _retval);
+#else
+  nsCOMPtr<nsIUTF8ConverterService> converter;
+  converter = do_GetService(NS_UTF8CONVERTERSERVICE_CONTRACTID);
+  return converter->ConvertStringToUTF8(aOriginal, "CP932", PR_FALSE, _retval);
+#endif
 }
 

@@ -54,8 +54,6 @@
 #include <nsIInputStream.h>
 #include <nsIOutputStream.h>
 #include <nsILineInputStream.h>
-#include <nsIUTF8ConverterService.h>
-#include <nsUConvCID.h>
 #include <nsNetUtil.h>
 #include <nsDirectoryServiceDefs.h>
 #include <nsDirectoryServiceUtils.h>
@@ -166,15 +164,13 @@ ConvertToUTF8File(nsIFile *aSourceFile, nsIFile **aConvertedFile)
   nsCOMPtr<nsILineInputStream> lineStream = do_QueryInterface(source, &rv);
   NS_ENSURE_SUCCESS(rv, rv);
 
-  nsCOMPtr<nsIUTF8ConverterService> converter;
-  converter = do_GetService(NS_UTF8CONVERTERSERVICE_CONTRACTID);
   nsCAutoString line;
   nsCAutoString utf8String;
   PRUint32 bytesWritten = 0;
   PRBool more = PR_TRUE;
   while (more) {
     rv = lineStream->ReadLine(line, &more);
-    converter->ConvertStringToUTF8(line, "CP932", PR_FALSE, utf8String);
+    BeckyUtils::ConvertStringToUTF8(line, utf8String);
     utf8String.AppendLiteral("\r\n");
     rv = destination->Write(utf8String.get(), utf8String.Length(), &bytesWritten);
   }

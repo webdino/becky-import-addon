@@ -42,6 +42,8 @@ class nsIFile;
 class BeckyUtils {
 public:
   static nsresult FindUserDirectory(nsIFile **aFile);
+  static nsresult ConvertStringToUTF8(const nsACString& aOriginal,
+                                      nsACString& _retval);
 };
 
 
