@@ -51,7 +51,15 @@
 #include <nsISmtpServer.h>
 #include <nsIStringEnumerator.h>
 #include <nsIDirectoryEnumerator.h>
-#include <nsMsgI18N.h>
+#include <nsIInputStream.h>
+#include <nsIOutputStream.h>
+#include <nsILineInputStream.h>
+#include <nsIUTF8ConverterService.h>
+#include <nsUConvCID.h>
+#include <nsNetUtil.h>
+#include <nsDirectoryServiceDefs.h>
+#include <nsDirectoryServiceUtils.h>
+#include <nsStringGlue.h>
 
 #include "BeckySettingsImporter.h"
 #include "BeckyStringBundle.h"
@@ -134,6 +142,45 @@ BeckySettingsImporter::SetLocation(nsIFile *aLocation)
   return NS_OK;
 }
 
+static nsresult
+ConvertToUTF8File(nsIFile *aSourceFile, nsIFile **aConvertedFile)
+{
+  nsCOMPtr<nsIInputStream> source;
+  nsresult rv = NS_NewLocalFileInputStream(getter_AddRefs(source),
+                                           aSourceFile);
+  NS_ENSURE_SUCCESS(rv, rv);
+  nsCOMPtr<nsIOutputStream> destination;
+
+  nsCOMPtr<nsIFile> convertedFile;
+  rv = NS_GetSpecialDirectory(NS_OS_TEMP_DIR, getter_AddRefs(convertedFile));
+  NS_ENSURE_SUCCESS(rv, rv);
+  rv = convertedFile->AppendNative(NS_LITERAL_CSTRING("becky-importer-addon"));
+  NS_ENSURE_SUCCESS(rv, rv);
+  rv = convertedFile->CreateUnique(nsIFile::NORMAL_FILE_TYPE, 0600);
+  NS_ENSURE_SUCCESS(rv, rv);
+
+  rv = NS_NewLocalFileOutputStream(getter_AddRefs(destination),
+                                   convertedFile);
+  NS_ENSURE_SUCCESS(rv, rv);
+
+  nsCOMPtr<nsILineInputStream> lineStream = do_QueryInterface(source, &rv);
+  NS_ENSURE_SUCCESS(rv, rv);
+
+  nsCOMPtr<nsIUTF8ConverterService> converter;
+  converter = do_GetService(NS_UTF8CONVERTERSERVICE_CONTRACTID);
+  nsCAutoString line;
+  nsCAutoString utf8String;
+  PRUint32 bytesWritten = 0;
+  PRBool more = PR_TRUE;
+  while (more) {
+    rv = lineStream->ReadLine(line, &more);
+    converter->ConvertStringToUTF8(line, "CP932", PR_FALSE, utf8String);
+    utf8String.AppendLiteral("\r\n");
+    rv = destination->Write(utf8String.get(), utf8String.Length(), &bytesWritten);
+  }
+  return CallQueryInterface(convertedFile, aConvertedFile);
+}
+
 nsresult
 BeckySettingsImporter::CreateParser(nsIINIParser **aParser)
 {
@@ -141,11 +188,16 @@ BeckySettingsImporter::CreateParser(nsIINIParser **aParser)
     return NS_ERROR_FILE_NOT_FOUND;
 
   nsresult rv;
+  nsCOMPtr<nsIFile> convertedFile;
+  rv = ConvertToUTF8File(mLocation, getter_AddRefs(convertedFile));
+  if (NS_FAILED(rv))
+    return rv;
+
   nsCOMPtr<nsIINIParserFactory> factory;
   factory = do_GetService("@mozilla.org/xpcom/ini-processor-factory;1", &rv);
   NS_ENSURE_SUCCESS(rv, rv);
 
-  nsCOMPtr<nsILocalFile> file = do_QueryInterface(mLocation);
+  nsCOMPtr<nsILocalFile> file = do_QueryInterface(convertedFile);
   nsCOMPtr<nsIINIParser> parser;
   rv = factory->CreateINIParser(file, getter_AddRefs(parser));
   NS_IF_ADDREF(*aParser = parser);
@@ -329,27 +381,14 @@ static nsresult
 CreateIdentity(nsIINIParser *aParser,
                nsIMsgIdentity **aIdentity)
 {
-  nsCAutoString email, nativeFullName, nativeIdentityName;
-  nsAutoString fullName, identityName;
+  nsCAutoString email, fullName, identityName;
 
   aParser->GetString(NS_LITERAL_CSTRING("Account"),
                      NS_LITERAL_CSTRING("Name"),
-                     nativeIdentityName);
-  if (!nativeIdentityName.IsEmpty()) {
-    nsMsgI18NConvertToUnicode("Shift_JIS",
-                              nativeIdentityName,
-                              identityName);
-  }
-
+                     identityName);
   aParser->GetString(NS_LITERAL_CSTRING("Account"),
                      NS_LITERAL_CSTRING("YourName"),
-                     nativeFullName);
-  if (!nativeFullName.IsEmpty()) {
-    nsMsgI18NConvertToUnicode("Shift_JIS",
-                              nativeFullName,
-                              fullName);
-  }
-
+                     fullName);
   aParser->GetString(NS_LITERAL_CSTRING("Account"),
                      NS_LITERAL_CSTRING("MailAddress"),
                      email);
@@ -363,8 +402,8 @@ CreateIdentity(nsIINIParser *aParser,
   rv = accountManager->CreateIdentity(getter_AddRefs(identity));
   NS_ENSURE_SUCCESS(rv, rv);
 
-  identity->SetIdentityName(identityName);
-  identity->SetFullName(fullName);
+  identity->SetIdentityName(NS_ConvertUTF8toUTF16(identityName));
+  identity->SetFullName(NS_ConvertUTF8toUTF16(fullName));
   identity->SetEmail(email);
 
   NS_IF_ADDREF(*aIdentity = identity);
