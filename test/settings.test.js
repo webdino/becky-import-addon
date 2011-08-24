@@ -57,6 +57,15 @@ function testCreate() {
   assert.isDefined(gSettings);
 }
 
+testAutoLocate.description = "AutoLocate test";
+testAutoLocate.priority = 'must';
+function testAutoLocate() {
+  testCreate();
+  var descriptionContainer = {};
+  var fileContainer = {};
+  assert.isFalse(gSettings.AutoLocate(descriptionContainer, fileContainer));
+}
+
 testSetLocation.description = "SetLocation test";
 testSetLocation.priority = 'must';
 function testSetLocation() {

@@ -58,6 +58,7 @@
 
 #include "BeckyAddressBooksImporter.h"
 #include "BeckyStringBundle.h"
+#include "BeckyUtils.h"
 #include "BeckyVCardAddress.h"
 
 NS_IMPL_ISUPPORTS1(BeckyAddressBooksImporter, nsIImportAddressBooks)
@@ -103,43 +104,10 @@ BeckyAddressBooksImporter::GetNeedsFieldMap(nsIFile *aLocation, PRBool *_retval 
 }
 
 static nsresult
-FindUserDirectory(nsIFile **aLocation NS_OUTPARAM)
-{
-  nsresult rv;
-  nsCOMPtr<nsILocalFile> folder = do_CreateInstance(NS_LOCAL_FILE_CONTRACTID, &rv);
-  NS_ENSURE_SUCCESS(rv, rv);
-
-  rv = folder->InitWithNativePath(NS_LITERAL_CSTRING("C:\\Becky!"));
-  NS_ENSURE_SUCCESS(rv, rv);
-
-  nsCOMPtr<nsISimpleEnumerator> entries;
-  rv = folder->GetDirectoryEntries(getter_AddRefs(entries));
-  NS_ENSURE_SUCCESS(rv, rv);
-
-  nsCOMPtr<nsIDirectoryEnumerator> files;
-  files = do_QueryInterface(entries, &rv);
-  NS_ENSURE_SUCCESS(rv, rv);
-
-  PRBool more;
-  nsCOMPtr<nsIFile> entry;
-  while (NS_SUCCEEDED(entries->HasMoreElements(&more)) && more) {
-    rv = files->GetNextFile(getter_AddRefs(entry));
-    PRBool isDirectory = PR_FALSE;
-    rv = entry->IsDirectory(&isDirectory);
-    NS_ENSURE_SUCCESS(rv, rv);
-
-    if (isDirectory)
-      return CallQueryInterface(entry, aLocation);
-  }
-
-  return NS_ERROR_FILE_NOT_FOUND;
-}
-
-static nsresult
 FindAddressBookDirectory(nsIFile **aAddressBookDirectory)
 {
   nsCOMPtr<nsIFile> userDirectory;
-  nsresult rv = FindUserDirectory(getter_AddRefs(userDirectory));
+  nsresult rv = BeckyUtils::FindUserDirectory(getter_AddRefs(userDirectory));
   if (NS_FAILED(rv))
     return rv;
 

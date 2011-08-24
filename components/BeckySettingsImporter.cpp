@@ -50,9 +50,12 @@
 #include <nsISmtpService.h>
 #include <nsISmtpServer.h>
 #include <nsIStringEnumerator.h>
+#include <nsIDirectoryEnumerator.h>
 #include <nsMsgI18N.h>
 
 #include "BeckySettingsImporter.h"
+#include "BeckyStringBundle.h"
+#include "BeckyUtils.h"
 
 NS_IMPL_ISUPPORTS1(BeckySettingsImporter, nsIImportSettings)
 
@@ -67,12 +70,61 @@ BeckySettingsImporter::~BeckySettingsImporter()
   /* destructor code */
 }
 
+static
+nsresult
+GetMailboxDirectory(nsIFile **aDirectory)
+{
+  nsCOMPtr<nsIFile> baseDirectory;
+  nsresult rv = BeckyUtils::FindUserDirectory(getter_AddRefs(baseDirectory));
+  if (NS_FAILED(rv))
+    return rv;
+
+  nsCOMPtr<nsISimpleEnumerator> entries;
+  rv = baseDirectory->GetDirectoryEntries(getter_AddRefs(entries));
+  NS_ENSURE_SUCCESS(rv, rv);
+
+  nsCOMPtr<nsIDirectoryEnumerator> files;
+  files = do_QueryInterface(entries, &rv);
+  NS_ENSURE_SUCCESS(rv, rv);
+
+  PRBool more;
+  nsCOMPtr<nsIFile> entry;
+  while (NS_SUCCEEDED(entries->HasMoreElements(&more)) && more) {
+    rv = files->GetNextFile(getter_AddRefs(entry));
+    PRBool isDirectory = PR_FALSE;
+    rv = entry->IsDirectory(&isDirectory);
+    NS_ENSURE_SUCCESS(rv, rv);
+
+    if (isDirectory)
+      return CallQueryInterface(entry, aDirectory);
+  }
+
+  return NS_ERROR_FILE_NOT_FOUND;
+}
+
 NS_IMETHODIMP
 BeckySettingsImporter::AutoLocate(PRUnichar **aDescription NS_OUTPARAM,
                                   nsIFile **aLocation NS_OUTPARAM,
                                   PRBool *_retval NS_OUTPARAM)
 {
-  return NS_ERROR_NOT_IMPLEMENTED;
+  NS_ENSURE_ARG_POINTER(aDescription);
+  NS_ENSURE_ARG_POINTER(aLocation);
+  NS_ENSURE_ARG_POINTER(_retval);
+
+  nsString description;
+  BeckyStringBundle::GetStringByID(BECKYIMPORT_NAME, description);
+
+  *aDescription = ToNewUnicode(description);
+  *aLocation = nsnull;
+  *_retval = PR_FALSE;
+
+  nsCOMPtr<nsIFile> location;
+  nsresult rv = GetMailboxDirectory(getter_AddRefs(location));
+  if (NS_FAILED(rv))
+    return NS_OK;
+
+  *_retval = PR_TRUE;
+  return CallQueryInterface(location, aLocation);
 }
 
 NS_IMETHODIMP
