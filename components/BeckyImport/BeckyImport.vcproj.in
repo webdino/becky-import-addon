@@ -201,6 +201,14 @@
 				>
 			</File>
 			<File
+				RelativePath="..\BeckyVCardAddress.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\BeckyUtils.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\BeckyImport.cpp"
 				>
 			</File>
@@ -236,6 +244,14 @@
 			</File>
 			<File
 				RelativePath="..\BeckyStringBundle.h"
+				>
+			</File>
+			<File
+				RelativePath="..\BeckyVCardAddress.h"
+				>
+			</File>
+			<File
+				RelativePath="..\BeckyUtils.h"
 				>
 			</File>
 			<File
