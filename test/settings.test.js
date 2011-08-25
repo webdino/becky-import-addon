@@ -8,17 +8,17 @@ function setUp() {
   expectedAccount = null;
 }
 
-function tearDown() {
-  if (actualAccount) {
+function removeAccount(account) {
+  if (account) {
     let accountManager = Cc["@mozilla.org/messenger/account-manager;1"].getService(Ci.nsIMsgAccountManager);
-    accountManager.removeAccount(actualAccount);
+    accountManager.removeAccount(account);
     actuaAccount = null;
   }
-  if (expectedAccount) {
-    let accountManager = Cc["@mozilla.org/messenger/account-manager;1"].getService(Ci.nsIMsgAccountManager);
-    accountManager.removeAccount(expectedAccount);
-    expectedAccount = null;
-  }
+}
+
+function tearDown() {
+  removeAccount(actualAccount);
+  removeAccount(expectedAccount);
 }
 
 assert.equalIncomingServer = function(expected, actual) {
