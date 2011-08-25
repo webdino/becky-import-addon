@@ -12,10 +12,12 @@ function tearDown() {
   if (actualAccount) {
     let accountManager = Cc["@mozilla.org/messenger/account-manager;1"].getService(Ci.nsIMsgAccountManager);
     accountManager.removeAccount(actualAccount);
+    actuaAccount = null;
   }
   if (expectedAccount) {
     let accountManager = Cc["@mozilla.org/messenger/account-manager;1"].getService(Ci.nsIMsgAccountManager);
     accountManager.removeAccount(expectedAccount);
+    expectedAccount = null;
   }
 }
 
