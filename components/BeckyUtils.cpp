@@ -1,4 +1,5 @@
 /* -*- Mode: C++; tab-width: 2; indent-tabs-mode: nil; c-basic-offset: 2 -*- */
+/* vim: set ts=2 et sw=2 tw=80: */
 /* ***** BEGIN LICENSE BLOCK *****
  * Version: MPL 1.1/GPL 2.0/LGPL 2.1
  *
@@ -86,14 +87,39 @@ BeckyUtils::FindUserDirectory(nsIFile **aLocation NS_OUTPARAM)
   return NS_ERROR_FILE_NOT_FOUND;
 }
 
+#ifdef XP_WIN
+#include <windows.h>
+static PRBool
+EnsureStringLength(nsAString& aString, PRUint32 aLength)
+{
+  aString.SetLength(aLength);
+  return (aString.Length() == aLength);
+}
+#endif
+
 nsresult
 BeckyUtils::ConvertStringToUTF8(const nsACString& aOriginal,
                                 nsACString& _retval NS_OUTPARAM)
 {
 #ifdef XP_WIN
-  nsAutoString unicodeString;
-  NS_CopyNativeToUnicode(aOriginal, unicodeString);
+  PRUint32 inputLen = aOriginal.Length();
+  const char *buf = aOriginal.BeginReading();
+
+  // determine length of result
+  PRUint32 resultLen = 0;
+  int n = ::MultiByteToWideChar(CP_ACP, 0, buf, inputLen, NULL, 0);
+  if (n > 0)
+    resultLen += n;
+
+  // allocate sufficient space
+  if (!EnsureStringLength(unicodeString, resultLen))
+    return NS_ERROR_OUT_OF_MEMORY;
+  if (resultLen > 0) {
+    PRUnichar *result = unicodeString.BeginWriting();
+    ::MultiByteToWideChar(CP_ACP, 0, buf, inputLen, result, resultLen);
+  }
   _retval = NS_ConvertUTF16toUTF8(unicodeString);
+
   return NS_OK;
 #else
   nsCOMPtr<nsIUTF8ConverterService> converter;
