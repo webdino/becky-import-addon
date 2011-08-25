@@ -136,10 +136,10 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="xpcomglue_s.lib xpcom.lib nspr4.lib plds4.lib libcmt.lib"
+				AdditionalDependencies="xpcomglue_s.lib xpcom.lib nspr4.lib plds4.lib msvcrt.lib"
 				OutputFile="$(OutDir)\$(ProjectName).dll"
 				AdditionalLibraryDirectories="@THUNDERBIRD_LIB_PATH@"
-				IgnoreDefaultLibraryNames="MSVCRT"
+				IgnoreDefaultLibraryNames=""
 				GenerateDebugInformation="true"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
