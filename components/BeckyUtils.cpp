@@ -93,7 +93,8 @@ BeckyUtils::ConvertStringToUTF8(const nsACString& aOriginal,
 #ifdef XP_WIN
   nsAutoString unicodeString;
   NS_CopyNativeToUnicode(aOriginal, unicodeString);
-  return NS_ConvertUTF16toUTF8(unicodeString, _retval);
+  _retval = NS_ConvertUTF16toUTF8(unicodeString);
+  return NS_OK;
 #else
   nsCOMPtr<nsIUTF8ConverterService> converter;
   converter = do_GetService(NS_UTF8CONVERTERSERVICE_CONTRACTID);
