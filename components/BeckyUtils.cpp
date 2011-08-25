@@ -112,6 +112,7 @@ BeckyUtils::ConvertStringToUTF8(const nsACString& aOriginal,
     resultLen += n;
 
   // allocate sufficient space
+  nsAutoString unicodeString;
   if (!EnsureStringLength(unicodeString, resultLen))
     return NS_ERROR_OUT_OF_MEMORY;
   if (resultLen > 0) {
