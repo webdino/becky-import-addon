@@ -441,7 +441,7 @@ BeckySettingsImporter::RemoveConvertedFile()
     mConvertedFile->Exists(&exists);
     if (exists)
       mConvertedFile->Remove(PR_FALSE);
-    NS_RELEASE(mConvertedFile);
+    mConvertedFile = nsnull;
   }
   return NS_OK;
 }
