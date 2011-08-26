@@ -61,7 +61,7 @@ NS_GENERIC_FACTORY_CONSTRUCTOR(BeckyAddressBooksImporter)
 NS_GENERIC_FACTORY_CONSTRUCTOR(BeckyImport)
 static NS_DEFINE_CID(kMJ_BECKYIMPORT_CID, MJ_BECKYIMPORT_CID);
 
-static nsresult
+static NS_METHOD
 BeckyRegister(nsIComponentManager *aCompManager,
               nsIFile *aPath,
               const char *aRegistryLocation,
@@ -89,7 +89,7 @@ BeckyRegister(nsIComponentManager *aCompManager,
 static const nsModuleComponentInfo components[] = {
   { "Becky! Import Component", MJ_BECKYIMPORT_CID,
     "@mozilla-japan.org/import/becky;1", BeckyImportConstructor,
-    (NSRegisterSelfProcPtr)BeckyRegister, nsnull },
+    BeckyRegister, nsnull },
   { "Becky! Import Settings Component", MJ_BECKYIMPORT_SETTINGS_CID,
     MJ_BECKYIMPORT_SETTINGS_CONTRACT_ID,
     BeckySettingsImporterConstructor },
