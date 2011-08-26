@@ -108,7 +108,7 @@ NS_IMETHODIMP
 BeckyImport::GetSupports(char **aSupports)
 {
   NS_ENSURE_ARG_POINTER(aSupports);
-  *aSupports = strdup(kBeckySupportsString);
+  *aSupports = NS_strdup(kBeckySupportsString);
   return NS_OK;
 }
 
