@@ -164,8 +164,7 @@ AppendAddressBookDescriptor(nsIFile *aEntry, nsISupportsArray *aCollected)
 
   nsCAutoString name;
   rv = aEntry->GetNativeLeafName(name);
-  PRInt32 dotPosition = name.RFind(".bab");
-  if (dotPosition != name.Length() - 4)
+  if (!StringEndsWith(name, NS_LITERAL_CSTRING(".bab")))
     return NS_OK;
 
   nsCOMPtr<nsIImportABDescriptor> descriptor;
