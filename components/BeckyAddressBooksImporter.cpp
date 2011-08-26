@@ -161,6 +161,13 @@ static nsresult
 AppendAddressBookDescriptor(nsIFile *aEntry, nsISupportsArray *aCollected)
 {
   nsresult rv;
+
+  nsCAutoString name;
+  rv = aEntry->GetNativeLeafName(name);
+  PRInt32 dotPosition = name.RFind(".bab");
+  if (dotPosition != name.Length() - 4)
+    return NS_OK;
+
   nsCOMPtr<nsIImportABDescriptor> descriptor;
   rv = CreateAddressBookDescriptor(getter_AddRefs(descriptor));
   if (NS_FAILED(rv))
@@ -179,9 +186,9 @@ AppendAddressBookDescriptor(nsIFile *aEntry, nsISupportsArray *aCollected)
   nsCOMPtr<nsIFile> parent;
   rv = aEntry->GetParent(getter_AddRefs(parent));
   NS_ENSURE_SUCCESS(rv, rv);
-  nsAutoString name;
-  parent->GetLeafName(name);
-  descriptor->SetPreferredName(name);
+  nsAutoString parentName;
+  parent->GetLeafName(parentName);
+  descriptor->SetPreferredName(parentName);
 
   nsCOMPtr<nsISupports> interface;
   interface = do_QueryInterface(descriptor, &rv);
@@ -210,13 +217,8 @@ CollectAddressBooks(nsIFile *aTarget, nsISupportsArray *aCollected)
     while (NS_SUCCEEDED(entries->HasMoreElements(&more)) && more) {
       rv = files->GetNextFile(getter_AddRefs(entry));
       NS_ENSURE_SUCCESS(rv, rv);
-      nsCAutoString name;
-      rv = entry->GetNativeLeafName(name);
-      PRInt32 dotPosition = name.RFind(".bab");
-      if (dotPosition == name.Length() - 4) {
-        rv = CollectAddressBooks(entry, aCollected);
-        NS_ENSURE_SUCCESS(rv, rv);
-      }
+      rv = CollectAddressBooks(entry, aCollected);
+      NS_ENSURE_SUCCESS(rv, rv);
     }
   }
 
