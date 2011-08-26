@@ -275,6 +275,10 @@ BeckyAddressBooksImporter::ImportAddressBook(nsIImportABDescriptor *aSource,
   rv = BeckyVCardAddress::ImportAddresses(file, aDestination, error, &mReadBytes);
   if (!error.IsEmpty()) {
     *aErrorLog = ToNewUnicode(error);
+  } else {
+    nsString successMessage;;
+    BeckyStringBundle::GetStringByID(BECKYIMPORT_SUCCESS_MESSAGE, successMessage);
+    *aSuccessLog = ToNewUnicode(successMessage);
   }
 
   return rv;
