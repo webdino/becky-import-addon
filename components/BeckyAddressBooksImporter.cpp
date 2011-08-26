@@ -210,8 +210,13 @@ CollectAddressBooks(nsIFile *aTarget, nsISupportsArray *aCollected)
     while (NS_SUCCEEDED(entries->HasMoreElements(&more)) && more) {
       rv = files->GetNextFile(getter_AddRefs(entry));
       NS_ENSURE_SUCCESS(rv, rv);
-      rv = CollectAddressBooks(entry, aCollected);
-      NS_ENSURE_SUCCESS(rv, rv);
+      nsCAutoString name;
+      rv = entry->GetNativeLeafName(name);
+      PRInt32 dotPosition = name.RFind(".bab");
+      if (dotPosition == name.Length() - 4) {
+        rv = CollectAddressBooks(entry, aCollected);
+        NS_ENSURE_SUCCESS(rv, rv);
+      }
     }
   }
 
