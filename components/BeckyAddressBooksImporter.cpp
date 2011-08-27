@@ -278,7 +278,7 @@ BeckyAddressBooksImporter::ImportAddressBook(nsIImportABDescriptor *aSource,
   if (!error.IsEmpty()) {
     *aErrorLog = ToNewUnicode(error);
   } else {
-    nsString successMessage;;
+    nsString successMessage;
     BeckyStringBundle::GetStringByID(BECKYIMPORT_SUCCESS_MESSAGE, successMessage);
     *aSuccessLog = ToNewUnicode(successMessage);
   }
