@@ -23,7 +23,7 @@ function testGetDefaultLocation() {
   let location = {};
   gMail.GetDefaultLocation(location, found, userVerify);
   assert.isTrue(userVerify.value);
-  assert.isTrue(userVerify.found);
+  assert.isFalse(found.value);
 }
 
 testFindMailboxes.description = "FindMailboxes test";

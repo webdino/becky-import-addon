@@ -43,8 +43,14 @@
 
 #include <mozilla-config.h>
 #include <nsStringGlue.h>
+#include <nsCOMPtr.h>
+#include <nsIFile.h>
+#include <nsIInputStream.h>
+#include <nsILineInputStream.h>
+#include <nsNetUtil.h>
 
 #include "BeckyMailImporter.h"
+#include "BeckyUtils.h"
 
 NS_IMPL_ISUPPORTS1(BeckyMailImporter, nsIImportMail)
 
@@ -58,12 +64,95 @@ BeckyMailImporter::~BeckyMailImporter()
   /* destructor code */
 }
 
+static nsresult
+GetFolderListFile(nsIFile **aFile)
+{
+  nsCOMPtr<nsIFile> folderListFile;
+  nsresult rv = BeckyUtils::FindUserDirectory(getter_AddRefs(folderListFile));
+  if (NS_FAILED(rv))
+    return rv;
+
+  rv = folderListFile->AppendNative(NS_LITERAL_CSTRING("Folder.lst"));
+  NS_ENSURE_SUCCESS(rv, rv);
+
+  PRBool exists;
+  rv = folderListFile->Exists(&exists);
+  if (NS_FAILED(rv))
+    return rv;
+
+  NS_IF_ADDREF(*aFile = folderListFile);
+
+  return NS_OK;
+}
+
+static nsresult
+GetDefaultFolderName(nsIFile *aFolderListFile, nsACString& name)
+{
+  nsresult rv;
+  nsCOMPtr<nsIInputStream> inputStream;
+  rv = NS_NewLocalFileInputStream(getter_AddRefs(inputStream),
+                                  aFolderListFile);
+  NS_ENSURE_SUCCESS(rv, rv);
+
+  nsCOMPtr<nsILineInputStream> lineStream = do_QueryInterface(inputStream, &rv);
+  NS_ENSURE_SUCCESS(rv, rv);
+
+  PRBool more = PR_TRUE;
+  rv = lineStream->ReadLine(name, &more);
+  NS_ENSURE_SUCCESS(rv, rv);
+
+  return NS_OK;
+}
+
+static nsresult
+GetDefaultFolder(nsIFile **aFolder)
+{
+  nsCOMPtr<nsIFile> folderListFile;
+  nsresult rv = GetFolderListFile(getter_AddRefs(folderListFile));
+  if (NS_FAILED(rv))
+    return rv;
+
+  nsCAutoString defaultFolderName;
+  rv = GetDefaultFolderName(folderListFile, defaultFolderName);
+  if (NS_FAILED(rv))
+    return rv;
+
+  nsCOMPtr<nsIFile> defaultFolder;
+  rv = BeckyUtils::FindUserDirectory(getter_AddRefs(defaultFolder));
+  if (NS_FAILED(rv))
+    return rv;
+
+  rv = defaultFolder->AppendNative(defaultFolderName);
+  if (NS_FAILED(rv))
+    return rv;
+
+  PRBool exists;
+  rv = folderListFile->Exists(&exists);
+  if (NS_FAILED(rv))
+    return rv;
+
+  NS_IF_ADDREF(*aFolder = defaultFolder);
+
+  return NS_OK;
+}
+
 NS_IMETHODIMP
 BeckyMailImporter::GetDefaultLocation(nsIFile **aLocation NS_OUTPARAM,
                                       PRBool *aFound NS_OUTPARAM,
                                       PRBool *aUserVerify NS_OUTPARAM)
 {
-  return NS_ERROR_NOT_IMPLEMENTED;
+  NS_ENSURE_ARG_POINTER(aFound);
+  NS_ENSURE_ARG_POINTER(aLocation);
+  NS_ENSURE_ARG_POINTER(aUserVerify);
+
+  *aLocation = nsnull;
+  *aFound = PR_FALSE;
+  *aUserVerify = PR_TRUE;
+
+  if (NS_SUCCEEDED(GetDefaultFolder(aLocation)))
+    *aFound = PR_TRUE;
+
+  return NS_OK;
 }
 
 NS_IMETHODIMP
