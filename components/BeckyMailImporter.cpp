@@ -190,6 +190,16 @@ AppendMailboxDescriptor(nsIFile *aEntry, nsISupportsArray *aCollected)
   parent->GetLeafName(parentName);
   descriptor->SetDisplayName(parentName.get());
 
+  nsCOMPtr<nsILocalFile> mailboxFile;
+  rv = descriptor->GetFile(getter_AddRefs(mailboxFile));
+  if (NS_FAILED(rv))
+    return rv;
+
+  nsCOMPtr<nsILocalFile> localFile;
+  localFile = do_QueryInterface(aEntry, &rv);
+  NS_ENSURE_SUCCESS(rv, rv);
+
+  mailboxFile->InitWithFile(localFile);
   aCollected->AppendElement(descriptor);
 
   return NS_OK;

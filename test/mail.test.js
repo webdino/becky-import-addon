@@ -40,6 +40,9 @@ function testFindMailboxes() {
   assert.isDefined(descriptor);
 
   assert.equals("mailboxes", descriptor.GetDisplayName());
+
+  let mailbox = descriptor.file;
+  assert.equals("test.bmf", mailbox.leafName);
 }
 
 testTranslateFolderName.description = "TranslateFolderName test";
