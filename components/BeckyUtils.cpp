@@ -44,7 +44,6 @@
 #include <nsCOMPtr.h>
 #include <nsILocalFile.h>
 #include <nsISimpleEnumerator.h>
-#include <nsIDirectoryEnumerator.h>
 #include <nsServiceManagerUtils.h>
 #include <nsComponentManagerUtils.h>
 #include <nsStringGlue.h>
@@ -68,14 +67,10 @@ BeckyUtils::FindUserDirectory(nsIFile **aLocation NS_OUTPARAM)
   rv = folder->GetDirectoryEntries(getter_AddRefs(entries));
   NS_ENSURE_SUCCESS(rv, rv);
 
-  nsCOMPtr<nsIDirectoryEnumerator> files;
-  files = do_QueryInterface(entries, &rv);
-  NS_ENSURE_SUCCESS(rv, rv);
-
   PRBool more;
   nsCOMPtr<nsIFile> entry;
   while (NS_SUCCEEDED(entries->HasMoreElements(&more)) && more) {
-    rv = files->GetNextFile(getter_AddRefs(entry));
+    rv = entries->GetNext(getter_AddRefs(entry));
     PRBool isDirectory = PR_FALSE;
     rv = entry->IsDirectory(&isDirectory);
     NS_ENSURE_SUCCESS(rv, rv);

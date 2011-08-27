@@ -208,17 +208,13 @@ CollectAddressBooks(nsIFile *aTarget, nsISupportsArray *aCollected)
   rv = aTarget->GetDirectoryEntries(getter_AddRefs(entries));
   NS_ENSURE_SUCCESS(rv, rv);
 
-  nsCOMPtr<nsIDirectoryEnumerator> files;
-  files = do_QueryInterface(entries);
-  if (files) {
-    PRBool more;
-    nsCOMPtr<nsIFile> entry;
-    while (NS_SUCCEEDED(entries->HasMoreElements(&more)) && more) {
-      rv = files->GetNextFile(getter_AddRefs(entry));
-      NS_ENSURE_SUCCESS(rv, rv);
-      rv = CollectAddressBooks(entry, aCollected);
-      NS_ENSURE_SUCCESS(rv, rv);
-    }
+  PRBool more;
+  nsCOMPtr<nsIFile> entry;
+  while (NS_SUCCEEDED(entries->HasMoreElements(&more)) && more) {
+    rv = entries->GetNext(getter_AddRefs(entry));
+    NS_ENSURE_SUCCESS(rv, rv);
+    rv = CollectAddressBooks(entry, aCollected);
+    NS_ENSURE_SUCCESS(rv, rv);
   }
 
   return NS_OK;
