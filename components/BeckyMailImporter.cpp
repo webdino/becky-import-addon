@@ -146,11 +146,8 @@ BeckyMailImporter::GetDefaultLocation(nsIFile **aLocation NS_OUTPARAM,
   NS_ENSURE_ARG_POINTER(aUserVerify);
 
   *aLocation = nsnull;
-  *aFound = PR_FALSE;
   *aUserVerify = PR_TRUE;
-
-  if (NS_SUCCEEDED(GetDefaultFolder(aLocation)))
-    *aFound = PR_TRUE;
+  *aFound = NS_SUCCEEDED(GetDefaultFolder(aLocation));
 
   return NS_OK;
 }
