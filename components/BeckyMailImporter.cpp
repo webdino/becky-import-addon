@@ -48,6 +48,9 @@
 #include <nsIInputStream.h>
 #include <nsILineInputStream.h>
 #include <nsNetUtil.h>
+#include <nsISupportsArray.h>
+#include <nsIImportService.h>
+#include <nsIImportMailboxDescriptor.h>
 
 #include "BeckyMailImporter.h"
 #include "BeckyUtils.h"
@@ -65,12 +68,12 @@ BeckyMailImporter::~BeckyMailImporter()
 }
 
 static nsresult
-GetFolderListFile(nsIFile **aFile)
+GetFolderListFile(nsIFile *aLocation, nsIFile **aFile)
 {
+  nsresult rv;
   nsCOMPtr<nsIFile> folderListFile;
-  nsresult rv = BeckyUtils::FindUserDirectory(getter_AddRefs(folderListFile));
-  if (NS_FAILED(rv))
-    return rv;
+  rv = aLocation->Clone(getter_AddRefs(folderListFile));
+  NS_ENSURE_SUCCESS(rv, rv);
 
   rv = folderListFile->AppendNative(NS_LITERAL_CSTRING("Folder.lst"));
   NS_ENSURE_SUCCESS(rv, rv);
@@ -82,7 +85,7 @@ GetFolderListFile(nsIFile **aFile)
 
   NS_IF_ADDREF(*aFile = folderListFile);
 
-  return NS_OK;
+  return exists ? NS_OK : NS_ERROR_FILE_NOT_FOUND;
 }
 
 static nsresult
@@ -107,8 +110,13 @@ GetDefaultFolderName(nsIFile *aFolderListFile, nsACString& name)
 static nsresult
 GetDefaultFolder(nsIFile **aFolder)
 {
+  nsCOMPtr<nsIFile> userDirectory;
+  nsresult rv = BeckyUtils::FindUserDirectory(getter_AddRefs(userDirectory));
+  if (NS_FAILED(rv))
+    return rv;
+
   nsCOMPtr<nsIFile> folderListFile;
-  nsresult rv = GetFolderListFile(getter_AddRefs(folderListFile));
+  rv = GetFolderListFile(userDirectory, getter_AddRefs(folderListFile));
   if (NS_FAILED(rv))
     return rv;
 
@@ -117,17 +125,13 @@ GetDefaultFolder(nsIFile **aFolder)
   if (NS_FAILED(rv))
     return rv;
 
-  nsCOMPtr<nsIFile> defaultFolder;
-  rv = BeckyUtils::FindUserDirectory(getter_AddRefs(defaultFolder));
+  rv = userDirectory->AppendNative(defaultFolderName);
   if (NS_FAILED(rv))
     return rv;
 
-  rv = defaultFolder->AppendNative(defaultFolderName);
-  if (NS_FAILED(rv))
-    return rv;
-
+  nsIFile *defaultFolder = userDirectory;
   PRBool exists;
-  rv = folderListFile->Exists(&exists);
+  rv = defaultFolder->Exists(&exists);
   if (NS_FAILED(rv))
     return rv;
 
@@ -152,11 +156,99 @@ BeckyMailImporter::GetDefaultLocation(nsIFile **aLocation NS_OUTPARAM,
   return NS_OK;
 }
 
+static nsresult
+CreateMailboxDescriptor(nsIImportMailboxDescriptor **aDescriptor)
+{
+  nsresult rv;
+  nsCOMPtr<nsIImportService> importService;
+  importService = do_GetService(NS_IMPORTSERVICE_CONTRACTID, &rv);
+  NS_ENSURE_SUCCESS(rv, rv);
+
+  return importService->CreateNewMailboxDescriptor(aDescriptor);
+}
+
+static nsresult
+AppendMailboxDescriptor(nsIFile *aEntry, nsISupportsArray *aCollected)
+{
+  nsCAutoString name;
+  nsresult rv = aEntry->GetNativeLeafName(name);
+  if (!StringEndsWith(name, NS_LITERAL_CSTRING(".bmf")))
+    return NS_OK;
+
+  nsCOMPtr<nsIImportMailboxDescriptor> descriptor;
+  rv = CreateMailboxDescriptor(getter_AddRefs(descriptor));
+
+  PRInt64 size;
+  aEntry->GetFileSize(&size);
+  descriptor->SetSize(size);
+
+  nsCOMPtr<nsIFile> parent;
+  rv = aEntry->GetParent(getter_AddRefs(parent));
+  NS_ENSURE_SUCCESS(rv, rv);
+
+  nsAutoString parentName;
+  parent->GetLeafName(parentName);
+  descriptor->SetDisplayName(parentName.get());
+
+  aCollected->AppendElement(descriptor);
+
+  return NS_OK;
+}
+
+static nsresult
+CollectFoldersInFolderListFile(nsIFile *aListFile, nsISupportsArray *aCollected)
+{
+  return NS_OK;
+}
+
+static nsresult
+CollectMailboxesInDirectory(nsIFile *aDirectory, nsISupportsArray *aCollected)
+{
+  nsresult rv;
+  nsCOMPtr<nsIFile> folderListFile;
+  rv = GetFolderListFile(aDirectory, getter_AddRefs(folderListFile));
+
+  if (NS_SUCCEEDED(rv)) {
+    CollectFoldersInFolderListFile(folderListFile, aCollected);
+  } else {
+    nsCOMPtr<nsISimpleEnumerator> entries;
+    rv = aDirectory->GetDirectoryEntries(getter_AddRefs(entries));
+    NS_ENSURE_SUCCESS(rv, rv);
+
+    PRBool more;
+    nsCOMPtr<nsIFile> entry;
+    while (NS_SUCCEEDED(entries->HasMoreElements(&more)) && more) {
+      rv = entries->GetNext(getter_AddRefs(entry));
+      PRBool isDirectory = PR_FALSE;
+      rv = entry->IsDirectory(&isDirectory);
+      NS_ENSURE_SUCCESS(rv, rv);
+      if (isDirectory) {
+        CollectMailboxesInDirectory(entry, aCollected);
+      } else {
+        AppendMailboxDescriptor(entry, aCollected);
+      }
+    }
+  }
+
+  return NS_OK;
+}
+
 NS_IMETHODIMP
 BeckyMailImporter::FindMailboxes(nsIFile *aLocation,
                                  nsISupportsArray **_retval NS_OUTPARAM)
 {
-  return NS_ERROR_NOT_IMPLEMENTED;
+  nsresult rv;
+  nsCOMPtr<nsISupportsArray> array;
+  rv = NS_NewISupportsArray(getter_AddRefs(array));
+  NS_ENSURE_SUCCESS(rv, rv);
+
+  rv = CollectMailboxesInDirectory(aLocation, array);
+  if (NS_FAILED(rv))
+    return rv;
+
+  array.swap(*_retval);
+
+  return NS_OK;
 }
 
 NS_IMETHODIMP

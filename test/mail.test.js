@@ -30,8 +30,10 @@ testFindMailboxes.description = "FindMailboxes test";
 testFindMailboxes.priority = 'must';
 function testFindMailboxes() {
   testCreate();
-  let mailboxes = gMail.FindMailboxes(utils.normalizeToFile(utils.baseURL));
+  let mailboxes = gMail.FindMailboxes(utils.normalizeToFile(utils.baseURL + 'fixtures/mailboxes'));
   assert.isDefined(mailboxes);
+  assert.isInstanceOf(Ci.nsISupportsArray, mailboxes);
+  assert.equals(1, mailboxes.Count());
 }
 
 testTranslateFolderName.description = "TranslateFolderName test";

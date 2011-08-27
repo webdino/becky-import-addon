@@ -1,0 +1,191 @@
+Return-Path: hiikezoe@expample.com
+Received: from mzcmta001.example.com (LHLO mzcmta001.example.com)
+ (127.0.0.1) by mzcstore001.example.com with LMTP; Sat, 27 Aug 2011
+ 08:23:54 +0900 (JST)
+Received: from example.com (example.com [127.0.0.1])
+	by mzcmta001.example.com (Postfix) with ESMTP id 9A34494C2AE
+	for <who@_ngm.example.com>; Sat, 27 Aug 2011 08:23:54 +0900 (JST)
+Received: by example.com (Postfix, from userid 86065)
+	id 45074237F; Sat, 27 Aug 2011 08:23:54 +0900 (JST)
+Received: from mmafrelay11.example.com (mf-omf-hcb007.example.com [127.0.0.1])
+	by example.com (Postfix) with ESMTP id 237E4237F
+	for <who@spam1.example.com>; Sat, 27 Aug 2011 08:23:54 +0900 (JST)
+Received: from mf-omf-hcb007.example.com (mf-omf-hcb007 [127.0.0.1])
+	by mmafrelay11.example.com (Postfix) with ESMTP id 0E3D9246FEE
+	for <who@spam1.example.com>; Sat, 27 Aug 2011 08:23:54 +0900 (JST)
+Received: from mfgw239.example.com (mfgw239.example.com [127.0.0.1])
+	by mf-omf-hcb007.example.com  with ESMTP id p7QNNrD9010261
+	for <who@spam1.example.com>; Sat, 27 Aug 2011 08:23:53 +0900
+Received-SPF: none (mfgw239.example.com: 127.0.0.1 is neither permitted nor denied by domain of expample.com) client-ip=127.0.0.1; envelope-from=hiikezoe@expample.com; helo=ml.expample.com;
+Received: from ml.expample.com (ml.expample.com [127.0.0.1])
+	by mfgw239.example.com (Postfix) with ESMTP id D75333AC282
+	for <who@example.com>; Sat, 27 Aug 2011 08:23:53 +0900 (JST)
+Received: from ml.expample.com (localhost [127.0.0.1])
+	by ml.expample.com (Postfix) with ESMTP id 2F5118F0988
+	for <who@example.com>; Sat, 27 Aug 2011 08:23:53 +0900 (JST)
+Received: from [127.0.0.1] (FL1-60-237-3-171.tcg.mesh.ad.jp [127.0.0.1])
+	by ml.expample.com (Postfix) with ESMTPA id B3B918F0948
+	for <who@example.com>; Sat, 27 Aug 2011 08:23:52 +0900 (JST)
+Subject: =?iso-2022-jp?Q?=1B$B%a!=3C%k=1B=28B?=
+From: Hiroyuki Ikezoe <hiikezoe@expample.com>
+To: who@example.com
+Content-Type: text/plain; charset="UTF-8"
+Date: Sat, 27 Aug 2011 08:23:51 +0900
+Message-ID: <1314401031.1786.0.camel@zoe-HPE-380jp>
+Mime-Version: 1.0
+X-Mailer: Evolution 2.32.2 
+Content-Transfer-Encoding: 8bit
+X-Virus-Scanned: ClamAV using ClamSMTP
+X-OCN-SPAM-CHECK: 0.00%
+X-Becky-Status: 010000,000000,3,4e582b0a,4e57ace8,1e4d160e,ffffffff
+
+メール
+
+
+.
+Return-Path: hiikezoe@expample.com
+Received: from mzcmta021.example.com (LHLO mzcmta021.example.com) (127.0.0.1)
+ by mzcstore001.example.com with LMTP; Sat, 27 Aug 2011 08:26:12 +0900 (JST)
+Received: from example.com (example.com [127.0.0.1])
+	by mzcmta021.example.com (Postfix) with ESMTP id 724536F029C
+	for <who@_ngm.example.com>; Sat, 27 Aug 2011 08:26:12 +0900 (JST)
+Received: by example.com (Postfix, from userid 86065)
+	id 2875D22E9; Sat, 27 Aug 2011 08:26:12 +0900 (JST)
+Received: from mmafrelay08.example.com (mf-omf-hkg004.example.com [127.0.0.1])
+	by example.com (Postfix) with ESMTP id 1635E22E9
+	for <who@spam1.example.com>; Sat, 27 Aug 2011 08:26:12 +0900 (JST)
+Received: from mf-omf-hkg004.example.com (mf-omf-hkg004 [127.0.0.1])
+	by mmafrelay08.example.com (Postfix) with ESMTP id 003B74CC43D
+	for <who@spam1.example.com>; Sat, 27 Aug 2011 08:26:11 +0900 (JST)
+Received: from mfgw221.example.com (mfgw221.example.com [127.0.0.1])
+	by mf-omf-hkg004.example.com  with ESMTP id p7QNQBrQ024373
+	for <who@spam1.example.com>; Sat, 27 Aug 2011 08:26:11 +0900
+Received-SPF: none (mfgw221.example.com: 127.0.0.1 is neither permitted nor denied by domain of expample.com) client-ip=127.0.0.1; envelope-from=hiikezoe@expample.com; helo=ml.expample.com;
+Received: from ml.expample.com (ml.expample.com [127.0.0.1])
+	by mfgw221.example.com (Postfix) with ESMTP id 9C81C1D42D8
+	for <who@example.com>; Sat, 27 Aug 2011 08:26:11 +0900 (JST)
+Received: from ml.expample.com (localhost [127.0.0.1])
+	by ml.expample.com (Postfix) with ESMTP id C6D2E8F0988
+	for <who@example.com>; Sat, 27 Aug 2011 08:26:10 +0900 (JST)
+Received: from [127.0.0.1] (FL1-60-237-3-171.tcg.mesh.ad.jp [127.0.0.1])
+	by ml.expample.com (Postfix) with ESMTPA id 62C888F0948
+	for <who@example.com>; Sat, 27 Aug 2011 08:26:10 +0900 (JST)
+Subject: =?iso-2022-jp?Q?2=1B$BDL$a=1B=28B?=
+From: Hiroyuki Ikezoe <hiikezoe@expample.com>
+To: who@example.com
+Content-Type: text/plain; charset="UTF-8"
+Date: Sat, 27 Aug 2011 08:26:09 +0900
+Message-ID: <1314401169.1786.1.camel@zoe-HPE-380jp>
+Mime-Version: 1.0
+X-Mailer: Evolution 2.32.2 
+Content-Transfer-Encoding: 8bit
+X-Virus-Scanned: ClamAV using ClamSMTP
+X-OCN-SPAM-CHECK: 0.00%
+X-Becky-Status: 010000,000000,3,4e582b94,4e57ad03,1e4d160f,ffffffff
+
+どうぞ。
+
+
+.
+Return-Path: hiikezoe@expample.com
+Received: from mzcmta008.example.com (LHLO mzcmta008.example.com)
+ (127.0.0.1) by mzcstore001.example.com with LMTP; Sat, 27 Aug 2011
+ 08:30:05 +0900 (JST)
+Received: from example.com (example.com [127.0.0.1])
+	by mzcmta008.example.com (Postfix) with ESMTP id 2BCE841424F
+	for <who@_ngm.example.com>; Sat, 27 Aug 2011 08:30:05 +0900 (JST)
+Received: by example.com (Postfix, from userid 86065)
+	id CF30723AE; Sat, 27 Aug 2011 08:30:04 +0900 (JST)
+Received: from mmafrelay02.example.com (mf-omf-hcb002.example.com [127.0.0.1])
+	by example.com (Postfix) with ESMTP id B867623AD
+	for <who@spam1.example.com>; Sat, 27 Aug 2011 08:30:04 +0900 (JST)
+Received: from mf-omf-hcb002.example.com (mf-omf-hcb002 [127.0.0.1])
+	by mmafrelay02.example.com (Postfix) with ESMTP id 9B91C5C43A
+	for <who@spam1.example.com>; Sat, 27 Aug 2011 08:30:04 +0900 (JST)
+Received: from mfgw110.example.com (mfgw110.example.com [127.0.0.1])
+	by mf-omf-hcb002.example.com  with ESMTP id p7QNU4OO025399
+	for <who@spam1.example.com>; Sat, 27 Aug 2011 08:30:04 +0900
+Received-SPF: none (mfgw110.example.com: 127.0.0.1 is neither permitted nor denied by domain of expample.com) client-ip=127.0.0.1; envelope-from=hiikezoe@expample.com; helo=ml.expample.com;
+Received: from ml.expample.com (ml.expample.com [127.0.0.1])
+	by mfgw110.example.com (Postfix) with ESMTP id 3E9A797C284
+	for <who@example.com>; Sat, 27 Aug 2011 08:30:04 +0900 (JST)
+Received: from ml.expample.com (localhost [127.0.0.1])
+	by ml.expample.com (Postfix) with ESMTP id 8E0188F0988
+	for <who@example.com>; Sat, 27 Aug 2011 08:30:03 +0900 (JST)
+Received: from [127.0.0.1] (FL1-60-237-3-171.tcg.mesh.ad.jp [127.0.0.1])
+	by ml.expample.com (Postfix) with ESMTPA id 2883E8F0948
+	for <who@example.com>; Sat, 27 Aug 2011 08:30:03 +0900 (JST)
+Subject: =?iso-2022-jp?Q?=1B$B%I%C%H=1B=28B?=
+From: Hiroyuki Ikezoe <hiikezoe@expample.com>
+To: who@example.com
+Content-Type: text/plain
+Date: Sat, 27 Aug 2011 08:30:02 +0900
+Message-ID: <1314401402.1786.2.camel@zoe-HPE-380jp>
+Mime-Version: 1.0
+X-Mailer: Evolution 2.32.2 
+Content-Transfer-Encoding: 7bit
+X-Virus-Scanned: ClamAV using ClamSMTP
+X-OCN-SPAM-CHECK: 0.00%
+X-Becky-Status: 010000,000000,3,4e582c7d,4e57adf3,1e4d1610,ffffffff
+
+..
+....
+..
+..
+..
+
+
+
+
+..
+
+
+
+
+.
+Return-Path: hiikezoe@expample.com
+Received: from mzcmta016.example.com (LHLO mzcmta016.example.com) (127.0.0.1)
+ by mzcstore001.example.com with LMTP; Sat, 27 Aug 2011 08:32:35 +0900 (JST)
+Received: from example.com (example.com [127.0.0.1])
+	by mzcmta016.example.com (Postfix) with ESMTP id E75231044328
+	for <who@_ngm.example.com>; Sat, 27 Aug 2011 08:32:34 +0900 (JST)
+Received: by example.com (Postfix, from userid 86065)
+	id A374622FB; Sat, 27 Aug 2011 08:32:34 +0900 (JST)
+Received: from mmafrelay06.example.com (mf-omf-hcb004.example.com [127.0.0.1])
+	by example.com (Postfix) with ESMTP id 89E00237F
+	for <who@spam1.example.com>; Sat, 27 Aug 2011 08:32:34 +0900 (JST)
+Received: from mf-omf-hcb004.example.com (mf-omf-hcb004 [127.0.0.1])
+	by mmafrelay06.example.com (Postfix) with ESMTP id 736202A8442
+	for <who@spam1.example.com>; Sat, 27 Aug 2011 08:32:34 +0900 (JST)
+Received: from mfgw228.example.com (mfgw228.example.com [127.0.0.1])
+	by mf-omf-hcb004.example.com  with ESMTP id p7QNWYx5008778
+	for <who@spam1.example.com>; Sat, 27 Aug 2011 08:32:34 +0900
+Received-SPF: none (mfgw228.example.com: 127.0.0.1 is neither permitted nor denied by domain of expample.com) client-ip=127.0.0.1; envelope-from=hiikezoe@expample.com; helo=ml.expample.com;
+Received: from ml.expample.com (ml.expample.com [127.0.0.1])
+	by mfgw228.example.com (Postfix) with ESMTP id 28137220266
+	for <who@example.com>; Sat, 27 Aug 2011 08:32:34 +0900 (JST)
+Received: from ml.expample.com (localhost [127.0.0.1])
+	by ml.expample.com (Postfix) with ESMTP id AA4958F0988
+	for <who@example.com>; Sat, 27 Aug 2011 08:32:33 +0900 (JST)
+Received: from [127.0.0.1] (FL1-60-237-3-171.tcg.mesh.ad.jp [127.0.0.1])
+	by ml.expample.com (Postfix) with ESMTPA id 606948F0948
+	for <who@example.com>; Sat, 27 Aug 2011 08:32:33 +0900 (JST)
+Subject: =?iso-2022-jp?Q?=1B$B%I%C%H%X%C%=40=1B=28B?=
+From: Hiroyuki Ikezoe <hiikezoe@expample.com>
+To: who@example.com
+Security: Personal
+...: dot
+Content-Type: text/plain; charset="UTF-8"
+Date: Sat, 27 Aug 2011 08:32:32 +0900
+Message-ID: <1314401552.1786.3.camel@zoe-HPE-380jp>
+Mime-Version: 1.0
+X-Mailer: Evolution 2.32.2 
+Content-Transfer-Encoding: 8bit
+X-Virus-Scanned: ClamAV using ClamSMTP
+X-OCN-SPAM-CHECK: 0.00%
+X-Becky-Status: 010000,000000,3,4e582d13,4e57ae87,1e4d1611,ffffffff
+
+どうなのよ。
+
+
+.
