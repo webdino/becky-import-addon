@@ -168,7 +168,7 @@ CreateMailboxDescriptor(nsIImportMailboxDescriptor **aDescriptor)
 }
 
 static nsresult
-AppendMailboxDescriptor(nsIFile *aEntry, nsISupportsArray *aCollected)
+AppendMailboxDescriptor(nsIFile *aEntry, PRUint32 aDepth, nsISupportsArray *aCollected)
 {
   nsCAutoString name;
   nsresult rv = aEntry->GetNativeLeafName(name);
@@ -199,6 +199,8 @@ AppendMailboxDescriptor(nsIFile *aEntry, nsISupportsArray *aCollected)
   localFile = do_QueryInterface(aEntry, &rv);
   NS_ENSURE_SUCCESS(rv, rv);
 
+  descriptor->SetDepth(aDepth);
+
   mailboxFile->InitWithFile(localFile);
   aCollected->AppendElement(descriptor);
 
@@ -212,7 +214,7 @@ CollectFoldersInFolderListFile(nsIFile *aListFile, nsISupportsArray *aCollected)
 }
 
 static nsresult
-CollectMailboxesInDirectory(nsIFile *aDirectory, nsISupportsArray *aCollected)
+CollectMailboxesInDirectory(nsIFile *aDirectory, PRUint32 aDepth, nsISupportsArray *aCollected)
 {
   nsresult rv;
   nsCOMPtr<nsIFile> folderListFile;
@@ -233,9 +235,9 @@ CollectMailboxesInDirectory(nsIFile *aDirectory, nsISupportsArray *aCollected)
       rv = entry->IsDirectory(&isDirectory);
       NS_ENSURE_SUCCESS(rv, rv);
       if (isDirectory) {
-        CollectMailboxesInDirectory(entry, aCollected);
+        CollectMailboxesInDirectory(entry, ++aDepth, aCollected);
       } else {
-        AppendMailboxDescriptor(entry, aCollected);
+        AppendMailboxDescriptor(entry, aDepth, aCollected);
       }
     }
   }
@@ -252,7 +254,7 @@ BeckyMailImporter::FindMailboxes(nsIFile *aLocation,
   rv = NS_NewISupportsArray(getter_AddRefs(array));
   NS_ENSURE_SUCCESS(rv, rv);
 
-  rv = CollectMailboxesInDirectory(aLocation, array);
+  rv = CollectMailboxesInDirectory(aLocation, 0, array);
   if (NS_FAILED(rv))
     return rv;
 
