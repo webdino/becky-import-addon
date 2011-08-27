@@ -34,6 +34,12 @@ function testFindMailboxes() {
   assert.isDefined(mailboxes);
   assert.isInstanceOf(Ci.nsISupportsArray, mailboxes);
   assert.equals(1, mailboxes.Count());
+
+  let descriptor;
+  descriptor = mailboxes.QueryElementAt(0, Ci.nsIImportMailboxDescriptor);
+  assert.isDefined(descriptor);
+
+  assert.equals("mailboxes", descriptor.GetDisplayName());
 }
 
 testTranslateFolderName.description = "TranslateFolderName test";
