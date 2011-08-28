@@ -314,7 +314,7 @@ BeckyMailImporter::ImportMailbox(nsIImportMailboxDescriptor *aSource,
       firstLineOfMessage = PR_FALSE;
     }
 
-    if (line.EqualsLiteral(".")) {
+    if (line.Equals(".")) {
       firstLineOfMessage = PR_TRUE;
       continue;
     }

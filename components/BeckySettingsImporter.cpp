@@ -284,7 +284,7 @@ CreateSmtpServer(nsIINIParser *aParser,
   aParser->GetString(NS_LITERAL_CSTRING("Account"),
                      NS_LITERAL_CSTRING("SSLSMTP"),
                      value);
-  if (value.EqualsLiteral("1")) {
+  if (value.Equals("1")) {
     isSecure = PR_TRUE;
   }
   if (isSecure)
@@ -293,7 +293,7 @@ CreateSmtpServer(nsIINIParser *aParser,
   aParser->GetString(NS_LITERAL_CSTRING("Account"),
                      NS_LITERAL_CSTRING("SMTPAUTH"),
                      value);
-  if (value.EqualsLiteral("1")) {
+  if (value.Equals("1")) {
   }
 
   NS_IF_ADDREF(*aServer = server);
@@ -318,9 +318,9 @@ CreateIncomingServer(nsIINIParser *aParser,
                      NS_LITERAL_CSTRING("Protocol"),
                      value);
   nsCString protocol;
-  if (value.EqualsLiteral("0")) {
+  if (value.Equals("0")) {
     protocol = NS_LITERAL_CSTRING("pop3");
-  } else if (value.EqualsLiteral("1")) {
+  } else if (value.Equals("1")) {
     protocol = NS_LITERAL_CSTRING("imap");
   } else {
     protocol = NS_LITERAL_CSTRING("pop3");
@@ -334,7 +334,7 @@ CreateIncomingServer(nsIINIParser *aParser,
   PRBool isSecure = PR_FALSE;
   PRInt32 port = 0;
   nsresult errorCode;
-  if (value.EqualsLiteral("0")) {
+  if (value.Equals("0")) {
     protocol = NS_LITERAL_CSTRING("pop");
     aParser->GetString(NS_LITERAL_CSTRING("Account"),
                        NS_LITERAL_CSTRING("POP3Port"),
@@ -343,7 +343,7 @@ CreateIncomingServer(nsIINIParser *aParser,
     aParser->GetString(NS_LITERAL_CSTRING("Account"),
                        NS_LITERAL_CSTRING("SSLPOP"),
                        value);
-    if (value.EqualsLiteral("1")) {
+    if (value.Equals("1")) {
       isSecure = PR_TRUE;
     }
     aParser->GetString(NS_LITERAL_CSTRING("Account"),
@@ -352,7 +352,7 @@ CreateIncomingServer(nsIINIParser *aParser,
     aParser->GetString(NS_LITERAL_CSTRING("Account"),
                        NS_LITERAL_CSTRING("LeaveServer"),
                        value);
-  } else if (value.EqualsLiteral("1")) {
+  } else if (value.Equals("1")) {
     protocol = NS_LITERAL_CSTRING("imap");
     aParser->GetString(NS_LITERAL_CSTRING("Account"),
                        NS_LITERAL_CSTRING("IMAP4Port"),
@@ -361,7 +361,7 @@ CreateIncomingServer(nsIINIParser *aParser,
     aParser->GetString(NS_LITERAL_CSTRING("Account"),
                        NS_LITERAL_CSTRING("SSLIMAP"),
                        value);
-    if (value.EqualsLiteral("1")) {
+    if (value.Equals("1")) {
       isSecure = PR_TRUE;
     }
   }
