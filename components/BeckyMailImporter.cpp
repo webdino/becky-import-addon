@@ -182,7 +182,11 @@ AppendMailboxDescriptor(nsIFile *aEntry, PRUint32 aDepth, nsISupportsArray *aCol
 
   PRInt64 size;
   aEntry->GetFileSize(&size);
-  descriptor->SetSize(size);
+  if (size > PR_UINT32_MAX) {
+    NS_WARNING("Overflowed file size. Could not handle over 4GB address book");
+    size = PR_UINT32_MAX;
+  }
+  descriptor->SetSize(static_cast<PRUint32>(size));
 
   nsCOMPtr<nsIFile> parent;
   rv = aEntry->GetParent(getter_AddRefs(parent));
