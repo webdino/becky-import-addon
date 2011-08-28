@@ -92,12 +92,9 @@ static nsresult
 GetDefaultFolderName(nsIFile *aFolderListFile, nsACString& name)
 {
   nsresult rv;
-  nsCOMPtr<nsIInputStream> inputStream;
-  rv = NS_NewLocalFileInputStream(getter_AddRefs(inputStream),
-                                  aFolderListFile);
-  NS_ENSURE_SUCCESS(rv, rv);
-
-  nsCOMPtr<nsILineInputStream> lineStream = do_QueryInterface(inputStream, &rv);
+  nsCOMPtr<nsILineInputStream> lineStream;
+  rv = BeckyUtils::CreateLineInputStream(aFolderListFile,
+                                         getter_AddRefs(lineStream));
   NS_ENSURE_SUCCESS(rv, rv);
 
   PRBool more = PR_TRUE;
