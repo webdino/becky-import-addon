@@ -57,6 +57,7 @@
 #include <nsDirectoryServiceDefs.h>
 #include <nsDirectoryServiceUtils.h>
 #include <nsStringGlue.h>
+#include <msgCore.h>
 
 #include "BeckySettingsImporter.h"
 #include "BeckyStringBundle.h"
@@ -171,7 +172,7 @@ ConvertToUTF8File(nsIFile *aSourceFile, nsIFile **aConvertedFile)
   while (more) {
     rv = lineStream->ReadLine(line, &more);
     BeckyUtils::ConvertStringToUTF8(line, utf8String);
-    utf8String.AppendLiteral("\r\n");
+    utf8String.AppendLiteral(MSG_LINEBREAK);
     rv = destination->Write(utf8String.get(), utf8String.Length(), &bytesWritten);
   }
   return CallQueryInterface(convertedFile, aConvertedFile);
