@@ -144,13 +144,9 @@ BeckySettingsImporter::SetLocation(nsIFile *aLocation)
 static nsresult
 ConvertToUTF8File(nsIFile *aSourceFile, nsIFile **aConvertedFile)
 {
-  nsCOMPtr<nsIInputStream> source;
-  nsresult rv = NS_NewLocalFileInputStream(getter_AddRefs(source),
-                                           aSourceFile);
-  NS_ENSURE_SUCCESS(rv, rv);
-  nsCOMPtr<nsIOutputStream> destination;
-
+  nsresult rv;
   nsCOMPtr<nsIFile> convertedFile;
+
   rv = NS_GetSpecialDirectory(NS_OS_TEMP_DIR, getter_AddRefs(convertedFile));
   NS_ENSURE_SUCCESS(rv, rv);
   rv = convertedFile->AppendNative(NS_LITERAL_CSTRING("becky-importer-addon"));
@@ -158,11 +154,14 @@ ConvertToUTF8File(nsIFile *aSourceFile, nsIFile **aConvertedFile)
   rv = convertedFile->CreateUnique(nsIFile::NORMAL_FILE_TYPE, 0600);
   NS_ENSURE_SUCCESS(rv, rv);
 
+  nsCOMPtr<nsIOutputStream> destination;
   rv = NS_NewLocalFileOutputStream(getter_AddRefs(destination),
                                    convertedFile);
   NS_ENSURE_SUCCESS(rv, rv);
 
-  nsCOMPtr<nsILineInputStream> lineStream = do_QueryInterface(source, &rv);
+  nsCOMPtr<nsILineInputStream> lineStream;
+  rv = BeckyUtils::CreateLineInputStream(aSourceFile,
+                                         getter_AddRefs(lineStream));
   NS_ENSURE_SUCCESS(rv, rv);
 
   nsCAutoString line;

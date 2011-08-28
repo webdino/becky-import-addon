@@ -50,6 +50,9 @@
 #include <nsIUTF8ConverterService.h>
 #include <nsUConvCID.h>
 #include <nsNativeCharsetUtils.h>
+#include <nsIInputStream.h>
+#include <nsILineInputStream.h>
+#include <nsNetUtil.h>
 
 #include "BeckyUtils.h"
 
@@ -122,5 +125,18 @@ BeckyUtils::ConvertStringToUTF8(const nsACString& aOriginal,
   converter = do_GetService(NS_UTF8CONVERTERSERVICE_CONTRACTID);
   return converter->ConvertStringToUTF8(aOriginal, "CP932", PR_FALSE, _retval);
 #endif
+}
+
+nsresult
+BeckyUtils::CreateLineInputStream(nsIFile *aFile,
+                                  nsILineInputStream **_retval NS_OUTPARAM)
+{
+  NS_ENSURE_ARG_POINTER(_retval);
+
+  nsCOMPtr<nsIInputStream> inputStream;
+  nsresult rv = NS_NewLocalFileInputStream(getter_AddRefs(inputStream), aFile);
+  NS_ENSURE_SUCCESS(rv, rv);
+
+  return CallQueryInterface(inputStream, _retval);
 }
 

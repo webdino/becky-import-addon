@@ -38,12 +38,15 @@
 #define _BeckyUtils_H__
 
 class nsIFile;
+class nsILineInputStream;
 
 class BeckyUtils {
 public:
   static nsresult FindUserDirectory(nsIFile **aFile);
   static nsresult ConvertStringToUTF8(const nsACString& aOriginal,
                                       nsACString& _retval);
+  static nsresult CreateLineInputStream(nsIFile *aFile,
+                                        nsILineInputStream **_retval);
 };
 
 
