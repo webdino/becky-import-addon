@@ -1,10 +1,15 @@
 var description = 'Mail component tests'
 var gMail;
+var gMailbox;
+var gTemporaryFile;
 
 function setUp() {
+  gTemporaryFile = null;
 }
 
 function tearDown() {
+  if (gTemporaryFile && gTemporaryFile.exists())
+    gTemporaryFile.remove(false);
 }
 
 testCreate.description = "create instance test";
@@ -45,6 +50,7 @@ function testFindMailboxes() {
   assert.equals("test.bmf", mailbox.leafName);
 
   assert.equals(0, descriptor.depth);
+  gMailbox = descriptor;
 }
 
 testTranslateFolderName.description = "TranslateFolderName test";
@@ -62,5 +68,18 @@ testGetImportProgress.priority = 'must';
 function testGetImportProgress() {
   testCreate();
   assert.equals(0, gMail.GetImportProgress());
+}
+
+testImportMailbox.description = "ImportMailbox test";
+testImportMailbox.priority = 'must';
+function testImportMailbox() {
+  testFindMailboxes();
+  gTemporaryFile = utils.makeTempFile();
+
+  gMail.ImportMailbox(gMailbox,
+                      gTemporaryFile,
+                      {},
+                      {},
+                      {});
 }
 

@@ -46,14 +46,19 @@
 #include <nsCOMPtr.h>
 #include <nsIFile.h>
 #include <nsIInputStream.h>
+#include <nsIOutputStream.h>
 #include <nsILineInputStream.h>
 #include <nsNetUtil.h>
 #include <nsISupportsArray.h>
 #include <nsIImportService.h>
 #include <nsIImportMailboxDescriptor.h>
+#include <nsMsgUtils.h>
 
 #include "BeckyMailImporter.h"
 #include "BeckyUtils.h"
+#include "BeckyStringBundle.h"
+
+#define FROM_LINE "From - Mon Jan 1 00:00:00 1965" MSG_LINEBREAK
 
 NS_IMPL_ISUPPORTS1(BeckyMailImporter, nsIImportMail)
 
@@ -267,8 +272,63 @@ BeckyMailImporter::ImportMailbox(nsIImportMailboxDescriptor *aSource,
                                  PRUnichar **aSuccessLog NS_OUTPARAM,
                                  PRBool *aFatalError NS_OUTPARAM)
 {
+  NS_ENSURE_ARG_POINTER(aSource);
+  NS_ENSURE_ARG_POINTER(aDestination);
+  NS_ENSURE_ARG_POINTER(aErrorLog);
+  NS_ENSURE_ARG_POINTER(aSuccessLog);
+  NS_ENSURE_ARG_POINTER(aFatalError);
+
   mReadBytes = 0;
-  return NS_ERROR_NOT_IMPLEMENTED;
+
+  nsresult rv;
+  nsCOMPtr<nsILocalFile> mailboxFile;
+  rv = aSource->GetFile(getter_AddRefs(mailboxFile));
+  if (NS_FAILED(rv)) {
+    return rv;
+  }
+
+  nsCOMPtr<nsILineInputStream> lineStream;
+  rv = BeckyUtils::CreateLineInputStream(mailboxFile,
+                                         getter_AddRefs(lineStream));
+  NS_ENSURE_SUCCESS(rv, rv);
+
+  nsCOMPtr<nsIOutputStream> outputStream;
+  rv = MsgNewBufferedFileOutputStream(getter_AddRefs(outputStream), aDestination);
+  NS_ENSURE_SUCCESS(rv, rv);
+
+  nsCAutoString line;
+  PRUint32 bytesWritten = 0;
+  PRBool firstLineOfMessage = PR_TRUE;
+  PRBool more = PR_TRUE;
+  while (more && NS_SUCCEEDED(rv)) {
+    rv = lineStream->ReadLine(line, &more);
+    if (NS_FAILED(rv))
+      break;
+
+    if (firstLineOfMessage) {
+      rv = outputStream->Write(FROM_LINE, strlen(FROM_LINE), &bytesWritten);
+      firstLineOfMessage = PR_FALSE;
+    }
+
+    if (line.EqualsLiteral(".")) {
+      firstLineOfMessage = PR_TRUE;
+      continue;
+    }
+
+    line.AppendLiteral(MSG_LINEBREAK);
+    if (StringBeginsWith(line, NS_LITERAL_CSTRING(".."))) {
+      line.Cut(0, 1);
+    }
+    rv = outputStream->Write(line.get(), line.Length(), &bytesWritten);
+  }
+
+  if (NS_SUCCEEDED(rv)) {
+    nsString successMessage;
+    BeckyStringBundle::GetStringByID(BECKYIMPORT_SUCCESS_MESSAGE, successMessage);
+    *aSuccessLog = ToNewUnicode(successMessage);
+  }
+
+  return rv;
 }
 
 NS_IMETHODIMP
