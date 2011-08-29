@@ -58,6 +58,10 @@
 #include "BeckyUtils.h"
 #include "BeckyStringBundle.h"
 
+static nsresult CollectMailboxesInDirectory(nsIFile *aDirectory,
+                                            PRUint32 aDepth,
+                                            nsISupportsArray *aCollected);
+
 #define FROM_LINE "From - Mon Jan 1 00:00:00 1965" MSG_LINEBREAK
 
 NS_IMPL_ISUPPORTS1(BeckyMailImporter, nsIImportMail)
@@ -214,9 +218,35 @@ AppendMailboxDescriptor(nsIFile *aEntry, PRUint32 aDepth, nsISupportsArray *aCol
 }
 
 static nsresult
-CollectFoldersInFolderListFile(nsIFile *aListFile, nsISupportsArray *aCollected)
+CollectFoldersInFolderListFile(nsIFile *aListFile, PRUint32 aDepth, nsISupportsArray *aCollected)
 {
-  return NS_OK;
+  nsresult rv;
+  nsCOMPtr<nsILineInputStream> lineStream;
+  rv = BeckyUtils::CreateLineInputStream(aListFile,
+                                         getter_AddRefs(lineStream));
+  NS_ENSURE_SUCCESS(rv, rv);
+
+  nsCOMPtr<nsIFile> parent;
+  rv = aListFile->GetParent(getter_AddRefs(parent));
+  NS_ENSURE_SUCCESS(rv, rv);
+
+  PRBool more;
+  nsCAutoString folderName;
+  while (more && NS_SUCCEEDED(rv)) {
+    rv = lineStream->ReadLine(folderName, &more);
+    NS_ENSURE_SUCCESS(rv, rv);
+
+    nsCOMPtr<nsIFile> folder;
+    rv = parent->Clone(getter_AddRefs(folder));
+    NS_ENSURE_SUCCESS(rv, rv);
+
+    rv = folder->AppendNative(folderName);
+    NS_ENSURE_SUCCESS(rv, rv);
+
+    rv = CollectMailboxesInDirectory(folder, aDepth, aCollected);
+  }
+
+  return rv;
 }
 
 static nsresult
@@ -227,7 +257,7 @@ CollectMailboxesInDirectory(nsIFile *aDirectory, PRUint32 aDepth, nsISupportsArr
   rv = GetFolderListFile(aDirectory, getter_AddRefs(folderListFile));
 
   if (NS_SUCCEEDED(rv)) {
-    CollectFoldersInFolderListFile(folderListFile, aCollected);
+    CollectFoldersInFolderListFile(folderListFile, aDepth, aCollected);
   } else {
     nsCOMPtr<nsISimpleEnumerator> entries;
     rv = aDirectory->GetDirectoryEntries(getter_AddRefs(entries));
