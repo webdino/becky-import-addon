@@ -230,7 +230,7 @@ CollectFoldersInFolderListFile(nsIFile *aListFile, PRUint32 aDepth, nsISupportsA
   rv = aListFile->GetParent(getter_AddRefs(parent));
   NS_ENSURE_SUCCESS(rv, rv);
 
-  PRBool more;
+  PRBool more = PR_TRUE;
   nsCAutoString folderName;
   while (more && NS_SUCCEEDED(rv)) {
     rv = lineStream->ReadLine(folderName, &more);
