@@ -121,8 +121,10 @@ BeckyUtils::ConvertStringToUTF8(const nsACString& aOriginal,
 
   return NS_OK;
 #else
+  nsresult rv;
   nsCOMPtr<nsIUTF8ConverterService> converter;
-  converter = do_GetService(NS_UTF8CONVERTERSERVICE_CONTRACTID);
+  converter = do_GetService(NS_UTF8CONVERTERSERVICE_CONTRACTID, &rv);
+  NS_ENSURE_SUCCESS(rv, rv);
   return converter->ConvertStringToUTF8(aOriginal, "CP932", PR_FALSE, _retval);
 #endif
 }
