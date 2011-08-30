@@ -379,6 +379,7 @@ HandleHeaderLine(nsACString &aHeaderLine, nsACString &aHeaders)
     statusLine = PR_smprintf(X_MOZILLA_STATUS_FORMAT MSG_LINEBREAK, flag);
     aHeaders.Append(statusLine);
     PR_smprintf_free(statusLine);
+    aHeaders.Append(X_MOZILLA_KEYWORDS);
   }
 
   return NS_OK;
