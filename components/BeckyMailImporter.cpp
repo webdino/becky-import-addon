@@ -86,76 +86,6 @@ BeckyMailImporter::~BeckyMailImporter()
   /* destructor code */
 }
 
-static nsresult
-GetFolderListFile(nsIFile *aLocation, nsIFile **aFile)
-{
-  nsresult rv;
-  nsCOMPtr<nsIFile> folderListFile;
-  rv = aLocation->Clone(getter_AddRefs(folderListFile));
-  NS_ENSURE_SUCCESS(rv, rv);
-
-  rv = folderListFile->AppendNative(NS_LITERAL_CSTRING("Folder.lst"));
-  NS_ENSURE_SUCCESS(rv, rv);
-
-  PRBool exists;
-  rv = folderListFile->Exists(&exists);
-  if (NS_FAILED(rv))
-    return rv;
-
-  NS_IF_ADDREF(*aFile = folderListFile);
-
-  return exists ? NS_OK : NS_ERROR_FILE_NOT_FOUND;
-}
-
-static nsresult
-GetDefaultFolderName(nsIFile *aFolderListFile, nsACString& name)
-{
-  nsresult rv;
-  nsCOMPtr<nsILineInputStream> lineStream;
-  rv = BeckyUtils::CreateLineInputStream(aFolderListFile,
-                                         getter_AddRefs(lineStream));
-  NS_ENSURE_SUCCESS(rv, rv);
-
-  PRBool more = PR_TRUE;
-  rv = lineStream->ReadLine(name, &more);
-  NS_ENSURE_SUCCESS(rv, rv);
-
-  return NS_OK;
-}
-
-static nsresult
-GetDefaultFolder(nsIFile **aFolder)
-{
-  nsCOMPtr<nsIFile> userDirectory;
-  nsresult rv = BeckyUtils::FindUserDirectory(getter_AddRefs(userDirectory));
-  if (NS_FAILED(rv))
-    return rv;
-
-  nsCOMPtr<nsIFile> folderListFile;
-  rv = GetFolderListFile(userDirectory, getter_AddRefs(folderListFile));
-  if (NS_FAILED(rv))
-    return rv;
-
-  nsCAutoString defaultFolderName;
-  rv = GetDefaultFolderName(folderListFile, defaultFolderName);
-  if (NS_FAILED(rv))
-    return rv;
-
-  rv = userDirectory->AppendNative(defaultFolderName);
-  if (NS_FAILED(rv))
-    return rv;
-
-  nsIFile *defaultFolder = userDirectory;
-  PRBool exists;
-  rv = defaultFolder->Exists(&exists);
-  if (NS_FAILED(rv))
-    return rv;
-
-  NS_IF_ADDREF(*aFolder = defaultFolder);
-
-  return NS_OK;
-}
-
 NS_IMETHODIMP
 BeckyMailImporter::GetDefaultLocation(nsIFile **aLocation NS_OUTPARAM,
                                       PRBool *aFound NS_OUTPARAM,
@@ -167,7 +97,7 @@ BeckyMailImporter::GetDefaultLocation(nsIFile **aLocation NS_OUTPARAM,
 
   *aLocation = nsnull;
   *aUserVerify = PR_TRUE;
-  *aFound = NS_SUCCEEDED(GetDefaultFolder(aLocation));
+  *aFound = NS_SUCCEEDED(BeckyUtils::GetDefaultMailboxDirectory(aLocation));
 
   return NS_OK;
 }
@@ -264,7 +194,7 @@ CollectMailboxesInDirectory(nsIFile *aDirectory, PRUint32 aDepth, nsISupportsArr
 {
   nsresult rv;
   nsCOMPtr<nsIFile> folderListFile;
-  rv = GetFolderListFile(aDirectory, getter_AddRefs(folderListFile));
+  rv = BeckyUtils::GetFolderListFile(aDirectory, getter_AddRefs(folderListFile));
 
   if (NS_SUCCEEDED(rv)) {
     CollectFoldersInFolderListFile(folderListFile, aDepth, aCollected);

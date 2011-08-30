@@ -142,3 +142,73 @@ BeckyUtils::CreateLineInputStream(nsIFile *aFile,
   return CallQueryInterface(inputStream, _retval);
 }
 
+nsresult
+BeckyUtils::GetFolderListFile(nsIFile *aLocation, nsIFile **_retval NS_OUTPARAM)
+{
+  nsresult rv;
+  nsCOMPtr<nsIFile> folderListFile;
+  rv = aLocation->Clone(getter_AddRefs(folderListFile));
+  NS_ENSURE_SUCCESS(rv, rv);
+
+  rv = folderListFile->AppendNative(NS_LITERAL_CSTRING("Folder.lst"));
+  NS_ENSURE_SUCCESS(rv, rv);
+
+  PRBool exists;
+  rv = folderListFile->Exists(&exists);
+  if (NS_FAILED(rv))
+    return rv;
+
+  NS_IF_ADDREF(*_retval = folderListFile);
+
+  return exists ? NS_OK : NS_ERROR_FILE_NOT_FOUND;
+}
+
+nsresult
+BeckyUtils::GetDefaultFolderName(nsIFile *aFolderListFile, nsACString& name)
+{
+  nsresult rv;
+  nsCOMPtr<nsILineInputStream> lineStream;
+  rv = BeckyUtils::CreateLineInputStream(aFolderListFile,
+                                         getter_AddRefs(lineStream));
+  NS_ENSURE_SUCCESS(rv, rv);
+
+  PRBool more = PR_TRUE;
+  rv = lineStream->ReadLine(name, &more);
+  NS_ENSURE_SUCCESS(rv, rv);
+
+  return NS_OK;
+}
+
+nsresult
+BeckyUtils::GetDefaultMailboxDirectory(nsIFile **_retval)
+{
+  nsCOMPtr<nsIFile> userDirectory;
+  nsresult rv = FindUserDirectory(getter_AddRefs(userDirectory));
+  if (NS_FAILED(rv))
+    return rv;
+
+  nsCOMPtr<nsIFile> folderListFile;
+  rv = GetFolderListFile(userDirectory, getter_AddRefs(folderListFile));
+  if (NS_FAILED(rv))
+    return rv;
+
+  nsCAutoString defaultFolderName;
+  rv = GetDefaultFolderName(folderListFile, defaultFolderName);
+  if (NS_FAILED(rv))
+    return rv;
+
+  rv = userDirectory->AppendNative(defaultFolderName);
+  if (NS_FAILED(rv))
+    return rv;
+
+  nsIFile *defaultFolder = userDirectory;
+  PRBool exists;
+  rv = defaultFolder->Exists(&exists);
+  if (NS_FAILED(rv))
+    return rv;
+
+  NS_IF_ADDREF(*_retval = defaultFolder);
+
+  return NS_OK;
+}
+

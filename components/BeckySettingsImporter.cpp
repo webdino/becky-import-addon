@@ -81,31 +81,18 @@ static
 nsresult
 GetMailbox(nsIFile **aDirectory)
 {
-  nsCOMPtr<nsIFile> baseDirectory;
-  nsresult rv = BeckyUtils::FindUserDirectory(getter_AddRefs(baseDirectory));
+  nsresult rv;
+  nsCOMPtr<nsIFile> mailboxDirectory;
+  rv = BeckyUtils::GetDefaultMailboxDirectory(getter_AddRefs(mailboxDirectory));
   if (NS_FAILED(rv))
     return rv;
 
-  nsCOMPtr<nsISimpleEnumerator> entries;
-  rv = baseDirectory->GetDirectoryEntries(getter_AddRefs(entries));
+  rv = mailboxDirectory->AppendNative(NS_LITERAL_CSTRING("Mailbox.ini"));
   NS_ENSURE_SUCCESS(rv, rv);
-
-  PRBool more;
-  nsCOMPtr<nsIFile> entry;
-  while (NS_SUCCEEDED(entries->HasMoreElements(&more)) && more) {
-    rv = entries->GetNext(getter_AddRefs(entry));
-    PRBool isDirectory = PR_FALSE;
-    rv = entry->IsDirectory(&isDirectory);
-    NS_ENSURE_SUCCESS(rv, rv);
-
-    if (isDirectory) {
-      entry->AppendNative(NS_LITERAL_CSTRING("Mailbox.ini"));
-      PRBool exists;
-      entry->Exists(&exists);
-      if (exists)
-        return CallQueryInterface(entry, aDirectory);
-    }
-  }
+  PRBool exists;
+  rv = mailboxDirectory->Exists(&exists);
+  if (exists)
+    return CallQueryInterface(mailboxDirectory, aDirectory);
 
   return NS_ERROR_FILE_NOT_FOUND;
 }

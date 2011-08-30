@@ -47,6 +47,11 @@ public:
                                       nsACString& _retval);
   static nsresult CreateLineInputStream(nsIFile *aFile,
                                         nsILineInputStream **_retval);
+  static nsresult GetDefaultMailboxDirectory(nsIFile **_retval);
+  static nsresult GetFolderListFile(nsIFile *aLocation,
+                                    nsIFile **_retval);
+  static nsresult GetDefaultFolderName(nsIFile *aFolderListFile,
+                                       nsACString& name);
 };
 
 
