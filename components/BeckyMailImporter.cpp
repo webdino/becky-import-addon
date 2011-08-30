@@ -390,7 +390,7 @@ BeckyMailImporter::ImportMailbox(nsIImportMailboxDescriptor *aSource,
 
   if (NS_SUCCEEDED(rv)) {
     nsString successMessage;
-    BeckyStringBundle::GetStringByID(BECKYIMPORT_SUCCESS_MESSAGE, successMessage);
+    BeckyStringBundle::GetStringByID(BECKYIMPORT_MAILBOX_SUCCESS, successMessage);
     *aSuccessLog = ToNewUnicode(successMessage);
   }
 

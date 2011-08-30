@@ -279,7 +279,7 @@ BeckyAddressBooksImporter::ImportAddressBook(nsIImportABDescriptor *aSource,
     *aErrorLog = ToNewUnicode(error);
   } else {
     nsString successMessage;
-    BeckyStringBundle::GetStringByID(BECKYIMPORT_SUCCESS_MESSAGE, successMessage);
+    BeckyStringBundle::GetStringByID(BECKYIMPORT_ADDRESS_SUCCESS, successMessage);
     *aSuccessLog = ToNewUnicode(successMessage);
   }
 
