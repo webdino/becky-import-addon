@@ -230,7 +230,7 @@ BeckyMailImporter::FindMailboxes(nsIFile *aLocation,
   rv = NS_NewISupportsArray(getter_AddRefs(array));
   NS_ENSURE_SUCCESS(rv, rv);
 
-  rv = CollectMailboxesInDirectory(aLocation, 0, array);
+  rv = CollectMailboxesInDirectory(aLocation, 1, array);
   if (NS_FAILED(rv))
     return rv;
 
