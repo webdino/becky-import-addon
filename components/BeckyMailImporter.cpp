@@ -367,6 +367,8 @@ BeckyMailImporter::ImportMailbox(nsIImportMailboxDescriptor *aSource,
     if (NS_FAILED(rv))
       break;
 
+    mReadBytes += line.Length(); // Actually this isn't correct.
+
     if (inHeader) {
       if (line.IsEmpty()) { // End of headers
         rv = outputStream->Write(FROM_LINE, strlen(FROM_LINE), &bytesWritten);
