@@ -68,8 +68,6 @@ static nsresult CollectMailboxesInDirectory(nsIFile *aDirectory,
 #define FROM_LINE "From - Mon Jan 1 00:00:00 1965" MSG_LINEBREAK
 #define X_BECKY_STATUS_HEADER "X-Becky-Status"
 
-static PRUint32 xBeckyStatusHeaderLength = strlen(X_BECKY_STATUS_HEADER ":");
-
 enum {
   BECKY_STATUS_READ      = 1 << 0,
   BECKY_STATUS_FORWARDED = 1 << 1,
@@ -311,13 +309,35 @@ BeckyMailImporter::FindMailboxes(nsIFile *aLocation,
   return NS_OK;
 }
 
+static nsresult
+GetHeaderValue (nsACString &aHeader, nsACString &aValue)
+{
+  PRUint32 valueStartPosition;
+
+  valueStartPosition = aHeader.Find(":");
+  if (valueStartPosition < 0)
+    return NS_ERROR_FAILURE;
+
+  valueStartPosition++;
+  nsDependentCSubstring value(aHeader,
+                              valueStartPosition,
+                              aHeader.Find(",", valueStartPosition) - valueStartPosition);
+  value.Trim(" \t");
+
+  aValue.Assign(value);
+
+  return NS_OK;
+}
+
 static PRBool
 ConvertBeckyStatusToMozillaStatus(nsACString &aHeader,
                                   nsMsgMessageFlagType *aMozillaStatusFlag)
 {
-  nsDependentCSubstring statusString(aHeader,
-                                     xBeckyStatusHeaderLength,
-                                     aHeader.Find(",", xBeckyStatusHeaderLength) - xBeckyStatusHeaderLength);
+  nsresult rv;
+  nsCAutoString statusString;
+  rv = GetHeaderValue(aHeader, statusString);
+  NS_ENSURE_SUCCESS(rv, rv);
+
   nsresult errorCode;
   PRUint32 beckyStatusFlag = static_cast<PRUint32>(statusString.ToInteger(&errorCode, 16));
   if (NS_FAILED(errorCode))
@@ -334,9 +354,17 @@ ConvertBeckyStatusToMozillaStatus(nsACString &aHeader,
 }
 
 static inline PRBool
+CheckHeaderKey(nsACString &aHeader, const char *aKeyString)
+{
+  nsDependentCSubstring key(aHeader, 0, aHeader.Find(":"));
+  key.Trim(" \t");
+  return key.Equals(aKeyString);
+}
+
+static inline PRBool
 IsBeckyStatusHeader(nsACString &aHeader)
 {
-  return StringBeginsWith(aHeader, NS_LITERAL_CSTRING(X_BECKY_STATUS_HEADER ":"));
+  return CheckHeaderKey(aHeader, X_BECKY_STATUS_HEADER);
 }
 
 static nsresult
