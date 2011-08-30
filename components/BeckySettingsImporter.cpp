@@ -444,7 +444,7 @@ static nsresult
 CreateIdentity(nsIINIParser *aParser,
                nsIMsgIdentity **aIdentity)
 {
-  nsCAutoString email, fullName, identityName;
+  nsCAutoString email, fullName, identityName, bccAddress;
 
   aParser->GetString(NS_LITERAL_CSTRING("Account"),
                      NS_LITERAL_CSTRING("Name"),
@@ -455,6 +455,9 @@ CreateIdentity(nsIINIParser *aParser,
   aParser->GetString(NS_LITERAL_CSTRING("Account"),
                      NS_LITERAL_CSTRING("MailAddress"),
                      email);
+  aParser->GetString(NS_LITERAL_CSTRING("Account"),
+                     NS_LITERAL_CSTRING("PermBcc"),
+                     bccAddress);
 
   nsresult rv;
   nsCOMPtr<nsIMsgAccountManager> accountManager =
@@ -468,6 +471,10 @@ CreateIdentity(nsIINIParser *aParser,
   identity->SetIdentityName(NS_ConvertUTF8toUTF16(identityName));
   identity->SetFullName(NS_ConvertUTF8toUTF16(fullName));
   identity->SetEmail(email);
+  if (!bccAddress.IsEmpty()) {
+    identity->SetDoBcc(PR_TRUE);
+    identity->SetDoBccList(bccAddress);
+  }
 
   NS_IF_ADDREF(*aIdentity = identity);
 
