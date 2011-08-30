@@ -114,6 +114,20 @@ CreateMailboxDescriptor(nsIImportMailboxDescriptor **aDescriptor)
 }
 
 static nsresult
+GetMailboxName(nsIFile *aMailbox, nsAString &aName)
+{
+  nsresult rv;
+  nsCOMPtr<nsIFile> parent;
+  rv = aMailbox->GetParent(getter_AddRefs(parent));
+  NS_ENSURE_SUCCESS(rv, rv);
+
+  parent->GetLeafName(aName);
+  aName.Trim("!", PR_TRUE, PR_FALSE);
+
+  return NS_OK;
+}
+
+static nsresult
 AppendMailboxDescriptor(nsIFile *aEntry, PRUint32 aDepth, nsISupportsArray *aCollected)
 {
   nsCAutoString name;
@@ -132,13 +146,10 @@ AppendMailboxDescriptor(nsIFile *aEntry, PRUint32 aDepth, nsISupportsArray *aCol
   }
   descriptor->SetSize(static_cast<PRUint32>(size));
 
-  nsCOMPtr<nsIFile> parent;
-  rv = aEntry->GetParent(getter_AddRefs(parent));
+  nsAutoString mailboxName;
+  rv = GetMailboxName(aEntry, mailboxName);
   NS_ENSURE_SUCCESS(rv, rv);
-
-  nsAutoString parentName;
-  parent->GetLeafName(parentName);
-  descriptor->SetDisplayName(parentName.get());
+  descriptor->SetDisplayName(mailboxName.get());
 
   nsCOMPtr<nsILocalFile> mailboxFile;
   rv = descriptor->GetFile(getter_AddRefs(mailboxFile));
