@@ -31,6 +31,8 @@ assert.equalIncomingServer = function(expected, actual) {
   assert.equals(expected.authMethod, actual.authMethod);
   assert.equals(expected.socketType, actual.socketType);
   assert.equals(expected.emptyTrashOnExit, actual.emptyTrashOnExit);
+  assert.equals(expected.doBiff, actual.doBiff);
+  assert.equals(expected.biffMinutes, actual.biffMinutes);
 }
 
 assert.equalIdentity = function(expected, actual) {
@@ -84,6 +86,8 @@ function createExpectedIncomingServer() {
   incomingServer.username = "lonesome";
   incomingServer.socketType = Ci.nsMsgSocketType.SSL;
   incomingServer.authMethod = Ci.nsMsgAuthMethod.passwordCleartext;
+  incomingServer.doBiff = true;
+  incomingServer.biffMinutes = 30;
   return incomingServer;
 }
 

@@ -414,6 +414,22 @@ CreateIncomingServer(nsIINIParser *aParser,
   if (isSecure)
     server->SetSocketType(nsMsgSocketType::SSL);
 
+  aParser->GetString(NS_LITERAL_CSTRING("Account"),
+                     NS_LITERAL_CSTRING("CheckInt"),
+                     value);
+  if (value.Equals("1")) {
+    server->SetDoBiff(PR_TRUE);
+  }
+  aParser->GetString(NS_LITERAL_CSTRING("Account"),
+                     NS_LITERAL_CSTRING("CheckEvery"),
+                     value);
+  if (!value.IsEmpty()) {
+    PRInt32 minutes = static_cast<PRInt32>(value.ToInteger(&errorCode, 10));
+    if (NS_SUCCEEDED(errorCode)) {
+      server->SetBiffMinutes(minutes * 10);
+    }
+  }
+
   NS_IF_ADDREF(*aServer = server);
 
   return NS_OK;
