@@ -49,6 +49,7 @@
 #include <nsIINIParser.h>
 #include <nsISmtpService.h>
 #include <nsISmtpServer.h>
+#include <nsIPop3IncomingServer.h>
 #include <nsIStringEnumerator.h>
 #include <nsIInputStream.h>
 #include <nsIOutputStream.h>
@@ -302,17 +303,51 @@ CreateSmtpServer(nsIINIParser *aParser,
 }
 
 static nsresult
+SetPop3ServerProperties(nsIINIParser *aParser,
+                        nsIMsgIncomingServer *aServer)
+{
+  nsCOMPtr<nsIPop3IncomingServer> pop3Server = do_QueryInterface(aServer);
+
+  nsCAutoString value;
+  aParser->GetString(NS_LITERAL_CSTRING("Account"),
+                     NS_LITERAL_CSTRING("POP3Auth"),
+                     value); // 0: plain, 1: APOP, 2: CRAM-MD5, 3: NTLM
+  nsMsgAuthMethodValue authMethod = nsMsgAuthMethod::none;
+  if (value.Equals("0")) {
+    authMethod = nsMsgAuthMethod::passwordCleartext;
+  } else if (value.Equals("1")) {
+    authMethod = nsMsgAuthMethod::old;
+  } else if (value.Equals("2")) {
+    authMethod = nsMsgAuthMethod::passwordEncrypted;
+  } else if (value.Equals("3")) {
+    authMethod = nsMsgAuthMethod::NTLM;
+  }
+  aServer->SetAuthMethod(authMethod);
+
+  aParser->GetString(NS_LITERAL_CSTRING("Account"),
+                     NS_LITERAL_CSTRING("LeaveServer"),
+                     value);
+  if (value.Equals("1")) {
+    pop3Server->SetLeaveMessagesOnServer(PR_TRUE);
+    aParser->GetString(NS_LITERAL_CSTRING("Account"),
+                       NS_LITERAL_CSTRING("KeepDays"),
+                       value);
+    if (!value.IsEmpty()) {
+      nsresult errorCode;
+      PRInt32 leftDays = static_cast<PRInt32>(value.ToInteger(&errorCode, 10));
+      if (NS_SUCCEEDED(errorCode)) {
+        pop3Server->SetNumDaysToLeaveOnServer(leftDays);
+      }
+    }
+  }
+
+  return NS_OK;
+}
+
+static nsresult
 CreateIncomingServer(nsIINIParser *aParser,
                      nsIMsgIncomingServer **aServer)
 {
-  nsCAutoString userName, serverName;
-  aParser->GetString(NS_LITERAL_CSTRING("Account"),
-                     NS_LITERAL_CSTRING("MailServer"),
-                     serverName);
-  aParser->GetString(NS_LITERAL_CSTRING("Account"),
-                     NS_LITERAL_CSTRING("UserID"),
-                     userName);
-
   nsCAutoString value;
   aParser->GetString(NS_LITERAL_CSTRING("Account"),
                      NS_LITERAL_CSTRING("Protocol"),
@@ -323,8 +358,16 @@ CreateIncomingServer(nsIINIParser *aParser,
   } else if (value.Equals("1")) {
     protocol = NS_LITERAL_CSTRING("imap");
   } else {
-    protocol = NS_LITERAL_CSTRING("pop3");
+    return NS_ERROR_FAILURE;
   }
+
+  nsCAutoString userName, serverName;
+  aParser->GetString(NS_LITERAL_CSTRING("Account"),
+                     NS_LITERAL_CSTRING("MailServer"),
+                     serverName);
+  aParser->GetString(NS_LITERAL_CSTRING("Account"),
+                     NS_LITERAL_CSTRING("UserID"),
+                     userName);
 
   nsresult rv;
   nsCOMPtr<nsIMsgIncomingServer> server;
@@ -334,8 +377,8 @@ CreateIncomingServer(nsIINIParser *aParser,
   PRBool isSecure = PR_FALSE;
   PRInt32 port = 0;
   nsresult errorCode;
-  if (value.Equals("0")) {
-    protocol = NS_LITERAL_CSTRING("pop");
+  if (protocol.Equals("pop3")) {
+    SetPop3ServerProperties(aParser, server);
     aParser->GetString(NS_LITERAL_CSTRING("Account"),
                        NS_LITERAL_CSTRING("POP3Port"),
                        value);
@@ -346,14 +389,7 @@ CreateIncomingServer(nsIINIParser *aParser,
     if (value.Equals("1")) {
       isSecure = PR_TRUE;
     }
-    aParser->GetString(NS_LITERAL_CSTRING("Account"),
-                       NS_LITERAL_CSTRING("POP3Auth"),
-                       value); // 0: plain, 1: APOP, 2: CRAM-MD5, 3: NTLM
-    aParser->GetString(NS_LITERAL_CSTRING("Account"),
-                       NS_LITERAL_CSTRING("LeaveServer"),
-                       value);
-  } else if (value.Equals("1")) {
-    protocol = NS_LITERAL_CSTRING("imap");
+  } else if (protocol.Equals("imap")) {
     aParser->GetString(NS_LITERAL_CSTRING("Account"),
                        NS_LITERAL_CSTRING("IMAP4Port"),
                        value);
