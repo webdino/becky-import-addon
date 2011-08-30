@@ -339,6 +339,23 @@ IsBeckyStatusHeader(nsACString &aHeader)
   return StringBeginsWith(aHeader, NS_LITERAL_CSTRING(X_BECKY_STATUS_HEADER ":"));
 }
 
+static nsresult
+HandleHeaderLine(nsACString &aHeaderLine, nsACString &aHeaders)
+{
+  aHeaders.Append(aHeaderLine);
+  aHeaders.AppendLiteral(MSG_LINEBREAK);
+
+  nsMsgMessageFlagType flag = 0;
+  if (IsBeckyStatusHeader(aHeaderLine) && ConvertBeckyStatusToMozillaStatus(aHeaderLine, &flag)) {
+    char *statusLine;
+    statusLine = PR_smprintf(X_MOZILLA_STATUS_FORMAT MSG_LINEBREAK, flag);
+    aHeaders.Append(statusLine);
+    PR_smprintf_free(statusLine);
+  }
+
+  return NS_OK;
+}
+
 NS_IMETHODIMP
 BeckyMailImporter::ImportMailbox(nsIImportMailboxDescriptor *aSource,
                                  nsIFile *aDestination,
@@ -394,15 +411,7 @@ BeckyMailImporter::ImportMailbox(nsIImportMailboxDescriptor *aSource,
         headers.Truncate();
         inHeader = PR_FALSE;
       } else {
-        headers.Append(line);
-        headers.AppendLiteral(MSG_LINEBREAK);
-        nsMsgMessageFlagType flag = 0;
-        if (IsBeckyStatusHeader(line) && ConvertBeckyStatusToMozillaStatus(line, &flag)) {
-          char *statusLine;
-          statusLine = PR_smprintf(X_MOZILLA_STATUS_FORMAT MSG_LINEBREAK, flag);
-          headers.Append(statusLine);
-          PR_smprintf_free(statusLine);
-        }
+        HandleHeaderLine(line, headers);
       }
       continue;
     }
