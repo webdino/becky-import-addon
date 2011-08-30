@@ -222,6 +222,10 @@ GetSmtpServer(const nsCString &aUserName,
 
   if (NS_FAILED(rv) || !server) {
     rv = smtpService->CreateSmtpServer(getter_AddRefs(server));
+    if (NS_SUCCEEDED(rv)) {
+      server->SetHostname(aServerName);
+      server->SetUsername(aUserName);
+    }
   }
   NS_IF_ADDREF(*aServer = server);
 
@@ -295,6 +299,20 @@ CreateSmtpServer(nsIINIParser *aParser,
                      NS_LITERAL_CSTRING("SMTPAUTH"),
                      value);
   if (value.Equals("1")) {
+    aParser->GetString(NS_LITERAL_CSTRING("Account"),
+                       NS_LITERAL_CSTRING("SMTPAUTHMODE"),
+                       value);
+    nsMsgAuthMethodValue authMethod = nsMsgAuthMethod::none;
+    if (value.Equals("1")) {
+      authMethod = nsMsgAuthMethod::passwordEncrypted;
+    } else if (value.Equals("2")) {
+      authMethod = nsMsgAuthMethod::old;
+    } else if (value.Equals("4")) {
+      authMethod = nsMsgAuthMethod::passwordCleartext;
+    } else {
+      authMethod = nsMsgAuthMethod::anything;
+    }
+    server->SetAuthMethod(authMethod);
   }
 
   NS_IF_ADDREF(*aServer = server);
