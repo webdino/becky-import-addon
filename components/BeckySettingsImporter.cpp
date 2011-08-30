@@ -358,7 +358,7 @@ CreateIncomingServer(nsIINIParser *aParser,
   } else if (value.Equals("1")) {
     protocol = NS_LITERAL_CSTRING("imap");
   } else {
-    return NS_ERROR_FAILURE;
+    protocol = NS_LITERAL_CSTRING("pop3");
   }
 
   nsCAutoString userName, serverName;
