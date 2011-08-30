@@ -53,6 +53,9 @@
 #include <nsIImportService.h>
 #include <nsIImportMailboxDescriptor.h>
 #include <nsMsgUtils.h>
+#include <nsMsgLocalFolderHdrs.h>
+#include <nsMsgMessageFlags.h>
+#include <nspr.h>
 
 #include "BeckyMailImporter.h"
 #include "BeckyUtils.h"
@@ -63,6 +66,15 @@ static nsresult CollectMailboxesInDirectory(nsIFile *aDirectory,
                                             nsISupportsArray *aCollected);
 
 #define FROM_LINE "From - Mon Jan 1 00:00:00 1965" MSG_LINEBREAK
+#define X_BECKY_STATUS_HEADER "X-Becky-Status"
+
+static PRUint32 xBeckyStatusHeaderLength = strlen(X_BECKY_STATUS_HEADER ":");
+
+enum {
+  BECKY_STATUS_READ      = 1 << 0,
+  BECKY_STATUS_FORWARDED = 1 << 1,
+  BECKY_STATUS_REPLIED   = 1 << 2
+};
 
 NS_IMPL_ISUPPORTS1(BeckyMailImporter, nsIImportMail)
 
@@ -299,6 +311,34 @@ BeckyMailImporter::FindMailboxes(nsIFile *aLocation,
   return NS_OK;
 }
 
+static PRBool
+ConvertBeckyStatusToMozillaStatus(nsACString &aHeader,
+                                  nsMsgMessageFlagType *aMozillaStatusFlag)
+{
+  nsDependentCSubstring statusString(aHeader,
+                                     xBeckyStatusHeaderLength,
+                                     aHeader.Find(",", xBeckyStatusHeaderLength) - xBeckyStatusHeaderLength);
+  nsresult errorCode;
+  PRUint32 beckyStatusFlag = static_cast<PRUint32>(statusString.ToInteger(&errorCode, 16));
+  if (NS_FAILED(errorCode))
+    return PR_FALSE;
+
+  if (beckyStatusFlag & BECKY_STATUS_READ)
+    *aMozillaStatusFlag |= nsMsgMessageFlags::Read;
+  if (beckyStatusFlag & BECKY_STATUS_FORWARDED)
+    *aMozillaStatusFlag |= nsMsgMessageFlags::Forwarded;
+  if (beckyStatusFlag & BECKY_STATUS_REPLIED)
+    *aMozillaStatusFlag |= nsMsgMessageFlags::Replied;
+
+  return PR_TRUE;
+}
+
+static inline PRBool
+IsBeckyStatusHeader(nsACString &aHeader)
+{
+  return StringBeginsWith(aHeader, NS_LITERAL_CSTRING(X_BECKY_STATUS_HEADER ":"));
+}
+
 NS_IMETHODIMP
 BeckyMailImporter::ImportMailbox(nsIImportMailboxDescriptor *aSource,
                                  nsIFile *aDestination,
@@ -332,27 +372,51 @@ BeckyMailImporter::ImportMailbox(nsIImportMailboxDescriptor *aSource,
 
   nsCAutoString line;
   PRUint32 bytesWritten = 0;
-  PRBool firstLineOfMessage = PR_TRUE;
+  PRBool inHeader = PR_TRUE;
   PRBool more = PR_TRUE;
+  nsCAutoString headers;
   while (more && NS_SUCCEEDED(rv)) {
     rv = lineStream->ReadLine(line, &more);
     if (NS_FAILED(rv))
       break;
 
-    if (firstLineOfMessage) {
-      rv = outputStream->Write(FROM_LINE, strlen(FROM_LINE), &bytesWritten);
-      firstLineOfMessage = PR_FALSE;
-    }
-
-    if (line.Equals(".")) {
-      firstLineOfMessage = PR_TRUE;
+    if (inHeader) {
+      if (line.IsEmpty()) { // End of headers
+        rv = outputStream->Write(FROM_LINE, strlen(FROM_LINE), &bytesWritten);
+        if (NS_FAILED(rv))
+          break;
+        rv = outputStream->Write(headers.get(), headers.Length(), &bytesWritten);
+        if (NS_FAILED(rv))
+          break;
+        rv = outputStream->Write(MSG_LINEBREAK, strlen(MSG_LINEBREAK), &bytesWritten);
+        if (NS_FAILED(rv))
+          break;
+        headers.Truncate();
+        inHeader = PR_FALSE;
+      } else {
+        headers.Append(line);
+        headers.AppendLiteral(MSG_LINEBREAK);
+        nsMsgMessageFlagType flag = 0;
+        if (IsBeckyStatusHeader(line) && ConvertBeckyStatusToMozillaStatus(line, &flag)) {
+          char *statusLine;
+          statusLine = PR_smprintf(X_MOZILLA_STATUS_FORMAT MSG_LINEBREAK, flag);
+          headers.Append(statusLine);
+          PR_smprintf_free(statusLine);
+        }
+      }
       continue;
     }
 
-    line.AppendLiteral(MSG_LINEBREAK);
+    if (line.Equals(".")) { // End of messages
+      inHeader = PR_TRUE;
+      continue;
+    }
+
     if (StringBeginsWith(line, NS_LITERAL_CSTRING(".."))) {
       line.Cut(0, 1);
     }
+
+    line.AppendLiteral(MSG_LINEBREAK);
     rv = outputStream->Write(line.get(), line.Length(), &bytesWritten);
   }
 
