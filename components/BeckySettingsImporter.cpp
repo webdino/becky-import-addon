@@ -382,7 +382,11 @@ CreateIncomingServer(nsIINIParser *aParser,
     aParser->GetString(NS_LITERAL_CSTRING("Account"),
                        NS_LITERAL_CSTRING("POP3Port"),
                        value);
-    port = static_cast<PRInt32>(value.ToInteger(&errorCode, 10));
+    if (value.IsEmpty()) {
+      port = 110;
+    } else {
+      port = static_cast<PRInt32>(value.ToInteger(&errorCode, 10));
+    }
     aParser->GetString(NS_LITERAL_CSTRING("Account"),
                        NS_LITERAL_CSTRING("SSLPOP"),
                        value);
@@ -393,7 +397,11 @@ CreateIncomingServer(nsIINIParser *aParser,
     aParser->GetString(NS_LITERAL_CSTRING("Account"),
                        NS_LITERAL_CSTRING("IMAP4Port"),
                        value);
-    port = static_cast<PRInt32>(value.ToInteger(&errorCode, 10));
+    if (value.IsEmpty()) {
+      port = 143;
+    } else {
+      port = static_cast<PRInt32>(value.ToInteger(&errorCode, 10));
+    }
     aParser->GetString(NS_LITERAL_CSTRING("Account"),
                        NS_LITERAL_CSTRING("SSLIMAP"),
                        value);
