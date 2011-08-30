@@ -293,7 +293,7 @@ CreateSmtpServer(nsIINIParser *aParser,
     if (value.Equals("1")) {
       authMethod = nsMsgAuthMethod::passwordEncrypted;
     } else if (value.Equals("2")) {
-      authMethod = nsMsgAuthMethod::old;
+      authMethod = nsMsgAuthMethod::passwordCleartext;
     } else if (value.Equals("4")) {
       authMethod = nsMsgAuthMethod::passwordCleartext;
     } else {
