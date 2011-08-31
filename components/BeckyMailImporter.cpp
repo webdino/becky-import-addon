@@ -320,6 +320,23 @@ HandleHeaderLine(nsACString &aHeaderLine, nsACString &aHeaders)
   return NS_OK;
 }
 
+static nsresult
+WriteHeaders(nsCString &aHeaders, nsIOutputStream *aOutputStream)
+{
+  nsresult rv;
+  PRUint32 bytesWritten = 0;
+
+  rv = aOutputStream->Write(FROM_LINE, strlen(FROM_LINE), &bytesWritten);
+  NS_ENSURE_SUCCESS(rv, rv);
+  rv = aOutputStream->Write(aHeaders.get(), aHeaders.Length(), &bytesWritten);
+  NS_ENSURE_SUCCESS(rv, rv);
+  rv = aOutputStream->Write(MSG_LINEBREAK, strlen(MSG_LINEBREAK), &bytesWritten);
+  NS_ENSURE_SUCCESS(rv, rv);
+  aHeaders.Truncate();
+
+  return NS_OK;
+}
+
 NS_IMETHODIMP
 BeckyMailImporter::ImportMailbox(nsIImportMailboxDescriptor *aSource,
                                  nsIFile *aDestination,
@@ -365,16 +382,9 @@ BeckyMailImporter::ImportMailbox(nsIImportMailboxDescriptor *aSource,
 
     if (inHeader) {
       if (line.IsEmpty()) { // End of headers
-        rv = outputStream->Write(FROM_LINE, strlen(FROM_LINE), &bytesWritten);
+        rv = WriteHeaders(headers, outputStream);
         if (NS_FAILED(rv))
           break;
-        rv = outputStream->Write(headers.get(), headers.Length(), &bytesWritten);
-        if (NS_FAILED(rv))
-          break;
-        rv = outputStream->Write(MSG_LINEBREAK, strlen(MSG_LINEBREAK), &bytesWritten);
-        if (NS_FAILED(rv))
-          break;
-        headers.Truncate();
         inHeader = PR_FALSE;
       } else {
         HandleHeaderLine(line, headers);
