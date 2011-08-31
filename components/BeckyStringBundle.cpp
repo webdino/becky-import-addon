@@ -48,6 +48,8 @@
 #include <nsIProxyObjectManager.h>
 #include <nsIURI.h>
 #include <nsServiceManagerUtils.h>
+#include <nsIProxyObjectManager.h>
+#include <nsXPCOMCIDInternal.h>
 
 #include "BeckyStringBundle.h"
 
@@ -80,12 +82,17 @@ BeckyStringBundle::GetStringBundleProxy(void)
   if (!mBundle)
     return nsnull;
 
-  nsIStringBundle *strProxy = nsnull;
-  // create a proxy object if we aren't on the same thread?
-  //NS_GetProxyForObject(NS_PROXY_TO_MAIN_THREAD, NS_GET_IID(nsIStringBundle),
-  //                     mBundle, NS_PROXY_SYNC | NS_PROXY_ALWAYS, (void **) &strProxy);
+  nsresult rv;
+  nsCOMPtr<nsIProxyObjectManager> proxyObjectManager = do_GetService(NS_XPCOMPROXY_CONTRACTID, &rv);
+  if (NS_FAILED(rv))
+    return nsnull;
 
-  return strProxy;
+  nsIStringBundle *stringBundleProxy = nsnull;
+  proxyObjectManager->GetProxyForObject(NS_PROXY_TO_MAIN_THREAD,
+                                        NS_GET_IID(nsIStringBundle),
+                                        mBundle, NS_PROXY_SYNC | NS_PROXY_ALWAYS,
+                                        (void **) &stringBundleProxy);
+  return stringBundleProxy;
 }
 
 void

@@ -59,6 +59,7 @@
 #include <nsDirectoryServiceUtils.h>
 #include <nsStringGlue.h>
 #include <msgCore.h>
+#include <nsIStringBundle.h>
 
 #include "BeckySettingsImporter.h"
 #include "BeckyStringBundle.h"
@@ -106,10 +107,12 @@ BeckySettingsImporter::AutoLocate(PRUnichar **aDescription NS_OUTPARAM,
   NS_ENSURE_ARG_POINTER(aLocation);
   NS_ENSURE_ARG_POINTER(_retval);
 
-  nsString description;
-  BeckyStringBundle::GetStringByID(BECKYIMPORT_NAME, description);
-
-  *aDescription = ToNewUnicode(description);
+  nsCOMPtr<nsIStringBundle> bundle(dont_AddRef(BeckyStringBundle::GetStringBundleProxy()));
+  if (bundle) {
+    nsString description;
+    BeckyStringBundle::GetStringByID(BECKYIMPORT_NAME, description, bundle);
+    *aDescription = ToNewUnicode(description);
+  }
   *aLocation = nsnull;
   *_retval = PR_FALSE;
 

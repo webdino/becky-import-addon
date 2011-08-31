@@ -57,6 +57,7 @@
 #include <nsMsgMessageFlags.h>
 #include <nsTArray.h>
 #include <nspr.h>
+#include <nsIStringBundle.h>
 
 #include "BeckyMailImporter.h"
 #include "BeckyUtils.h"
@@ -503,9 +504,12 @@ BeckyMailImporter::ImportMailbox(nsIImportMailboxDescriptor *aSource,
   }
 
   if (NS_SUCCEEDED(rv)) {
-    nsString successMessage;
-    BeckyStringBundle::GetStringByID(BECKYIMPORT_MAILBOX_SUCCESS, successMessage);
-    *aSuccessLog = ToNewUnicode(successMessage);
+    nsCOMPtr<nsIStringBundle> bundle(dont_AddRef(BeckyStringBundle::GetStringBundleProxy()));
+    if (bundle) {
+      nsString successMessage;
+      BeckyStringBundle::GetStringByID(BECKYIMPORT_MAILBOX_SUCCESS, successMessage, bundle);
+      *aSuccessLog = ToNewUnicode(successMessage);
+    }
   }
 
   return rv;

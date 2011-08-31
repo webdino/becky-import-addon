@@ -55,6 +55,7 @@
 #include <nsIImportService.h>
 #include <nsIImportABDescriptor.h>
 #include <nsMsgUtils.h>
+#include <nsIStringBundle.h>
 
 #include "BeckyAddressBooksImporter.h"
 #include "BeckyStringBundle.h"
@@ -88,10 +89,12 @@ BeckyAddressBooksImporter::GetAutoFind(PRUnichar **aDescription NS_OUTPARAM, PRB
   NS_ENSURE_ARG_POINTER(aDescription);
   NS_ENSURE_ARG_POINTER(_retval);
 
-  nsString description;
-  BeckyStringBundle::GetStringByID(BECKYIMPORT_DESCRIPTION, description);
-
-  *aDescription = ToNewUnicode(description);
+  nsCOMPtr<nsIStringBundle> bundle(dont_AddRef(BeckyStringBundle::GetStringBundleProxy()));
+  if (bundle) {
+    nsString description;
+    BeckyStringBundle::GetStringByID(BECKYIMPORT_DESCRIPTION, description, bundle);
+    *aDescription = ToNewUnicode(description);
+  }
   *_retval = PR_FALSE;
 
   return NS_OK;
@@ -278,9 +281,12 @@ BeckyAddressBooksImporter::ImportAddressBook(nsIImportABDescriptor *aSource,
   if (!error.IsEmpty()) {
     *aErrorLog = ToNewUnicode(error);
   } else {
-    nsString successMessage;
-    BeckyStringBundle::GetStringByID(BECKYIMPORT_ADDRESS_SUCCESS, successMessage);
-    *aSuccessLog = ToNewUnicode(successMessage);
+    nsCOMPtr<nsIStringBundle> bundle(dont_AddRef(BeckyStringBundle::GetStringBundleProxy()));
+    if (bundle) {
+      nsString successMessage;
+      BeckyStringBundle::GetStringByID(BECKYIMPORT_ADDRESS_SUCCESS, successMessage, bundle);
+      *aSuccessLog = ToNewUnicode(successMessage);
+    }
   }
 
   return rv;
