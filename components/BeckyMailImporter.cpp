@@ -55,6 +55,7 @@
 #include <nsMsgUtils.h>
 #include <nsMsgLocalFolderHdrs.h>
 #include <nsMsgMessageFlags.h>
+#include <nsTArray.h>
 #include <nspr.h>
 
 #include "BeckyMailImporter.h"
@@ -67,6 +68,7 @@ static nsresult CollectMailboxesInDirectory(nsIFile *aDirectory,
 
 #define FROM_LINE "From - Mon Jan 1 00:00:00 1965" MSG_LINEBREAK
 #define X_BECKY_STATUS_HEADER "X-Becky-Status"
+#define X_BECKY_INCLUDE_HEADER "X-Becky-Include"
 
 enum {
   BECKY_STATUS_READ      = 1 << 0,
@@ -337,6 +339,78 @@ WriteHeaders(nsCString &aHeaders, nsIOutputStream *aOutputStream)
   return NS_OK;
 }
 
+static inline PRBool
+IsBeckyIncludeLine(const nsCString &aLine)
+{
+  return CheckHeaderKey(aLine, X_BECKY_INCLUDE_HEADER);
+}
+
+static nsresult
+GetAttachmentFile(nsIFile *aMailboxFile,
+                  const nsCString &aHeader,
+                  nsIFile **_retval NS_OUTPARAM)
+{
+  nsresult rv;
+  nsCOMPtr<nsIFile> attachmentFile;
+
+  rv = aMailboxFile->Clone(getter_AddRefs(attachmentFile));
+  NS_ENSURE_SUCCESS(rv, rv);
+
+  rv = attachmentFile->AppendNative(NS_LITERAL_CSTRING("#Attach"));
+  NS_ENSURE_SUCCESS(rv, rv);
+
+  nsCAutoString attachmentPath;
+  rv = GetHeaderValue(aHeader, attachmentPath);
+  NS_ENSURE_SUCCESS(rv, rv);
+
+  nsTArray<nsCAutoString> directoryNames;
+  ParseString(attachmentPath, '\\', directoryNames);
+  for (nsTArray<nsCString>::index_type i = 0; i < directoryNames.Length(); i++) {
+    rv = attachmentFile->AppendNative(directoryNames[i]);
+  }
+
+  PRBool exists = PR_FALSE;
+  attachmentFile->Exists(&exists);
+
+  NS_IF_ADDREF(*_retval = attachmentFile);
+
+  return exists ? NS_OK : NS_ERROR_FILE_NOT_FOUND;
+}
+
+static nsresult
+WriteAttachmentFile(nsIFile *aMailboxFile,
+                    const nsCString &aHeader,
+                    nsIOutputStream *aOutputStream)
+{
+  nsresult rv;
+  nsCOMPtr<nsIFile> parentDirectory;
+  rv = aMailboxFile->GetParent(getter_AddRefs(parentDirectory));
+  NS_ENSURE_SUCCESS(rv, rv);
+
+  nsCOMPtr<nsIFile> attachmentFile;
+  rv = GetAttachmentFile(parentDirectory,
+                         aHeader,
+                         getter_AddRefs(attachmentFile));
+  if (NS_FAILED(rv))
+    return rv;
+
+  nsCOMPtr<nsIInputStream> inputStream;
+  rv = NS_NewLocalFileInputStream(getter_AddRefs(inputStream),
+                                  attachmentFile);
+  NS_ENSURE_SUCCESS(rv, rv);
+
+  char buffer[4096];
+  PRUint32 readBytes = 0;
+  PRUint32 writtenBytes = 0;
+  rv = aOutputStream->Write(MSG_LINEBREAK, strlen(MSG_LINEBREAK), &writtenBytes);
+  while (NS_SUCCEEDED(inputStream->Read(buffer, sizeof(buffer), &readBytes)) &&
+         readBytes > 0) {
+    rv = aOutputStream->Write(buffer, readBytes, &writtenBytes);
+  }
+
+  return NS_OK;
+}
+
 static nsresult
 _MsgNewBufferedFileOutputStream(nsIOutputStream **aResult,
                                 nsIFile* aFile,
@@ -414,6 +488,12 @@ BeckyMailImporter::ImportMailbox(nsIImportMailboxDescriptor *aSource,
       continue;
     }
 
+    if (IsBeckyIncludeLine(line)) {
+      rv = WriteAttachmentFile(mailboxFile, line, outputStream);
+      if (NS_FAILED(rv))
+        break;
+      continue;
+    }
     if (StringBeginsWith(line, NS_LITERAL_CSTRING(".."))) {
       line.Cut(0, 1);
     }
