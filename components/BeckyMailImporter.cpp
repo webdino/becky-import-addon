@@ -337,6 +337,23 @@ WriteHeaders(nsCString &aHeaders, nsIOutputStream *aOutputStream)
   return NS_OK;
 }
 
+static nsresult
+_MsgNewBufferedFileOutputStream(nsIOutputStream **aResult,
+                                nsIFile* aFile,
+                                PRInt32 aIOFlags = -1,
+                                PRInt32 aPerm = -1)
+{
+  nsCOMPtr<nsIOutputStream> stream;
+  nsresult rv = NS_NewLocalFileOutputStream(getter_AddRefs(stream),
+                                            aFile,
+                                            aIOFlags,
+                                            aPerm);
+  if (NS_SUCCEEDED(rv))
+    rv = NS_NewBufferedOutputStream(aResult, stream, 4096);
+  return rv;
+}
+
+
 NS_IMETHODIMP
 BeckyMailImporter::ImportMailbox(nsIImportMailboxDescriptor *aSource,
                                  nsIFile *aDestination,
@@ -365,7 +382,7 @@ BeckyMailImporter::ImportMailbox(nsIImportMailboxDescriptor *aSource,
   NS_ENSURE_SUCCESS(rv, rv);
 
   nsCOMPtr<nsIOutputStream> outputStream;
-  rv = MsgNewBufferedFileOutputStream(getter_AddRefs(outputStream), aDestination);
+  rv = _MsgNewBufferedFileOutputStream(getter_AddRefs(outputStream), aDestination);
   NS_ENSURE_SUCCESS(rv, rv);
 
   nsCAutoString line;
