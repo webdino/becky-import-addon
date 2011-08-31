@@ -209,24 +209,18 @@ CollectMailboxesInDirectory(nsIFile *aDirectory, PRUint32 aDepth, nsISupportsArr
 
   if (NS_SUCCEEDED(rv)) {
     CollectFoldersInFolderListFile(folderListFile, aDepth, aCollected);
-  } else {
-    nsCOMPtr<nsISimpleEnumerator> entries;
-    rv = aDirectory->GetDirectoryEntries(getter_AddRefs(entries));
-    NS_ENSURE_SUCCESS(rv, rv);
+  }
 
-    PRBool more;
-    nsCOMPtr<nsIFile> entry;
-    while (NS_SUCCEEDED(entries->HasMoreElements(&more)) && more) {
-      rv = entries->GetNext(getter_AddRefs(entry));
-      PRBool isDirectory = PR_FALSE;
-      rv = entry->IsDirectory(&isDirectory);
-      NS_ENSURE_SUCCESS(rv, rv);
-      if (isDirectory) {
-        CollectMailboxesInDirectory(entry, ++aDepth, aCollected);
-      } else {
-        AppendMailboxDescriptor(entry, aDepth, aCollected);
-      }
-    }
+  nsCOMPtr<nsISimpleEnumerator> entries;
+  rv = aDirectory->GetDirectoryEntries(getter_AddRefs(entries));
+  NS_ENSURE_SUCCESS(rv, rv);
+
+  PRBool more;
+  nsCOMPtr<nsIFile> entry;
+  while (NS_SUCCEEDED(entries->HasMoreElements(&more)) && more) {
+    rv = entries->GetNext(getter_AddRefs(entry));
+    NS_ENSURE_SUCCESS(rv, rv);
+    rv = AppendMailboxDescriptor(entry, aDepth, aCollected);
   }
 
   return NS_OK;
