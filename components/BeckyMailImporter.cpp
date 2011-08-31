@@ -245,7 +245,7 @@ BeckyMailImporter::FindMailboxes(nsIFile *aLocation,
 }
 
 static nsresult
-GetHeaderValue (nsACString &aHeader, nsACString &aValue)
+GetHeaderValue (const nsCString &aHeader, nsACString &aValue)
 {
   PRUint32 valueStartPosition;
 
@@ -265,7 +265,7 @@ GetHeaderValue (nsACString &aHeader, nsACString &aValue)
 }
 
 static PRBool
-ConvertBeckyStatusToMozillaStatus(nsACString &aHeader,
+ConvertBeckyStatusToMozillaStatus(const nsCString &aHeader,
                                   nsMsgMessageFlagType *aMozillaStatusFlag)
 {
   nsresult rv;
@@ -289,7 +289,7 @@ ConvertBeckyStatusToMozillaStatus(nsACString &aHeader,
 }
 
 static inline PRBool
-CheckHeaderKey(nsACString &aHeader, const char *aKeyString)
+CheckHeaderKey(const nsCString &aHeader, const char *aKeyString)
 {
   nsDependentCSubstring key(aHeader, 0, aHeader.Find(":"));
   key.Trim(" \t");
@@ -297,13 +297,13 @@ CheckHeaderKey(nsACString &aHeader, const char *aKeyString)
 }
 
 static inline PRBool
-IsBeckyStatusHeader(nsACString &aHeader)
+IsBeckyStatusHeader(const nsCString &aHeader)
 {
   return CheckHeaderKey(aHeader, X_BECKY_STATUS_HEADER);
 }
 
 static nsresult
-HandleHeaderLine(nsACString &aHeaderLine, nsACString &aHeaders)
+HandleHeaderLine(const nsCString &aHeaderLine, nsACString &aHeaders)
 {
   aHeaders.Append(aHeaderLine);
   aHeaders.AppendLiteral(MSG_LINEBREAK);
