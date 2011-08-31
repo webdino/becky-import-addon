@@ -118,8 +118,10 @@ BeckySettingsImporter::AutoLocate(PRUnichar **aDescription NS_OUTPARAM,
 
   nsCOMPtr<nsIFile> location;
   nsresult rv = GetMailbox(getter_AddRefs(location));
-  if (NS_FAILED(rv))
-    return NS_OK;
+  if (NS_FAILED(rv)) {
+    location = do_CreateInstance(NS_LOCAL_FILE_CONTRACTID, &rv);
+    return CallQueryInterface(location, aLocation);
+  }
 
   *_retval = PR_TRUE;
   return CallQueryInterface(location, aLocation);
