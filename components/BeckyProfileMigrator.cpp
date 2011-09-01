@@ -41,8 +41,11 @@
 #include "config.h"
 #endif /* HAVE_CONFIG_H */
 
-#include <stdio.h>
+#include <mozilla-config.h>
+#include <nsCOMPtr.h>
+
 #include "BeckyProfileMigrator.h"
+#include "BeckyUtils.h"
 
 NS_IMPL_ISUPPORTS2(BeckyProfileMigrator, nsIMailProfileMigrator, nsITimerCallback)
 
@@ -70,7 +73,6 @@ BeckyProfileMigrator::Migrate(PRUint16 aItems,
                               nsIProfileStartup *aStartup,
                               const PRUnichar *aProfile)
 {
-  printf("%s\n", __PRETTY_FUNCTION__);
   return NS_ERROR_NOT_IMPLEMENTED;
 }
 
@@ -79,28 +81,31 @@ BeckyProfileMigrator::GetMigrateData(const PRUnichar *aProfile,
                                      PRBool aDoingStartup,
                                      PRUint16 *_retval NS_OUTPARAM)
 {
-  printf("%s\n", __PRETTY_FUNCTION__);
   return NS_ERROR_NOT_IMPLEMENTED;
 }
 
 NS_IMETHODIMP
 BeckyProfileMigrator::GetSourceExists(PRBool *aSourceExists)
 {
-  printf("%s\n", __PRETTY_FUNCTION__);
-  return NS_ERROR_NOT_IMPLEMENTED;
+  *aSourceExists = PR_FALSE;
+
+  nsresult rv;
+  nsCOMPtr<nsIFile> userDirectory;
+  rv = BeckyUtils::FindUserDirectory(getter_AddRefs(userDirectory));
+  *aSourceExists = (NS_SUCCEEDED(rv) && userDirectory);
+
+  return NS_OK;
 }
 
 NS_IMETHODIMP
 BeckyProfileMigrator::GetSourceHasMultipleProfiles(PRBool *aSourceHasMultipleProfiles)
 {
-  printf("%s\n", __PRETTY_FUNCTION__);
   return NS_ERROR_NOT_IMPLEMENTED;
 }
 
 NS_IMETHODIMP
 BeckyProfileMigrator::GetSourceProfiles(nsIArray * *aSourceProfiles)
 {
-  printf("%s\n", __PRETTY_FUNCTION__);
   return NS_ERROR_NOT_IMPLEMENTED;
 }
 
