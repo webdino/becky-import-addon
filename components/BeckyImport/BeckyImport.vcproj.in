@@ -209,6 +209,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\BeckyProfileMigrator.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\BeckyImportModule_1_9_2.cpp"
 				>
 			</File>
@@ -248,6 +252,10 @@
 			</File>
 			<File
 				RelativePath="..\BeckyUtils.h"
+				>
+			</File>
+			<File
+				RelativePath="..\BeckyProfileMigrator.h"
 				>
 			</File>
 			<File
