@@ -205,6 +205,13 @@ BeckyProfileMigrator::ImportAddressBook()
                                          getter_AddRefs(mGenericImporter));
   NS_ENSURE_SUCCESS(rv, rv);
 
+  nsCOMPtr<nsISupportsCString> pabString = do_CreateInstance(NS_SUPPORTS_CSTRING_CONTRACTID, &rv);
+  NS_ENSURE_SUCCESS(rv, rv);
+
+  // we want to migrate the outlook express addressbook into our personal address book
+  pabString->SetData(nsDependentCString("moz-abmdbdirectory://abook.mab"));
+  mGenericImporter->SetData("addressDestination", pabString);
+
   PRBool imported;
   PRBool wantsProgress;
   mGenericImporter->WantsProgress(&wantsProgress);
