@@ -14,7 +14,7 @@ function testCreate() {
   assert.isDefined(gMigrator);
 }
 
-testSourceExists.description = "create instance test";
+testSourceExists.description = "sourceExists test";
 testSourceExists.priority = 'must';
 function testSourceExists() {
   testCreate();
