@@ -35,3 +35,12 @@ function testSourceProfiles() {
   assert.isNull(gMigrator.sourceProfiles);
 }
 
+testGetMigrateData.description = "getMigrateData test";
+testGetMigrateData.priority = 'must';
+function testGetMigrateData() {
+  testCreate();
+  assert.equals(Ci.nsIMailProfileMigrator.ACCOUNT_SETTINGS |
+                Ci.nsIMailProfileMigrator.ADDRESSBOOK_DATA |
+                Ci.nsIMailProfileMigrator.MAILDATA, gMigrator.getMigrateData({}, {}));
+}
+

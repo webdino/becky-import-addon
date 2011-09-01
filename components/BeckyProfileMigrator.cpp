@@ -81,7 +81,11 @@ BeckyProfileMigrator::GetMigrateData(const PRUnichar *aProfile,
                                      PRBool aDoingStartup,
                                      PRUint16 *_retval NS_OUTPARAM)
 {
-  return NS_ERROR_NOT_IMPLEMENTED;
+  *_retval = nsIMailProfileMigrator::ACCOUNT_SETTINGS |
+             nsIMailProfileMigrator::ADDRESSBOOK_DATA |
+             nsIMailProfileMigrator::MAILDATA;
+
+  return NS_OK;
 }
 
 NS_IMETHODIMP
