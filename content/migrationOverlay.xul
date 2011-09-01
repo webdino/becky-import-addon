@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<!DOCTYPE overlay SYSTEM "chrome://becky-import/locale/beckyImport.dtd">
+<overlay xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
+
+  <radiogroup id="importSourceGroup">
+    <radio id="becky" label="&importFromBecky.label;"/>
+  </radiogroup>
+
+</overlay>
