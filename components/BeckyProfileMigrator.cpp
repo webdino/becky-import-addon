@@ -100,7 +100,8 @@ BeckyProfileMigrator::GetSourceExists(PRBool *aSourceExists)
 NS_IMETHODIMP
 BeckyProfileMigrator::GetSourceHasMultipleProfiles(PRBool *aSourceHasMultipleProfiles)
 {
-  return NS_ERROR_NOT_IMPLEMENTED;
+  *aSourceHasMultipleProfiles = PR_FALSE;
+  return NS_OK;
 }
 
 NS_IMETHODIMP
