@@ -107,6 +107,7 @@ BeckyProfileMigrator::GetSourceHasMultipleProfiles(PRBool *aSourceHasMultiplePro
 NS_IMETHODIMP
 BeckyProfileMigrator::GetSourceProfiles(nsIArray * *aSourceProfiles)
 {
-  return NS_ERROR_NOT_IMPLEMENTED;
+  *aSourceProfiles = nsnull;
+  return NS_OK;
 }
 

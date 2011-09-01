@@ -28,3 +28,10 @@ function testSourceHasMultipleProfiles() {
   assert.isFalse(gMigrator.sourceHasMultipleProfiles);
 }
 
+testSourceProfiles.description = "sourceProfiles test";
+testSourceProfiles.priority = 'must';
+function testSourceProfiles() {
+  testCreate();
+  assert.isNull(gMigrator.sourceProfiles);
+}
+
