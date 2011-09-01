@@ -42,16 +42,30 @@
 #endif /* HAVE_CONFIG_H */
 
 #include <mozilla-config.h>
+#include <nsServiceManagerUtils.h>
 #include <nsCOMPtr.h>
+#include <nsStringGlue.h>
+#include <nsIProfileMigrator.h>
+#include <nsIImportGeneric.h>
+#include <nsIImportSettings.h>
+#include <nsIImportFilters.h>
+#include <nsComponentManagerUtils.h>
+#include <nsIMsgAccount.h>
+#include <nsISupportsPrimitives.h>
 
 #include "BeckyProfileMigrator.h"
 #include "BeckyUtils.h"
+#include "BeckyMailImporter.h"
+#include "BeckyAddressBooksImporter.h"
+#include "BeckySettingsImporter.h"
+#include "BeckyFiltersImporter.h"
 
 NS_IMPL_ISUPPORTS2(BeckyProfileMigrator, nsIMailProfileMigrator, nsITimerCallback)
 
 BeckyProfileMigrator::BeckyProfileMigrator()
 {
-  /* member initializers and constructor code */
+  mObserverService = do_GetService(NS_OBSERVERSERVICE_CONTRACTID);
+  mImportModule = do_CreateInstance("@mozilla-japan.org/import/becky;1");
 }
 
 BeckyProfileMigrator::~BeckyProfileMigrator()
@@ -59,9 +73,33 @@ BeckyProfileMigrator::~BeckyProfileMigrator()
   /* destructor code */
 }
 
+nsresult
+BeckyProfileMigrator::ContinueImport()
+{
+  return Notify(nsnull);
+}
+
 NS_IMETHODIMP
 BeckyProfileMigrator::Notify(nsITimer *aTimer)
 {
+  PRInt32 progress;
+  mGenericImporter->GetProgress(&progress);
+
+  nsAutoString index;
+  index.AppendInt(progress);
+  mObserverService->NotifyObservers(nsnull, "Migration:Progress", index.get());
+
+  if (progress == 100) {
+    if (mProcessingMailFolders)
+      return FinishCopyingMailFolders();
+    else
+      return FinishCopyingAddressBookData();
+  } else {
+    // fire a timer to handle the next one.
+    mFileIOTimer = do_CreateInstance("@mozilla.org/timer;1");
+    if (mFileIOTimer)
+      mFileIOTimer->InitWithCallback(static_cast<nsITimerCallback *>(this), 100, nsITimer::TYPE_ONE_SHOT);
+  }
   return NS_OK;
 }
 
@@ -73,7 +111,17 @@ BeckyProfileMigrator::Migrate(PRUint16 aItems,
                               nsIProfileStartup *aStartup,
                               const PRUnichar *aProfile)
 {
-  return NS_ERROR_NOT_IMPLEMENTED;
+  nsresult rv;
+
+  if (aStartup) {
+    rv = aStartup->DoStartup();
+    NS_ENSURE_SUCCESS(rv, rv);
+  }
+
+  mObserverService->NotifyObservers(nsnull, "Migration:Started", nsnull);
+  rv = ImportSettings();
+
+  return ImportAddressBook();
 }
 
 NS_IMETHODIMP
@@ -93,10 +141,15 @@ BeckyProfileMigrator::GetSourceExists(PRBool *aSourceExists)
 {
   *aSourceExists = PR_FALSE;
 
-  nsresult rv;
-  nsCOMPtr<nsIFile> userDirectory;
-  rv = BeckyUtils::FindUserDirectory(getter_AddRefs(userDirectory));
-  *aSourceExists = (NS_SUCCEEDED(rv) && userDirectory);
+  nsCOMPtr<nsIImportSettings> importSettings;
+  mImportModule->GetImportInterface(NS_IMPORT_SETTINGS_STR, getter_AddRefs(importSettings));
+
+  if (importSettings) {
+    nsString description;
+    nsCOMPtr<nsIFile> location;
+    importSettings->AutoLocate(getter_Copies(description),
+                               getter_AddRefs(location), aSourceExists);
+  }
 
   return NS_OK;
 }
@@ -113,5 +166,146 @@ BeckyProfileMigrator::GetSourceProfiles(nsIArray * *aSourceProfiles)
 {
   *aSourceProfiles = nsnull;
   return NS_OK;
+}
+
+nsresult
+BeckyProfileMigrator::ImportSettings()
+{
+  nsAutoString index;
+  index.AppendInt(nsIMailProfileMigrator::ACCOUNT_SETTINGS);
+  mObserverService->NotifyObservers(nsnull,
+                                    "Migration:ItemBeforeMigrate",
+                                    index.get());
+
+  nsresult rv;
+  nsCOMPtr<nsIImportSettings> importer;
+  rv = mImportModule->GetImportInterface(NS_IMPORT_SETTINGS_STR,
+                                         getter_AddRefs(importer));
+  PRBool imported;
+  nsCOMPtr<nsIMsgAccount> account;
+  rv = importer->Import(getter_AddRefs(account), &imported);
+
+  mObserverService->NotifyObservers(nsnull,
+                                    "Migration:ItemAfterMigrate",
+                                    index.get());
+  return rv;
+}
+
+nsresult
+BeckyProfileMigrator::ImportAddressBook()
+{
+  nsAutoString index;
+  index.AppendInt(nsIMailProfileMigrator::ADDRESSBOOK_DATA);
+  mObserverService->NotifyObservers(nsnull,
+                                    "Migration:ItemBeforeMigrate",
+                                    index.get());
+
+  nsresult rv;
+  rv = mImportModule->GetImportInterface(NS_IMPORT_ADDRESS_STR,
+                                         getter_AddRefs(mGenericImporter));
+  NS_ENSURE_SUCCESS(rv, rv);
+
+  PRBool imported;
+  PRBool wantsProgress;
+  mGenericImporter->WantsProgress(&wantsProgress);
+  rv = mGenericImporter->BeginImport(nsnull, nsnull, PR_TRUE, &imported);
+
+  if (wantsProgress)
+    ContinueImport();
+  else
+    FinishCopyingAddressBookData();
+
+  return NS_OK;
+}
+
+nsresult
+BeckyProfileMigrator::ImportMailData()
+{
+  nsAutoString index;
+  index.AppendInt(nsIMailProfileMigrator::MAILDATA);
+  mObserverService->NotifyObservers(nsnull,
+                                    "Migration:ItemBeforeMigrate",
+                                    index.get());
+
+  nsresult rv;
+  rv = mImportModule->GetImportInterface(NS_IMPORT_MAIL_STR,
+                                         getter_AddRefs(mGenericImporter));
+  NS_ENSURE_SUCCESS(rv, rv);
+
+  nsCOMPtr<nsISupportsPRBool> migrating = do_CreateInstance(NS_SUPPORTS_PRBOOL_CONTRACTID, &rv);
+  NS_ENSURE_SUCCESS(rv, rv);
+
+  // by setting the migration flag, we force the import utility to install local folders from OE
+  // directly into Local Folders and not as a subfolder
+  migrating->SetData(PR_TRUE);
+  mGenericImporter->SetData("migration", migrating);
+
+  PRBool importResult;
+  PRBool wantsProgress;
+  mGenericImporter->WantsProgress(&wantsProgress);
+  rv = mGenericImporter->BeginImport(nsnull, nsnull, PR_TRUE, &importResult);
+
+  mProcessingMailFolders = PR_TRUE;
+
+  if (wantsProgress)
+    ContinueImport();
+  else
+    FinishCopyingMailFolders();
+
+  return NS_OK;
+}
+
+nsresult
+BeckyProfileMigrator::ImportFilters()
+{
+  nsAutoString index;
+  index.AppendInt(nsIMailProfileMigrator::MAILDATA);
+  mObserverService->NotifyObservers(nsnull,
+                                    "Migration:ItemBeforeMigrate",
+                                    index.get());
+
+  nsresult rv;
+  nsCOMPtr<nsIImportFilters> importer;
+  rv = mImportModule->GetImportInterface(NS_IMPORT_FILTERS_STR,
+                                         getter_AddRefs(importer));
+  if (NS_SUCCEEDED(rv)) {
+    PRBool imported;
+    PRUnichar *error;
+    rv = importer->Import(&error, &imported);
+    mObserverService->NotifyObservers(nsnull,
+                                      "Migration:ItemAfterMigrate",
+                                      index.get());
+  }
+
+  mObserverService->NotifyObservers(nsnull, "Migration:Ended", nsnull);
+  return NS_OK;
+}
+
+nsresult
+BeckyProfileMigrator::FinishCopyingAddressBookData()
+{
+  nsAutoString index;
+  index.AppendInt(nsIMailProfileMigrator::ADDRESSBOOK_DATA);
+  mObserverService->NotifyObservers(nsnull,
+                                    "Migration:ItemAfterMigrate",
+                                    index.get());
+
+  // now kick off the mail migration code
+  ImportMailData();
+
+  return NS_OK;
+}
+
+nsresult
+BeckyProfileMigrator::FinishCopyingMailFolders()
+{
+  nsAutoString index;
+  index.AppendInt(nsIMailProfileMigrator::MAILDATA);
+  mObserverService->NotifyObservers(nsnull,
+                                    "Migration:ItemAfterMigrate",
+                                    index.get());
+
+  // now kick off the filters migration code
+  return ImportFilters();
 }
 

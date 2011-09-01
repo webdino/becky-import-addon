@@ -42,6 +42,9 @@
 
 #include <nsIMailProfileMigrator.h>
 #include <nsITimer.h>
+#include <nsIObserverService.h>
+#include <nsIImportModule.h>
+#include <nsIImportGeneric.h>
 
 #define MJ_BECKY_PROFILE_MIGRATOR_CONTRACT_ID \
   "@mozilla.org/profile/migrator;1?app=mail&type=becky"
@@ -62,7 +65,21 @@ public:
   BeckyProfileMigrator();
   virtual ~BeckyProfileMigrator();
 
+  virtual nsresult ContinueImport();
+
 private:
+  nsresult ImportSettings();
+  nsresult ImportAddressBook();
+  nsresult ImportMailData();
+  nsresult ImportFilters();
+  nsresult FinishCopyingAddressBookData();
+  nsresult FinishCopyingMailFolders();
+
+  nsCOMPtr<nsITimer> mFileIOTimer;
+  nsCOMPtr<nsIObserverService> mObserverService;
+  nsCOMPtr<nsIImportModule> mImportModule;
+  nsCOMPtr<nsIImportGeneric> mGenericImporter;
+  PRBool mProcessingMailFolders;
 };
 
 #endif /* BeckyProfileMigrator_h___ */
