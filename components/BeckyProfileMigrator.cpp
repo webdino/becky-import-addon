@@ -64,6 +64,7 @@ NS_IMPL_ISUPPORTS2(BeckyProfileMigrator, nsIMailProfileMigrator, nsITimerCallbac
 
 BeckyProfileMigrator::BeckyProfileMigrator()
 {
+  mProcessingMailFolders = PR_FALSE;
   mObserverService = do_GetService(NS_OBSERVERSERVICE_CONTRACTID);
   mImportModule = do_CreateInstance("@mozilla-japan.org/import/becky;1");
 }
