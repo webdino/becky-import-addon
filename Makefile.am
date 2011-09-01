@@ -5,7 +5,9 @@ ACLOCAL_AMFLAGS = -I m4macros $$ACLOCAL_OPTIONS
 
 noinst_DATA = deploy xpi
 
-JAR_TARGET_FILES = locale
+JAR_TARGET_FILES =      \
+        content         \
+        locale
 
 XPI_TARGET_FILES = 				\
 	install.rdf				\

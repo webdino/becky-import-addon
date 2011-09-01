@@ -19,6 +19,8 @@ BeckyImport_la_SOURCES = 	        \
 	BeckyUtils.h                    \
 	BeckyVCardAddress.cpp           \
 	BeckyVCardAddress.h             \
+	BeckyProfileMigrator.cpp        \
+	BeckyProfileMigrator.h          \
 	BeckyImport.cpp                 \
 	BeckyImport.h                   \
 	BeckyImportModule_1_9_2.cpp

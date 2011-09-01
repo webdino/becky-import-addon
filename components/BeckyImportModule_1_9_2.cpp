@@ -52,6 +52,7 @@
 #include "BeckyFiltersImporter.h"
 #include "BeckyAddressBooksImporter.h"
 #include "BeckyImport.h"
+#include "BeckyProfileMigrator.h"
 #include "BeckyStringBundle.h"
 
 NS_GENERIC_FACTORY_CONSTRUCTOR(BeckyMailImporter)
@@ -59,6 +60,7 @@ NS_GENERIC_FACTORY_CONSTRUCTOR(BeckySettingsImporter)
 NS_GENERIC_FACTORY_CONSTRUCTOR(BeckyFiltersImporter)
 NS_GENERIC_FACTORY_CONSTRUCTOR(BeckyAddressBooksImporter)
 NS_GENERIC_FACTORY_CONSTRUCTOR(BeckyImport)
+NS_GENERIC_FACTORY_CONSTRUCTOR(BeckyProfileMigrator)
 static NS_DEFINE_CID(kMJ_BECKYIMPORT_CID, MJ_BECKYIMPORT_CID);
 
 static NS_METHOD
@@ -101,7 +103,10 @@ static const nsModuleComponentInfo components[] = {
     BeckyAddressBooksImporterConstructor },
   { "Becky! Import Mail Component", MJ_BECKYIMPORT_MAIL_CID,
     MJ_BECKYIMPORT_MAIL_CONTRACT_ID,
-    BeckyMailImporterConstructor }
+    BeckyMailImporterConstructor },
+  { "Becky! Mail Profile Migrator", MJ_BECKY_PROFILE_MIGRATOR_CID,
+    MJ_BECKY_PROFILE_MIGRATOR_CONTRACT_ID,
+    BeckyProfileMigratorConstructor }
 };
 
 static void
