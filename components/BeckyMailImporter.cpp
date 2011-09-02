@@ -58,6 +58,7 @@
 #include <nsTArray.h>
 #include <nspr.h>
 #include <nsIStringBundle.h>
+#include <nsIEnumerator.h>
 
 #include "BeckyMailImporter.h"
 #include "BeckyUtils.h"
@@ -130,6 +131,55 @@ GetMailboxName(nsIFile *aMailbox, nsAString &aName)
   return NS_OK;
 }
 
+static PRBool
+IsUniqueName(const nsAString &aName, nsISupportsArray *aCollected)
+{
+  nsresult rv;
+  nsCOMPtr<nsICollection> collection;
+  collection = do_QueryInterface(aCollected, &rv);
+  NS_ENSURE_SUCCESS(rv, PR_TRUE);
+
+  nsCOMPtr<nsIEnumerator> enumerator;
+  rv = collection->Enumerate(getter_AddRefs(enumerator));
+  NS_ENSURE_SUCCESS(rv, PR_TRUE);
+
+  enumerator->First();
+  nsCOMPtr<nsIImportMailboxDescriptor> descriptor;
+  while (enumerator->IsDone() == NS_ENUMERATOR_FALSE) {
+    rv = enumerator->CurrentItem(getter_AddRefs(descriptor));
+    NS_ENSURE_SUCCESS(rv, PR_TRUE);
+
+    PRUnichar *displayName = nsnull;
+    rv = descriptor->GetDisplayName(&displayName);
+    NS_ENSURE_SUCCESS(rv, PR_TRUE);
+
+    if (aName.Equals(displayName))
+      return PR_FALSE;
+    enumerator->Next();
+  }
+  return PR_TRUE;
+}
+
+static nsresult
+EnsureUniqueName(nsAString &aName,
+                 nsISupportsArray *aCollected)
+{
+  if (IsUniqueName(aName, aCollected))
+    return NS_OK;
+
+  for (PRInt32 index = 0; index < 256; index++) {
+    nsAutoString newName;
+    newName.Assign(aName);
+    newName.AppendInt(index);
+    if (IsUniqueName(newName, aCollected)) {
+      aName.Assign(newName);
+      return NS_OK;
+    }
+  }
+
+  return NS_OK;
+}
+
 static nsresult
 AppendMailboxDescriptor(nsIFile *aEntry, PRUint32 aDepth, nsISupportsArray *aCollected)
 {
@@ -151,6 +201,8 @@ AppendMailboxDescriptor(nsIFile *aEntry, PRUint32 aDepth, nsISupportsArray *aCol
 
   nsAutoString mailboxName;
   rv = GetMailboxName(aEntry, mailboxName);
+  NS_ENSURE_SUCCESS(rv, rv);
+  rv = EnsureUniqueName(mailboxName, aCollected);
   NS_ENSURE_SUCCESS(rv, rv);
   descriptor->SetDisplayName(mailboxName.get());
 
