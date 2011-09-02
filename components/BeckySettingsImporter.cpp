@@ -78,8 +78,7 @@ BeckySettingsImporter::~BeckySettingsImporter()
 {
 }
 
-static
-nsresult
+static nsresult
 GetMailbox(nsIFile **aDirectory)
 {
   nsresult rv;
