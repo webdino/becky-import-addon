@@ -41,6 +41,7 @@
 #define BeckyFiltersImporter_h___
 
 #include <nsIImportFilters.h>
+#include <nsILocalFile.h>
 
 #define MJ_BECKYIMPORT_FILTERS_CONTRACT_ID \
   "@mozilla-japan.org/import/becky/filters;1"
@@ -60,6 +61,7 @@ public:
   virtual ~BeckyFiltersImporter();
 
 private:
+  nsCOMPtr<nsIFile> mLocation;
 };
 
 #endif /* BeckyFiltersImporter_h___ */

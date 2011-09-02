@@ -42,12 +42,18 @@
 #endif /* HAVE_CONFIG_H */
 
 #include <mozilla-config.h>
+#include <nsIStringBundle.h>
+#include <nsComponentManagerUtils.h>
+#include <nsCOMPtr.h>
 
 #include "BeckyFiltersImporter.h"
+#include "BeckyStringBundle.h"
+#include "BeckyUtils.h"
 
 NS_IMPL_ISUPPORTS1(BeckyFiltersImporter, nsIImportFilters)
 
 BeckyFiltersImporter::BeckyFiltersImporter()
+: mLocation(nsnull)
 {
   /* member initializers and constructor code */
 }
@@ -57,18 +63,61 @@ BeckyFiltersImporter::~BeckyFiltersImporter()
   /* destructor code */
 }
 
+static nsresult
+GetDefaultFilterFile(nsIFile **aFile)
+{
+  nsresult rv;
+  nsCOMPtr<nsIFile> filter;
+  rv = BeckyUtils::GetDefaultMailboxDirectory(getter_AddRefs(filter));
+  if (NS_FAILED(rv))
+    return rv;
+
+  rv = filter->AppendNative(NS_LITERAL_CSTRING("IFilter.def"));
+  NS_ENSURE_SUCCESS(rv, rv);
+
+  PRBool exists;
+  rv = filter->Exists(&exists);
+  if (exists)
+    return CallQueryInterface(filter, aFile);
+
+  return NS_ERROR_FILE_NOT_FOUND;
+}
+
 NS_IMETHODIMP
 BeckyFiltersImporter::AutoLocate(PRUnichar **aDescription NS_OUTPARAM,
                                  nsIFile **aLocation NS_OUTPARAM,
                                  PRBool *_retval NS_OUTPARAM)
 {
-  return NS_ERROR_NOT_IMPLEMENTED;
+  NS_ENSURE_ARG_POINTER(aDescription);
+  NS_ENSURE_ARG_POINTER(aLocation);
+  NS_ENSURE_ARG_POINTER(_retval);
+
+  nsCOMPtr<nsIStringBundle> bundle(dont_AddRef(BeckyStringBundle::GetStringBundleProxy()));
+  if (bundle) {
+    nsString description;
+    BeckyStringBundle::GetStringByID(BECKYIMPORT_NAME, description, bundle);
+    *aDescription = ToNewUnicode(description);
+  }
+  *aLocation = nsnull;
+  *_retval = PR_FALSE;
+
+  nsresult rv;
+  nsCOMPtr<nsIFile> location;
+  rv = GetDefaultFilterFile(getter_AddRefs(location));
+  if (NS_FAILED(rv)) {
+    location = do_CreateInstance(NS_LOCAL_FILE_CONTRACTID, &rv);
+    return CallQueryInterface(location, aLocation);
+  }
+
+  *_retval = PR_TRUE;
+  return CallQueryInterface(location, aLocation);
 }
 
 NS_IMETHODIMP
 BeckyFiltersImporter::SetLocation(nsIFile *aLocation)
 {
-  return NS_ERROR_NOT_IMPLEMENTED;
+  mLocation = aLocation;
+  return NS_OK;
 }
 
 NS_IMETHODIMP
