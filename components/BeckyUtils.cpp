@@ -96,8 +96,8 @@ EnsureStringLength(nsAString& aString, PRUint32 aLength)
 #endif
 
 nsresult
-BeckyUtils::ConvertStringToUTF8(const nsACString& aOriginal,
-                                nsACString& _retval NS_OUTPARAM)
+BeckyUtils::ConvertNativeStringToUTF8(const nsACString& aOriginal,
+                                      nsACString& _retval NS_OUTPARAM)
 {
 #ifdef XP_WIN
   PRUint32 inputLen = aOriginal.Length();

@@ -162,7 +162,7 @@ ConvertToUTF8File(nsIFile *aSourceFile, nsIFile **aConvertedFile)
   PRBool more = PR_TRUE;
   while (more) {
     rv = lineStream->ReadLine(line, &more);
-    BeckyUtils::ConvertStringToUTF8(line, utf8String);
+    BeckyUtils::ConvertNativeStringToUTF8(line, utf8String);
     utf8String.AppendLiteral(MSG_LINEBREAK);
     rv = destination->Write(utf8String.get(), utf8String.Length(), &bytesWritten);
   }

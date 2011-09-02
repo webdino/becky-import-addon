@@ -43,8 +43,8 @@ class nsILineInputStream;
 class BeckyUtils {
 public:
   static nsresult FindUserDirectory(nsIFile **aFile);
-  static nsresult ConvertStringToUTF8(const nsACString& aOriginal,
-                                      nsACString& _retval);
+  static nsresult ConvertNativeStringToUTF8(const nsACString& aOriginal,
+                                            nsACString& _retval);
   static nsresult CreateLineInputStream(nsIFile *aFile,
                                         nsILineInputStream **_retval);
   static nsresult GetDefaultMailboxDirectory(nsIFile **_retval);
