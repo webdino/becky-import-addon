@@ -276,13 +276,10 @@ CreateSmtpServer(nsIINIParser *aParser,
   PRInt32 port = static_cast<PRInt32>(value.ToInteger(&errorCode, 10));
   server->SetPort(port);
 
-  PRBool isSecure = PR_FALSE;
   aParser->GetString(NS_LITERAL_CSTRING("Account"),
                      NS_LITERAL_CSTRING("SSLSMTP"),
                      value);
   if (value.Equals("1"))
-    isSecure = PR_TRUE;
-  if (isSecure)
     server->SetSocketType(nsMsgSocketType::SSL);
 
   aParser->GetString(NS_LITERAL_CSTRING("Account"),
