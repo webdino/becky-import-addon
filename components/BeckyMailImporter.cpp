@@ -303,14 +303,14 @@ GetHeaderValue (const nsCString &aHeader, nsACString &aValue)
 {
   PRUint32 valueStartPosition;
 
-  valueStartPosition = aHeader.Find(":");
+  valueStartPosition = aHeader.FindChar(':');
   if (valueStartPosition < 0)
     return NS_ERROR_FAILURE;
 
   valueStartPosition++;
   nsDependentCSubstring value(aHeader,
                               valueStartPosition,
-                              aHeader.Find(",", valueStartPosition) - valueStartPosition);
+                              aHeader.FindChar(',', valueStartPosition) - valueStartPosition);
   value.Trim(" \t");
 
   aValue.Assign(value);
@@ -345,7 +345,7 @@ ConvertBeckyStatusToMozillaStatus(const nsCString &aHeader,
 static inline PRBool
 CheckHeaderKey(const nsCString &aHeader, const char *aKeyString)
 {
-  nsDependentCSubstring key(aHeader, 0, aHeader.Find(":"));
+  nsDependentCSubstring key(aHeader, 0, aHeader.FindChar(':'));
   key.Trim(" \t");
   return key.Equals(aKeyString);
 }
