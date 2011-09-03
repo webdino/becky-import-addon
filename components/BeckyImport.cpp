@@ -164,12 +164,10 @@ BeckyImport::GetAddressBookImportInterface(nsISupports **aInterface)
 
   nsCOMPtr<nsIImportGeneric> generic;
   rv = importService->CreateNewGenericAddressBooks(getter_AddRefs(generic));
-  if (NS_SUCCEEDED(rv)) {
-    generic->SetData("addressInterface", importer);
-    rv = CallQueryInterface(generic, aInterface);
-  }
+  NS_ENSURE_SUCCESS(rv, rv);
 
-  return rv;
+  generic->SetData("addressInterface", importer);
+  return CallQueryInterface(generic, aInterface);
 }
 
 nsresult
@@ -178,10 +176,9 @@ BeckyImport::GetSettingsImportInterface(nsISupports **aInterface)
   nsresult rv;
   nsCOMPtr<nsIImportSettings> importer;
   importer = do_CreateInstance(MJ_BECKYIMPORT_SETTINGS_CONTRACT_ID, &rv);
-  if (NS_SUCCEEDED(rv))
-    rv = CallQueryInterface(importer, aInterface);
+  NS_ENSURE_SUCCESS(rv, rv);
 
-  return rv;
+  return CallQueryInterface(importer, aInterface);
 }
 
 nsresult
@@ -190,10 +187,9 @@ BeckyImport::GetFiltersImportInterface(nsISupports **aInterface)
   nsresult rv;
   nsCOMPtr<nsIImportFilters> importer;
   importer = do_CreateInstance(MJ_BECKYIMPORT_FILTERS_CONTRACT_ID, &rv);
-  if (NS_SUCCEEDED(rv))
-    rv = CallQueryInterface(importer, aInterface);
+  NS_ENSURE_SUCCESS(rv, rv);
 
-  return rv;
+  return CallQueryInterface(importer, aInterface);
 }
 
 NS_IMETHODIMP
