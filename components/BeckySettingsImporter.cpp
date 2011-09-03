@@ -280,9 +280,8 @@ CreateSmtpServer(nsIINIParser *aParser,
   aParser->GetString(NS_LITERAL_CSTRING("Account"),
                      NS_LITERAL_CSTRING("SSLSMTP"),
                      value);
-  if (value.Equals("1")) {
+  if (value.Equals("1"))
     isSecure = PR_TRUE;
-  }
   if (isSecure)
     server->SetSocketType(nsMsgSocketType::SSL);
 
@@ -344,9 +343,8 @@ SetPop3ServerProperties(nsIINIParser *aParser,
     if (!value.IsEmpty()) {
       nsresult errorCode;
       PRInt32 leftDays = static_cast<PRInt32>(value.ToInteger(&errorCode, 10));
-      if (NS_SUCCEEDED(errorCode)) {
+      if (NS_SUCCEEDED(errorCode))
         pop3Server->SetNumDaysToLeaveOnServer(leftDays);
-      }
     }
   }
 
@@ -391,11 +389,10 @@ CreateIncomingServer(nsIINIParser *aParser,
     aParser->GetString(NS_LITERAL_CSTRING("Account"),
                        NS_LITERAL_CSTRING("POP3Port"),
                        value);
-    if (value.IsEmpty()) {
+    if (value.IsEmpty())
       port = 110;
-    } else {
+    else
       port = static_cast<PRInt32>(value.ToInteger(&errorCode, 10));
-    }
     aParser->GetString(NS_LITERAL_CSTRING("Account"),
                        NS_LITERAL_CSTRING("SSLPOP"),
                        value);
@@ -406,17 +403,15 @@ CreateIncomingServer(nsIINIParser *aParser,
     aParser->GetString(NS_LITERAL_CSTRING("Account"),
                        NS_LITERAL_CSTRING("IMAP4Port"),
                        value);
-    if (value.IsEmpty()) {
+    if (value.IsEmpty())
       port = 143;
-    } else {
+    else
       port = static_cast<PRInt32>(value.ToInteger(&errorCode, 10));
-    }
     aParser->GetString(NS_LITERAL_CSTRING("Account"),
                        NS_LITERAL_CSTRING("SSLIMAP"),
                        value);
-    if (value.Equals("1")) {
+    if (value.Equals("1"))
       isSecure = PR_TRUE;
-    }
   }
 
   server->SetPort(port);
@@ -426,17 +421,15 @@ CreateIncomingServer(nsIINIParser *aParser,
   aParser->GetString(NS_LITERAL_CSTRING("Account"),
                      NS_LITERAL_CSTRING("CheckInt"),
                      value);
-  if (value.Equals("1")) {
+  if (value.Equals("1"))
     server->SetDoBiff(PR_TRUE);
-  }
   aParser->GetString(NS_LITERAL_CSTRING("Account"),
                      NS_LITERAL_CSTRING("CheckEvery"),
                      value);
   if (!value.IsEmpty()) {
     PRInt32 minutes = static_cast<PRInt32>(value.ToInteger(&errorCode, 10));
-    if (NS_SUCCEEDED(errorCode)) {
+    if (NS_SUCCEEDED(errorCode))
       server->SetBiffMinutes(minutes * 10);
-    }
   }
 
   NS_IF_ADDREF(*aServer = server);

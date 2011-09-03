@@ -262,9 +262,8 @@ CollectMailboxesInDirectory(nsIFile *aDirectory, PRUint32 aDepth, nsISupportsArr
   nsCOMPtr<nsIFile> folderListFile;
   rv = BeckyUtils::GetFolderListFile(aDirectory, getter_AddRefs(folderListFile));
 
-  if (NS_SUCCEEDED(rv)) {
+  if (NS_SUCCEEDED(rv))
     CollectFoldersInFolderListFile(folderListFile, aDepth, aCollected);
-  }
 
   nsCOMPtr<nsISimpleEnumerator> entries;
   rv = aDirectory->GetDirectoryEntries(getter_AddRefs(entries));
@@ -418,9 +417,8 @@ GetAttachmentFile(nsIFile *aMailboxFile,
 
   nsTArray<nsCAutoString> directoryNames;
   ParseString(attachmentPath, '\\', directoryNames);
-  for (nsTArray<nsCString>::index_type i = 0; i < directoryNames.Length(); i++) {
+  for (nsTArray<nsCString>::index_type i = 0; i < directoryNames.Length(); i++)
     rv = attachmentFile->AppendNative(directoryNames[i]);
-  }
 
   PRBool exists = PR_FALSE;
   attachmentFile->Exists(&exists);
@@ -499,9 +497,8 @@ BeckyMailImporter::ImportMailbox(nsIImportMailboxDescriptor *aSource,
   nsresult rv;
   nsCOMPtr<nsILocalFile> mailboxFile;
   rv = aSource->GetFile(getter_AddRefs(mailboxFile));
-  if (NS_FAILED(rv)) {
+  if (NS_FAILED(rv))
     return rv;
-  }
 
   nsCOMPtr<nsILineInputStream> lineStream;
   rv = BeckyUtils::CreateLineInputStream(mailboxFile,
@@ -547,9 +544,8 @@ BeckyMailImporter::ImportMailbox(nsIImportMailboxDescriptor *aSource,
         break;
       continue;
     }
-    if (StringBeginsWith(line, NS_LITERAL_CSTRING(".."))) {
+    if (StringBeginsWith(line, NS_LITERAL_CSTRING("..")))
       line.Cut(0, 1);
-    }
 
     line.AppendLiteral(MSG_LINEBREAK);
     rv = outputStream->Write(line.get(), line.Length(), &bytesWritten);
