@@ -610,6 +610,41 @@ BeckyFiltersImporter::FindMessageFolderInServer(const nsCString &aName,
   return rootFolder->GetChildNamed(NS_ConvertUTF8toUTF16(aName), _retval);
 }
 
+class _MsgQueryElementAt : public nsCOMPtr_helper
+{
+public:
+  _MsgQueryElementAt(nsISupportsArray* anArray,
+                    PRUint32 aIndex,
+                    nsresult* aErrorPtr)
+    : mArray(anArray),
+      mIndex(aIndex),
+      mErrorPtr(aErrorPtr)
+  {
+    // nothing else
+    // to do here
+  }
+  virtual nsresult NS_FASTCALL operator()(const nsIID& aIID, void** aResult) const
+  {
+    nsresult status = mArray ? mArray->QueryElementAt(mIndex, aIID, aResult) : NS_ERROR_NULL_POINTER;
+
+    if (mErrorPtr)
+      *mErrorPtr = status;
+    return status;
+  }
+
+
+private:
+  nsISupportsArray* mArray;
+  PRUint32 mIndex;
+  nsresult* mErrorPtr;
+};
+
+inline const _MsgQueryElementAt
+_do_QueryElementAt(nsISupportsArray* anArray, PRUint32 aIndex, nsresult* aErrorPtr = 0)
+{
+  return _MsgQueryElementAt(anArray, aIndex, aErrorPtr);
+}
+
 nsresult
 BeckyFiltersImporter::FindMessageFolder(const nsCString &aName, nsIMsgFolder **_retval NS_OUTPARAM)
 {
@@ -629,7 +664,7 @@ BeckyFiltersImporter::FindMessageFolder(const nsCString &aName, nsIMsgFolder **_
 
   nsCOMPtr<nsIMsgFolder> found;
   for (PRUint32 i = 0; i < accountCount; i++) {
-    nsCOMPtr<nsIMsgAccount> account(do_QueryElementAt(accounts, i));
+    nsCOMPtr<nsIMsgAccount> account(_do_QueryElementAt(accounts, i));
     if (!account)
       continue;
 
