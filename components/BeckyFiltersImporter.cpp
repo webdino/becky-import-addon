@@ -351,11 +351,15 @@ BeckyFiltersImporter::CreateResendAction(const nsCString &aLine,
 }
 
 static nsresult
-GetFolderName(const nsCString &aTarget, nsCString &aName)
+GetFolderName(const nsCString &aTarget, nsAString &aName)
 {
   PRInt32 backslashPosition = aTarget.RFindChar('\\');
-  if (backslashPosition > 0)
-    aName.Assign(nsDependentCSubstring(aTarget, backslashPosition + 1));
+  if (backslashPosition > 0) {
+    nsDependentCSubstring nativeString(aTarget, backslashPosition + 1);
+    nsCAutoString utf8String;
+    BeckyUtils::ConvertNativeStringToUTF8(nativeString, utf8String);
+    aName.Assign(NS_ConvertUTF8toUTF16(utf8String));
+  }
 
   return NS_OK;
 }
@@ -370,11 +374,12 @@ BeckyFiltersImporter::GetDistributeTarget(const nsCString &aLine,
   NS_ENSURE_SUCCESS(rv, rv);
 
   target.Trim("\\", PR_FALSE, PR_TRUE);
-  rv = GetFolderName(target, target);
+  nsAutoString folderName;
+  rv = GetFolderName(target, folderName);
   NS_ENSURE_SUCCESS(rv, rv);
 
   nsCOMPtr <nsIMsgFolder> folder;
-  rv = FindMessageFolder(target, getter_AddRefs(folder));
+  rv = FindMessageFolder(folderName, getter_AddRefs(folder));
   NS_ENSURE_SUCCESS(rv, rv);
 
   nsCAutoString folderURL;
@@ -598,7 +603,7 @@ BeckyFiltersImporter::Import(PRUnichar **aError NS_OUTPARAM, PRBool *_retval NS_
 }
 
 nsresult
-BeckyFiltersImporter::FindMessageFolderInServer(const nsCString &aName,
+BeckyFiltersImporter::FindMessageFolderInServer(const nsAString &aName,
                                                 nsIMsgIncomingServer *aServer,
                                                 nsIMsgFolder **_retval NS_OUTPARAM)
 {
@@ -607,7 +612,7 @@ BeckyFiltersImporter::FindMessageFolderInServer(const nsCString &aName,
   rv = aServer->GetRootMsgFolder(getter_AddRefs(rootFolder));
   NS_ENSURE_SUCCESS(rv, rv);
 
-  return rootFolder->GetChildNamed(NS_ConvertUTF8toUTF16(aName), _retval);
+  return rootFolder->GetChildNamed(aName, _retval);
 }
 
 class _MsgQueryElementAt : public nsCOMPtr_helper
@@ -646,7 +651,7 @@ _do_QueryElementAt(nsISupportsArray* anArray, PRUint32 aIndex, nsresult* aErrorP
 }
 
 nsresult
-BeckyFiltersImporter::FindMessageFolder(const nsCString &aName, nsIMsgFolder **_retval NS_OUTPARAM)
+BeckyFiltersImporter::FindMessageFolder(const nsAString &aName, nsIMsgFolder **_retval NS_OUTPARAM)
 {
   nsresult rv;
 
