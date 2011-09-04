@@ -99,6 +99,20 @@ nsresult
 BeckyUtils::ConvertNativeStringToUTF8(const nsACString& aOriginal,
                                       nsACString& _retval NS_OUTPARAM)
 {
+  nsresult rv;
+  nsAutoString unicodeString;
+  rv = ConvertNativeStringToUTF16(aOriginal, unicodeString);
+  if (NS_FAILED(rv))
+    return rv;
+
+  _retval = NS_ConvertUTF16toUTF8(unicodeString);
+  return NS_OK;
+}
+
+nsresult
+BeckyUtils::ConvertNativeStringToUTF16(const nsACString& aOriginal,
+                                       nsAString& _retval NS_OUTPARAM)
+{
 #ifdef XP_WIN
   PRUint32 inputLen = aOriginal.Length();
   const char *buf = aOriginal.BeginReading();
@@ -110,14 +124,12 @@ BeckyUtils::ConvertNativeStringToUTF8(const nsACString& aOriginal,
     resultLen += n;
 
   // allocate sufficient space
-  nsAutoString unicodeString;
-  if (!EnsureStringLength(unicodeString, resultLen))
+  if (!EnsureStringLength(_retval, resultLen))
     return NS_ERROR_OUT_OF_MEMORY;
   if (resultLen > 0) {
-    PRUnichar *result = unicodeString.BeginWriting();
+    PRUnichar *result = _retval.BeginWriting();
     ::MultiByteToWideChar(CP_ACP, 0, buf, inputLen, result, resultLen);
   }
-  _retval = NS_ConvertUTF16toUTF8(unicodeString);
 
   return NS_OK;
 #else
@@ -125,7 +137,13 @@ BeckyUtils::ConvertNativeStringToUTF8(const nsACString& aOriginal,
   nsCOMPtr<nsIUTF8ConverterService> converter;
   converter = do_GetService(NS_UTF8CONVERTERSERVICE_CONTRACTID, &rv);
   NS_ENSURE_SUCCESS(rv, rv);
-  return converter->ConvertStringToUTF8(aOriginal, "CP932", PR_FALSE, _retval);
+  nsCAutoString utf8String;
+  rv = converter->ConvertStringToUTF8(aOriginal, "CP932", PR_FALSE, utf8String);
+  if (NS_FAILED(rv))
+    return rv;
+
+  _retval = NS_ConvertUTF8toUTF16(utf8String);
+  return NS_OK;
 #endif
 }
 

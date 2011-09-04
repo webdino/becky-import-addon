@@ -42,6 +42,8 @@
 
 #include <nsIImportFilters.h>
 #include <nsILocalFile.h>
+#include <nsIMsgIncomingServer.h>
+#include <nsMsgFilterCore.h>
 
 #define MJ_BECKYIMPORT_FILTERS_CONTRACT_ID \
   "@mozilla-japan.org/import/becky/filters;1"
@@ -50,6 +52,10 @@
 {                                                   \
   0x464afea6, 0x8d49, 0x4c5d,                       \
   {0x87, 0x8e, 0x81, 0xc8, 0x2a, 0xcf, 0x4d, 0x09}}
+
+class nsIMsgFilter;
+class nsIMsgRuleAction;
+class nsCString;
 
 class BeckyFiltersImporter : public nsIImportFilters
 {
@@ -62,6 +68,43 @@ public:
 
 private:
   nsCOMPtr<nsIFile> mLocation;
+  nsCOMPtr<nsIMsgIncomingServer> mServer;
+
+  nsresult GetDefaultFilterFile(nsIFile **aFile);
+  nsresult ParseFilterFile(nsIFile *aFile);
+  nsresult ParseRuleLine(const nsCString &aLine,
+                         nsMsgSearchAttribValue *aSearchAttribute,
+                         nsMsgSearchOpValue *aSearchOperator,
+                         nsString &aSearchKeyword);
+  nsresult CollectServers();
+  nsresult FindMessageFolderInServer(const nsCString& aName,
+                                     nsIMsgIncomingServer *aServer,
+                                     nsIMsgFolder **_retval);
+  nsresult FindMessageFolder(const nsCString& aName, nsIMsgFolder **_retval);
+  nsresult GetActionTarget(const nsCString &aLine, nsCString &aTarget);
+  nsresult GetDistributeTarget(const nsCString &aLine,
+                               nsCString &aTargetFolder);
+  nsresult GetResendTarget(const nsCString &aLine,
+                           nsCString &aTemplate,
+                           nsCString &aTargetAddress);
+  nsresult CreateRuleAction(nsIMsgFilter *aFilter,
+                            nsMsgRuleActionType actionType,
+                            nsIMsgRuleAction **_retval);
+  nsresult CreateDistributeAction(const nsCString &aLine,
+                                  nsIMsgFilter *aFilter,
+                                  const nsMsgRuleActionType &aActionType,
+                                  nsIMsgRuleAction **_retval);
+  nsresult CreateLeaveOrDeleteAction(const nsCString &aLine,
+                                     nsIMsgFilter *aFilter,
+                                     nsIMsgRuleAction **_retval);
+  nsresult CreateResendAction(const nsCString &aLine,
+                              nsIMsgFilter *aFilter,
+                              const nsMsgRuleActionType &aActionType,
+                              nsIMsgRuleAction **_retval);
+  nsresult CreateFilter(nsIMsgFilter **_retval);
+  nsresult AppendFilter(nsIMsgFilter *aFilter);
+  nsresult SetRuleAction(const nsCString &aLine, nsIMsgFilter *aFilter);
+  nsresult SetSearchTerm(const nsCString &aLine, nsIMsgFilter *aFilter);
 };
 
 #endif /* BeckyFiltersImporter_h___ */

@@ -132,7 +132,8 @@ BeckyProfileMigrator::GetMigrateData(const PRUnichar *aProfile,
 {
   *_retval = nsIMailProfileMigrator::ACCOUNT_SETTINGS |
              nsIMailProfileMigrator::ADDRESSBOOK_DATA |
-             nsIMailProfileMigrator::MAILDATA;
+             nsIMailProfileMigrator::MAILDATA |
+             nsIMailProfileMigrator::FILTERS;
 
   return NS_OK;
 }

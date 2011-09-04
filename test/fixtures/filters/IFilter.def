@@ -1,0 +1,23 @@
+Version=1
+AutoSorting=1
+OnlyRead=0
+OnlyOneFolder=1
+:Begin ""
+!R:template
+@0:Cc:reply-to	X	WTR
+$X
+:End ""
+:Begin ""
+!G:R
+@0:To:mozilla	O	I
+$O:Sort=1
+:End ""
+:Begin ""
+!F:*forward@example.com
+@0:From:ikezoe	X	
+:End ""
+:Begin ""
+!M:4e52b5e1.mb\!!!!Inbox\mozilla\
+@0:To:hello	O	IT
+$O:Sort=3
+:End ""

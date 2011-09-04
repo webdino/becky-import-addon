@@ -45,6 +45,8 @@ public:
   static nsresult FindUserDirectory(nsIFile **aFile);
   static nsresult ConvertNativeStringToUTF8(const nsACString& aOriginal,
                                             nsACString& _retval);
+  static nsresult ConvertNativeStringToUTF16(const nsACString& aOriginal,
+                                             nsAString& _retval);
   static nsresult CreateLineInputStream(nsIFile *aFile,
                                         nsILineInputStream **_retval);
   static nsresult GetDefaultMailboxDirectory(nsIFile **_retval);
