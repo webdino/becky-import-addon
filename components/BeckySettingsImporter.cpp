@@ -158,13 +158,13 @@ ConvertToUTF8File(nsIFile *aSourceFile, nsIFile **aConvertedFile)
 
   nsCAutoString line;
   nsCAutoString utf8String;
-  PRUint32 bytesWritten = 0;
+  PRUint32 writtenBytes = 0;
   PRBool more = PR_TRUE;
   while (more) {
     rv = lineStream->ReadLine(line, &more);
     BeckyUtils::ConvertNativeStringToUTF8(line, utf8String);
     utf8String.AppendLiteral(MSG_LINEBREAK);
-    rv = destination->Write(utf8String.get(), utf8String.Length(), &bytesWritten);
+    rv = destination->Write(utf8String.get(), utf8String.Length(), &writtenBytes);
   }
   return CallQueryInterface(convertedFile, aConvertedFile);
 }

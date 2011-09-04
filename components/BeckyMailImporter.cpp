@@ -378,13 +378,13 @@ static nsresult
 WriteHeaders(nsCString &aHeaders, nsIOutputStream *aOutputStream)
 {
   nsresult rv;
-  PRUint32 bytesWritten = 0;
+  PRUint32 writtenBytes = 0;
 
-  rv = aOutputStream->Write(FROM_LINE, strlen(FROM_LINE), &bytesWritten);
+  rv = aOutputStream->Write(FROM_LINE, strlen(FROM_LINE), &writtenBytes);
   NS_ENSURE_SUCCESS(rv, rv);
-  rv = aOutputStream->Write(aHeaders.get(), aHeaders.Length(), &bytesWritten);
+  rv = aOutputStream->Write(aHeaders.get(), aHeaders.Length(), &writtenBytes);
   NS_ENSURE_SUCCESS(rv, rv);
-  rv = aOutputStream->Write(MSG_LINEBREAK, strlen(MSG_LINEBREAK), &bytesWritten);
+  rv = aOutputStream->Write(MSG_LINEBREAK, strlen(MSG_LINEBREAK), &writtenBytes);
   NS_ENSURE_SUCCESS(rv, rv);
   aHeaders.Truncate();
 
@@ -510,7 +510,7 @@ BeckyMailImporter::ImportMailbox(nsIImportMailboxDescriptor *aSource,
   NS_ENSURE_SUCCESS(rv, rv);
 
   nsCAutoString line;
-  PRUint32 bytesWritten = 0;
+  PRUint32 writtenBytes = 0;
   PRBool inHeader = PR_TRUE;
   PRBool more = PR_TRUE;
   nsCAutoString headers;
@@ -548,7 +548,7 @@ BeckyMailImporter::ImportMailbox(nsIImportMailboxDescriptor *aSource,
       line.Cut(0, 1);
 
     line.AppendLiteral(MSG_LINEBREAK);
-    rv = outputStream->Write(line.get(), line.Length(), &bytesWritten);
+    rv = outputStream->Write(line.get(), line.Length(), &writtenBytes);
   }
 
   if (NS_SUCCEEDED(rv)) {
