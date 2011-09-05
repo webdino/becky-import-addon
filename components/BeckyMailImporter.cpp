@@ -64,10 +64,6 @@
 #include "BeckyUtils.h"
 #include "BeckyStringBundle.h"
 
-static nsresult CollectMailboxesInDirectory(nsIFile *aDirectory,
-                                            PRUint32 aDepth,
-                                            nsISupportsArray *aCollected);
-
 #define FROM_LINE "From - Mon Jan 1 00:00:00 1965" MSG_LINEBREAK
 #define X_BECKY_STATUS_HEADER "X-Becky-Status"
 #define X_BECKY_INCLUDE_HEADER "X-Becky-Include"
@@ -223,8 +219,10 @@ AppendMailboxDescriptor(nsIFile *aEntry, PRUint32 aDepth, nsISupportsArray *aCol
   return NS_OK;
 }
 
-static nsresult
-CollectFoldersInFolderListFile(nsIFile *aListFile, PRUint32 aDepth, nsISupportsArray *aCollected)
+nsresult
+BeckyMailImporter::CollectMailboxesInFolderListFile(nsIFile *aListFile,
+                                                    PRUint32 aDepth,
+                                                    nsISupportsArray *aCollected)
 {
   nsresult rv;
   nsCOMPtr<nsILineInputStream> lineStream;
@@ -255,15 +253,17 @@ CollectFoldersInFolderListFile(nsIFile *aListFile, PRUint32 aDepth, nsISupportsA
   return rv;
 }
 
-static nsresult
-CollectMailboxesInDirectory(nsIFile *aDirectory, PRUint32 aDepth, nsISupportsArray *aCollected)
+nsresult
+BeckyMailImporter::CollectMailboxesInDirectory(nsIFile *aDirectory,
+                                               PRUint32 aDepth,
+                                               nsISupportsArray *aCollected)
 {
   nsresult rv;
   nsCOMPtr<nsIFile> folderListFile;
   rv = BeckyUtils::GetFolderListFile(aDirectory, getter_AddRefs(folderListFile));
 
   if (NS_SUCCEEDED(rv))
-    CollectFoldersInFolderListFile(folderListFile, aDepth, aCollected);
+    CollectMailboxesInFolderListFile(folderListFile, aDepth, aCollected);
 
   nsCOMPtr<nsISimpleEnumerator> entries;
   rv = aDirectory->GetDirectoryEntries(getter_AddRefs(entries));

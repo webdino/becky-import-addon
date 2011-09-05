@@ -50,6 +50,9 @@
   0x335b2634, 0xec60, 0x4389,                       \
   {0x8b, 0x2d, 0x28, 0xd7, 0x02, 0xab, 0x83, 0x8c}}
 
+class nsIFile;
+class nsISupportsArray;
+
 class BeckyMailImporter : public nsIImportMail
 {
 public:
@@ -61,6 +64,13 @@ public:
 
 private:
   PRUint32 mReadBytes;
+  nsresult CollectMailboxesInDirectory(nsIFile *aDirectory,
+                                       PRUint32 aDepth,
+                                       nsISupportsArray *aCollected);
+
+  nsresult CollectMailboxesInFolderListFile(nsIFile *aListFile,
+                                            PRUint32 aDepth,
+                                            nsISupportsArray *aCollected);
 };
 
 #endif /* BeckyMailImporter_h___ */
