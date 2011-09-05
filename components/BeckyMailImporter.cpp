@@ -176,8 +176,10 @@ EnsureUniqueName(nsAString &aName,
   return NS_OK;
 }
 
-static nsresult
-AppendMailboxDescriptor(nsIFile *aEntry, PRUint32 aDepth, nsISupportsArray *aCollected)
+nsresult
+BeckyMailImporter::AppendMailboxDescriptor(nsIFile *aEntry,
+                                           PRUint32 aDepth,
+                                           nsISupportsArray *aCollected)
 {
   nsCAutoString name;
   nsresult rv = aEntry->GetNativeLeafName(name);

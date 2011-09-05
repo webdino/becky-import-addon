@@ -71,6 +71,9 @@ private:
   nsresult CollectMailboxesInFolderListFile(nsIFile *aListFile,
                                             PRUint32 aDepth,
                                             nsISupportsArray *aCollected);
+  nsresult AppendMailboxDescriptor(nsIFile *aEntry,
+                                   PRUint32 aDepth,
+                                   nsISupportsArray *aCollected);
 };
 
 #endif /* BeckyMailImporter_h___ */
