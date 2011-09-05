@@ -388,7 +388,7 @@ BeckyFiltersImporter::GetDistributeTarget(const nsCString &aLine,
     if (NS_FAILED(rv))
       return rv;
   }
-  rv = folder->GetFolderURL(folderURL);
+  rv = folder->GetURI(folderURL);
   NS_ENSURE_SUCCESS(rv, rv);
 
   aTargetFolder.Assign(folderURL);

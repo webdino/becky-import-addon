@@ -113,7 +113,7 @@ function getFilterList() {
 
 function getRootFolderURL() {
   let server = getDefaultServer();
-  return server.rootMsgFolder.folderURL;
+  return server.rootMsgFolder.URI;
 }
 
 var expectedFilters = [
@@ -129,7 +129,7 @@ function createAction(filter, properties) {
   if (properties[1]) {
     if (action.type == Ci.nsMsgFilterAction.MoveToFolder ||
         action.type == Ci.nsMsgFilterAction.CopyToFolder) {
-      action.targetFolderUri = getRootFolderURL() + properties[1];
+      action.targetFolderUri = getRootFolderURL() + "/" + properties[1];
     } else if (action.type == Ci.nsMsgFilterAction.Forward ||
                action.type == Ci.nsMsgFilterAction.Reply) {
       action.strValue = properties[1];
