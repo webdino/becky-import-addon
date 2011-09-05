@@ -710,7 +710,7 @@ BeckyFiltersImporter::GetMessageFolder(const nsAString &aName, nsIMsgFolder **_r
     account->GetIncomingServer(getter_AddRefs(server));
     if (!server)
       continue;
-    FindMessageFolderInServer(aName, server,getter_AddRefs(found));
+    FindMessageFolderInServer(aName, server, getter_AddRefs(found));
     if (found)
       break;
   }
@@ -720,7 +720,7 @@ BeckyFiltersImporter::GetMessageFolder(const nsAString &aName, nsIMsgFolder **_r
     rv = accountManager->GetLocalFoldersServer(getter_AddRefs(server));
     NS_ENSURE_SUCCESS(rv, rv);
 
-    FindMessageFolderInServer(aName, server,getter_AddRefs(found));
+    FindMessageFolderInServer(aName, server, getter_AddRefs(found));
   }
 
   NS_IF_ADDREF(*_retval = found);
