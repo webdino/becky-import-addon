@@ -77,10 +77,13 @@ private:
                          nsMsgSearchOpValue *aSearchOperator,
                          nsString &aSearchKeyword);
   nsresult CollectServers();
+  nsresult FindMessageFolder(const nsAString& aName,
+                             nsIMsgFolder *aParantFolder,
+                             nsIMsgFolder **_retval);
   nsresult FindMessageFolderInServer(const nsAString& aName,
                                      nsIMsgIncomingServer *aServer,
                                      nsIMsgFolder **_retval);
-  nsresult FindMessageFolder(const nsAString& aName, nsIMsgFolder **_retval);
+  nsresult GetMessageFolder(const nsAString& aName, nsIMsgFolder **_retval);
   nsresult GetActionTarget(const nsCString &aLine, nsCString &aTarget);
   nsresult GetDistributeTarget(const nsCString &aLine,
                                nsCString &aTargetFolder);

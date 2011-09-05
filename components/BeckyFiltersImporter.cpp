@@ -379,7 +379,7 @@ BeckyFiltersImporter::GetDistributeTarget(const nsCString &aLine,
   NS_ENSURE_SUCCESS(rv, rv);
 
   nsCOMPtr <nsIMsgFolder> folder;
-  rv = FindMessageFolder(folderName, getter_AddRefs(folder));
+  rv = GetMessageFolder(folderName, getter_AddRefs(folder));
   NS_ENSURE_SUCCESS(rv, rv);
 
   nsCAutoString folderURL;
@@ -603,6 +603,39 @@ BeckyFiltersImporter::Import(PRUnichar **aError NS_OUTPARAM, PRBool *_retval NS_
 }
 
 nsresult
+BeckyFiltersImporter::FindMessageFolder(const nsAString &aName,
+                                        nsIMsgFolder *aParentFolder,
+                                        nsIMsgFolder **_retval NS_OUTPARAM)
+{
+  nsresult rv;
+
+  nsCOMPtr<nsIMsgFolder> found;
+  rv = aParentFolder->GetChildNamed(aName, getter_AddRefs(found));
+  if (found) {
+    NS_ADDREF(*_retval = found);
+    return NS_OK;
+  }
+
+  nsCOMPtr<nsISimpleEnumerator> children;
+  rv = aParentFolder->GetSubFolders(getter_AddRefs(children));
+  NS_ENSURE_SUCCESS(rv, rv);
+
+  PRBool more;
+  nsCOMPtr<nsIMsgFolder> child;
+  while (NS_SUCCEEDED(children->HasMoreElements(&more)) && more) {
+    rv = children->GetNext(getter_AddRefs(child));
+    NS_ENSURE_SUCCESS(rv, rv);
+    rv = FindMessageFolder(aName, child, getter_AddRefs(found));
+    if (found)
+      break;
+  }
+
+  NS_IF_ADDREF(*_retval = found);
+
+  return NS_OK;
+}
+
+nsresult
 BeckyFiltersImporter::FindMessageFolderInServer(const nsAString &aName,
                                                 nsIMsgIncomingServer *aServer,
                                                 nsIMsgFolder **_retval NS_OUTPARAM)
@@ -612,7 +645,7 @@ BeckyFiltersImporter::FindMessageFolderInServer(const nsAString &aName,
   rv = aServer->GetRootMsgFolder(getter_AddRefs(rootFolder));
   NS_ENSURE_SUCCESS(rv, rv);
 
-  return rootFolder->GetChildNamed(aName, _retval);
+  return FindMessageFolder(aName, rootFolder, _retval);
 }
 
 class _MsgQueryElementAt : public nsCOMPtr_helper
@@ -651,7 +684,7 @@ _do_QueryElementAt(nsISupportsArray* anArray, PRUint32 aIndex, nsresult* aErrorP
 }
 
 nsresult
-BeckyFiltersImporter::FindMessageFolder(const nsAString &aName, nsIMsgFolder **_retval NS_OUTPARAM)
+BeckyFiltersImporter::GetMessageFolder(const nsAString &aName, nsIMsgFolder **_retval NS_OUTPARAM)
 {
   nsresult rv;
 
