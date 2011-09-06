@@ -60,6 +60,8 @@ public:
   static nsresult CreateINIParserForFile(nsIFile *aFile,
                                          nsIINIParser **aParser);
   static nsresult GetMaiboxNameFromINIFile(nsIFile *aFile, nsCString &aName);
+  static nsresult ConvertToUTF8File(nsIFile *aSourceFile,
+                                    nsIFile **_retval);
 };
 
 

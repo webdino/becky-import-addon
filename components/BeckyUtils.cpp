@@ -54,6 +54,9 @@
 #include <nsILineInputStream.h>
 #include <nsNetUtil.h>
 #include <nsIINIParser.h>
+#include <nsDirectoryServiceDefs.h>
+#include <nsDirectoryServiceUtils.h>
+#include <msgCore.h>
 
 #include "BeckyUtils.h"
 
@@ -289,5 +292,42 @@ BeckyUtils::GetMaiboxNameFromINIFile(nsIFile *aFile, nsCString &aName)
   return parser->GetString(NS_LITERAL_CSTRING("Account"),
                            NS_LITERAL_CSTRING("Name"),
                            aName);
+}
+
+nsresult
+BeckyUtils::ConvertToUTF8File(nsIFile *aSourceFile,
+                              nsIFile **_retval NS_OUTPARAM)
+{
+  nsresult rv;
+  nsCOMPtr<nsIFile> convertedFile;
+
+  rv = NS_GetSpecialDirectory(NS_OS_TEMP_DIR, getter_AddRefs(convertedFile));
+  NS_ENSURE_SUCCESS(rv, rv);
+  rv = convertedFile->AppendNative(NS_LITERAL_CSTRING("becky-importer-addon"));
+  NS_ENSURE_SUCCESS(rv, rv);
+  rv = convertedFile->CreateUnique(nsIFile::NORMAL_FILE_TYPE, 0600);
+  NS_ENSURE_SUCCESS(rv, rv);
+
+  nsCOMPtr<nsIOutputStream> destination;
+  rv = NS_NewLocalFileOutputStream(getter_AddRefs(destination),
+                                   convertedFile);
+  NS_ENSURE_SUCCESS(rv, rv);
+
+  nsCOMPtr<nsILineInputStream> lineStream;
+  rv = BeckyUtils::CreateLineInputStream(aSourceFile,
+                                         getter_AddRefs(lineStream));
+  NS_ENSURE_SUCCESS(rv, rv);
+
+  nsCAutoString line;
+  nsCAutoString utf8String;
+  PRUint32 writtenBytes = 0;
+  PRBool more = PR_TRUE;
+  while (more) {
+    rv = lineStream->ReadLine(line, &more);
+    BeckyUtils::ConvertNativeStringToUTF8(line, utf8String);
+    utf8String.AppendLiteral(MSG_LINEBREAK);
+    rv = destination->Write(utf8String.get(), utf8String.Length(), &writtenBytes);
+  }
+  return CallQueryInterface(convertedFile, _retval);
 }
 
