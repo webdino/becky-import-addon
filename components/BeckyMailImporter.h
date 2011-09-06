@@ -64,6 +64,7 @@ public:
 
 private:
   PRUint32 mReadBytes;
+  PRUint32 CountMailboxSize(nsIFile *aMailboxFolder);
   nsresult CollectMailboxesInDirectory(nsIFile *aDirectory,
                                        PRUint32 aDepth,
                                        nsISupportsArray *aCollected);
@@ -74,6 +75,8 @@ private:
   nsresult AppendMailboxDescriptor(nsIFile *aEntry,
                                    PRUint32 aDepth,
                                    nsISupportsArray *aCollected);
+  nsresult ImportMailFile(nsIFile *aMailFile,
+                          nsIOutputStream *aOutputStream);
 };
 
 #endif /* BeckyMailImporter_h___ */

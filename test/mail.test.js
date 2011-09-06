@@ -44,12 +44,12 @@ function testFindMailboxes() {
   descriptor = mailboxes.QueryElementAt(0, Ci.nsIImportMailboxDescriptor);
   assert.isDefined(descriptor);
 
-  assert.equals("mailboxes", descriptor.GetDisplayName());
+  assert.equals("4e4d1621.mb", descriptor.GetDisplayName());
 
   let mailbox = descriptor.file;
-  assert.equals("test.bmf", mailbox.leafName);
+  assert.equals("4e4d1621.mb", mailbox.leafName);
 
-  assert.equals(0, descriptor.depth);
+  assert.equals(1, descriptor.depth);
   gMailbox = descriptor;
 }
 

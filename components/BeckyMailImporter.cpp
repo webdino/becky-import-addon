@@ -117,63 +117,56 @@ static nsresult
 GetMailboxName(nsIFile *aMailbox, nsAString &aName)
 {
   nsresult rv;
-  nsCOMPtr<nsIFile> parent;
-  rv = aMailbox->GetParent(getter_AddRefs(parent));
-  NS_ENSURE_SUCCESS(rv, rv);
 
-  parent->GetLeafName(aName);
-  aName.Trim("!", PR_TRUE, PR_FALSE);
-
-  return NS_OK;
-}
-
-static PRBool
-IsUniqueName(const nsAString &aName, nsISupportsArray *aCollected)
-{
-  nsresult rv;
-  nsCOMPtr<nsICollection> collection;
-  collection = do_QueryInterface(aCollected, &rv);
-  NS_ENSURE_SUCCESS(rv, PR_TRUE);
-
-  nsCOMPtr<nsIEnumerator> enumerator;
-  rv = collection->Enumerate(getter_AddRefs(enumerator));
-  NS_ENSURE_SUCCESS(rv, PR_TRUE);
-
-  enumerator->First();
-  nsCOMPtr<nsIImportMailboxDescriptor> descriptor;
-  while (enumerator->IsDone() == NS_ENUMERATOR_FALSE) {
-    rv = enumerator->CurrentItem(getter_AddRefs(descriptor));
-    NS_ENSURE_SUCCESS(rv, PR_TRUE);
-
-    PRUnichar *displayName = nsnull;
-    rv = descriptor->GetDisplayName(&displayName);
-    NS_ENSURE_SUCCESS(rv, PR_TRUE);
-
-    if (aName.Equals(displayName))
-      return PR_FALSE;
-    enumerator->Next();
-  }
-  return PR_TRUE;
-}
-
-static nsresult
-EnsureUniqueName(nsAString &aName,
-                 nsISupportsArray *aCollected)
-{
-  if (IsUniqueName(aName, aCollected))
-    return NS_OK;
-
-  for (PRInt32 index = 0; index < 256; index++) {
-    nsAutoString newName;
-    newName.Assign(aName);
-    newName.AppendInt(index);
-    if (IsUniqueName(newName, aCollected)) {
-      aName.Assign(newName);
-      return NS_OK;
+  nsCOMPtr<nsIFile> iniFile;
+  rv = BeckyUtils::GetMailboxINIFile(aMailbox, getter_AddRefs(iniFile));
+  if (iniFile) {
+    nsCOMPtr<nsIFile> convertedFile;
+    rv = BeckyUtils::ConvertToUTF8File(iniFile, getter_AddRefs(convertedFile));
+    if (convertedFile) {
+      nsCAutoString utf8Name;
+      BeckyUtils::GetMaiboxNameFromINIFile(convertedFile, utf8Name);
+      convertedFile->Remove(PR_FALSE);
+      aName = NS_ConvertUTF8toUTF16(utf8Name);
     }
   }
 
+  if (aName.IsEmpty()) {
+    aMailbox->GetLeafName(aName);
+    aName.Trim("!", PR_TRUE, PR_FALSE);
+  }
+
   return NS_OK;
+}
+
+PRUint32
+BeckyMailImporter::CountMailboxSize(nsIFile *aMailboxFolder)
+{
+  nsresult rv;
+  nsCOMPtr<nsISimpleEnumerator> entries;
+  rv = aMailboxFolder->GetDirectoryEntries(getter_AddRefs(entries));
+  NS_ENSURE_SUCCESS(rv, 0);
+
+  PRBool more;
+  nsCOMPtr<nsIFile> entry;
+  PRUint32 totalSize = 0;
+  while (NS_SUCCEEDED(entries->HasMoreElements(&more)) && more) {
+    rv = entries->GetNext(getter_AddRefs(entry));
+    NS_ENSURE_SUCCESS(rv, 0);
+
+    nsCAutoString name;
+    rv = entry->GetNativeLeafName(name);
+    if (!StringEndsWith(name, NS_LITERAL_CSTRING(".bmf")))
+      continue;
+
+    PRInt64 size;
+    entry->GetFileSize(&size);
+    if (totalSize + size > PR_UINT32_MAX)
+      return totalSize;
+    totalSize += size;
+  }
+
+  return totalSize;
 }
 
 nsresult
@@ -181,26 +174,17 @@ BeckyMailImporter::AppendMailboxDescriptor(nsIFile *aEntry,
                                            PRUint32 aDepth,
                                            nsISupportsArray *aCollected)
 {
-  nsCAutoString name;
-  nsresult rv = aEntry->GetNativeLeafName(name);
-  if (!StringEndsWith(name, NS_LITERAL_CSTRING(".bmf")))
-    return NS_OK;
-
+  nsresult rv;
   nsCOMPtr<nsIImportMailboxDescriptor> descriptor;
   rv = CreateMailboxDescriptor(getter_AddRefs(descriptor));
+  NS_ENSURE_SUCCESS(rv, rv);
 
-  PRInt64 size;
-  aEntry->GetFileSize(&size);
-  if (size > PR_UINT32_MAX) {
-    NS_WARNING("Overflowed file size. Could not handle over 4GB address book");
-    size = PR_UINT32_MAX;
-  }
-  descriptor->SetSize(static_cast<PRUint32>(size));
+  PRUint32 size = CountMailboxSize(aEntry);
+  rv = descriptor->SetSize(size);
+  NS_ENSURE_SUCCESS(rv, rv);
 
   nsAutoString mailboxName;
   rv = GetMailboxName(aEntry, mailboxName);
-  NS_ENSURE_SUCCESS(rv, rv);
-  rv = EnsureUniqueName(mailboxName, aCollected);
   NS_ENSURE_SUCCESS(rv, rv);
   descriptor->SetDisplayName(mailboxName.get());
 
@@ -260,24 +244,15 @@ BeckyMailImporter::CollectMailboxesInDirectory(nsIFile *aDirectory,
                                                PRUint32 aDepth,
                                                nsISupportsArray *aCollected)
 {
+  if (aDepth != 0)
+    AppendMailboxDescriptor(aDirectory, aDepth, aCollected);
+
   nsresult rv;
   nsCOMPtr<nsIFile> folderListFile;
   rv = BeckyUtils::GetFolderListFile(aDirectory, getter_AddRefs(folderListFile));
 
   if (NS_SUCCEEDED(rv))
-    CollectMailboxesInFolderListFile(folderListFile, aDepth, aCollected);
-
-  nsCOMPtr<nsISimpleEnumerator> entries;
-  rv = aDirectory->GetDirectoryEntries(getter_AddRefs(entries));
-  NS_ENSURE_SUCCESS(rv, rv);
-
-  PRBool more;
-  nsCOMPtr<nsIFile> entry;
-  while (NS_SUCCEEDED(entries->HasMoreElements(&more)) && more) {
-    rv = entries->GetNext(getter_AddRefs(entry));
-    NS_ENSURE_SUCCESS(rv, rv);
-    rv = AppendMailboxDescriptor(entry, aDepth, aCollected);
-  }
+    CollectMailboxesInFolderListFile(folderListFile, ++aDepth, aCollected);
 
   return NS_OK;
 }
@@ -291,7 +266,7 @@ BeckyMailImporter::FindMailboxes(nsIFile *aLocation,
   rv = NS_NewISupportsArray(getter_AddRefs(array));
   NS_ENSURE_SUCCESS(rv, rv);
 
-  rv = CollectMailboxesInDirectory(aLocation, 1, array);
+  rv = CollectMailboxesInDirectory(aLocation, 0, array);
   if (NS_FAILED(rv))
     return rv;
 
@@ -480,6 +455,58 @@ _MsgNewBufferedFileOutputStream(nsIOutputStream **aResult,
   return rv;
 }
 
+nsresult
+BeckyMailImporter::ImportMailFile(nsIFile *aMailFile, nsIOutputStream *aOutputStream)
+{
+  nsresult rv;
+  nsCOMPtr<nsILineInputStream> lineStream;
+  rv = BeckyUtils::CreateLineInputStream(aMailFile,
+                                         getter_AddRefs(lineStream));
+  NS_ENSURE_SUCCESS(rv, rv);
+
+  nsCAutoString line;
+  PRUint32 writtenBytes = 0;
+  PRBool inHeader = PR_TRUE;
+  PRBool more = PR_TRUE;
+  nsCAutoString headers;
+  while (more && NS_SUCCEEDED(rv)) {
+    rv = lineStream->ReadLine(line, &more);
+    if (NS_FAILED(rv))
+      break;
+
+    mReadBytes += line.Length(); // Actually this isn't correct.
+
+    if (inHeader) {
+      if (line.IsEmpty()) { // End of headers
+        rv = WriteHeaders(headers, aOutputStream);
+        if (NS_FAILED(rv))
+          break;
+        inHeader = PR_FALSE;
+      } else {
+        HandleHeaderLine(line, headers);
+      }
+      continue;
+    }
+
+    if (line.Equals(".")) { // End of messages
+      inHeader = PR_TRUE;
+      continue;
+    }
+
+    if (IsBeckyIncludeLine(line)) {
+      rv = WriteAttachmentFile(aMailFile, line, aOutputStream);
+      if (NS_FAILED(rv))
+        break;
+      continue;
+    }
+    if (StringBeginsWith(line, NS_LITERAL_CSTRING("..")))
+      line.Cut(0, 1);
+
+    line.AppendLiteral(MSG_LINEBREAK);
+    rv = aOutputStream->Write(line.get(), line.Length(), &writtenBytes);
+  }
+  return NS_OK;
+}
 
 NS_IMETHODIMP
 BeckyMailImporter::ImportMailbox(nsIImportMailboxDescriptor *aSource,
@@ -497,60 +524,36 @@ BeckyMailImporter::ImportMailbox(nsIImportMailboxDescriptor *aSource,
   mReadBytes = 0;
 
   nsresult rv;
-  nsCOMPtr<nsILocalFile> mailboxFile;
-  rv = aSource->GetFile(getter_AddRefs(mailboxFile));
+  nsCOMPtr<nsILocalFile> mailboxFolder;
+  rv = aSource->GetFile(getter_AddRefs(mailboxFolder));
   if (NS_FAILED(rv))
     return rv;
 
-  nsCOMPtr<nsILineInputStream> lineStream;
-  rv = BeckyUtils::CreateLineInputStream(mailboxFile,
-                                         getter_AddRefs(lineStream));
-  NS_ENSURE_SUCCESS(rv, rv);
+  PRBool isDirectory = PR_FALSE;
+  rv = mailboxFolder->IsDirectory(&isDirectory);
+  if (!isDirectory)
+    return NS_ERROR_FAILURE;
 
   nsCOMPtr<nsIOutputStream> outputStream;
   rv = _MsgNewBufferedFileOutputStream(getter_AddRefs(outputStream), aDestination);
   NS_ENSURE_SUCCESS(rv, rv);
 
-  nsCAutoString line;
-  PRUint32 writtenBytes = 0;
-  PRBool inHeader = PR_TRUE;
-  PRBool more = PR_TRUE;
-  nsCAutoString headers;
-  while (more && NS_SUCCEEDED(rv)) {
-    rv = lineStream->ReadLine(line, &more);
-    if (NS_FAILED(rv))
-      break;
+  nsCOMPtr<nsISimpleEnumerator> entries;
+  rv = mailboxFolder->GetDirectoryEntries(getter_AddRefs(entries));
+  NS_ENSURE_SUCCESS(rv, rv);
 
-    mReadBytes += line.Length(); // Actually this isn't correct.
+  PRBool more;
+  nsCOMPtr<nsIFile> entry;
+  while (NS_SUCCEEDED(entries->HasMoreElements(&more)) && more) {
+    rv = entries->GetNext(getter_AddRefs(entry));
+    NS_ENSURE_SUCCESS(rv, rv);
 
-    if (inHeader) {
-      if (line.IsEmpty()) { // End of headers
-        rv = WriteHeaders(headers, outputStream);
-        if (NS_FAILED(rv))
-          break;
-        inHeader = PR_FALSE;
-      } else {
-        HandleHeaderLine(line, headers);
-      }
+    nsCAutoString name;
+    rv = entry->GetNativeLeafName(name);
+    if (!StringEndsWith(name, NS_LITERAL_CSTRING(".bmf")))
       continue;
-    }
 
-    if (line.Equals(".")) { // End of messages
-      inHeader = PR_TRUE;
-      continue;
-    }
-
-    if (IsBeckyIncludeLine(line)) {
-      rv = WriteAttachmentFile(mailboxFile, line, outputStream);
-      if (NS_FAILED(rv))
-        break;
-      continue;
-    }
-    if (StringBeginsWith(line, NS_LITERAL_CSTRING("..")))
-      line.Cut(0, 1);
-
-    line.AppendLiteral(MSG_LINEBREAK);
-    rv = outputStream->Write(line.get(), line.Length(), &writtenBytes);
+    ImportMailFile(entry, outputStream);
   }
 
   if (NS_SUCCEEDED(rv)) {
