@@ -54,6 +54,7 @@ public:
                                     nsIFile **_retval);
   static nsresult GetDefaultFolderName(nsIFile *aFolderListFile,
                                        nsACString& name);
+  static nsresult GetMailboxINIFile(nsIFile **aDirectory);
 };
 
 

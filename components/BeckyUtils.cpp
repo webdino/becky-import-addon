@@ -230,3 +230,22 @@ BeckyUtils::GetDefaultMailboxDirectory(nsIFile **_retval)
   return NS_OK;
 }
 
+nsresult
+BeckyUtils::GetMailboxINIFile(nsIFile **aDirectory)
+{
+  nsresult rv;
+  nsCOMPtr<nsIFile> mailboxDirectory;
+  rv = BeckyUtils::GetDefaultMailboxDirectory(getter_AddRefs(mailboxDirectory));
+  if (NS_FAILED(rv))
+    return rv;
+
+  rv = mailboxDirectory->AppendNative(NS_LITERAL_CSTRING("Mailbox.ini"));
+  NS_ENSURE_SUCCESS(rv, rv);
+  PRBool exists;
+  rv = mailboxDirectory->Exists(&exists);
+  if (exists)
+    return CallQueryInterface(mailboxDirectory, aDirectory);
+
+  return NS_ERROR_FILE_NOT_FOUND;
+}
+

@@ -78,25 +78,6 @@ BeckySettingsImporter::~BeckySettingsImporter()
 {
 }
 
-static nsresult
-GetMailbox(nsIFile **aDirectory)
-{
-  nsresult rv;
-  nsCOMPtr<nsIFile> mailboxDirectory;
-  rv = BeckyUtils::GetDefaultMailboxDirectory(getter_AddRefs(mailboxDirectory));
-  if (NS_FAILED(rv))
-    return rv;
-
-  rv = mailboxDirectory->AppendNative(NS_LITERAL_CSTRING("Mailbox.ini"));
-  NS_ENSURE_SUCCESS(rv, rv);
-  PRBool exists;
-  rv = mailboxDirectory->Exists(&exists);
-  if (exists)
-    return CallQueryInterface(mailboxDirectory, aDirectory);
-
-  return NS_ERROR_FILE_NOT_FOUND;
-}
-
 NS_IMETHODIMP
 BeckySettingsImporter::AutoLocate(PRUnichar **aDescription NS_OUTPARAM,
                                   nsIFile **aLocation NS_OUTPARAM,
@@ -116,7 +97,7 @@ BeckySettingsImporter::AutoLocate(PRUnichar **aDescription NS_OUTPARAM,
   *_retval = PR_FALSE;
 
   nsCOMPtr<nsIFile> location;
-  nsresult rv = GetMailbox(getter_AddRefs(location));
+  nsresult rv = BeckyUtils::GetMailboxINIFile(getter_AddRefs(location));
   if (NS_FAILED(rv)) {
     location = do_CreateInstance(NS_LOCAL_FILE_CONTRACTID, &rv);
     return CallQueryInterface(location, aLocation);
@@ -173,7 +154,7 @@ nsresult
 BeckySettingsImporter::CreateParser(nsIINIParser **aParser)
 {
   if (!mLocation) {
-    nsresult rv = GetMailbox(getter_AddRefs(mLocation));
+    nsresult rv = BeckyUtils::GetMailboxINIFile(getter_AddRefs(mLocation));
     if (NS_FAILED(rv))
       return rv;
   }
