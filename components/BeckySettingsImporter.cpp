@@ -97,7 +97,7 @@ BeckySettingsImporter::AutoLocate(PRUnichar **aDescription NS_OUTPARAM,
   *_retval = PR_FALSE;
 
   nsCOMPtr<nsIFile> location;
-  nsresult rv = BeckyUtils::GetMailboxINIFile(getter_AddRefs(location));
+  nsresult rv = BeckyUtils::GetDefaultMailboxINIFile(getter_AddRefs(location));
   if (NS_FAILED(rv)) {
     location = do_CreateInstance(NS_LOCAL_FILE_CONTRACTID, &rv);
     return CallQueryInterface(location, aLocation);
@@ -154,7 +154,7 @@ nsresult
 BeckySettingsImporter::CreateParser(nsIINIParser **aParser)
 {
   if (!mLocation) {
-    nsresult rv = BeckyUtils::GetMailboxINIFile(getter_AddRefs(mLocation));
+    nsresult rv = BeckyUtils::GetDefaultMailboxINIFile(getter_AddRefs(mLocation));
     if (NS_FAILED(rv))
       return rv;
   }

@@ -231,7 +231,7 @@ BeckyUtils::GetDefaultMailboxDirectory(nsIFile **_retval)
 }
 
 nsresult
-BeckyUtils::GetMailboxINIFile(nsIFile **aDirectory)
+BeckyUtils::GetDefaultMailboxINIFile(nsIFile **_retval NS_OUTPARAM)
 {
   nsresult rv;
   nsCOMPtr<nsIFile> mailboxDirectory;
@@ -239,12 +239,23 @@ BeckyUtils::GetMailboxINIFile(nsIFile **aDirectory)
   if (NS_FAILED(rv))
     return rv;
 
-  rv = mailboxDirectory->AppendNative(NS_LITERAL_CSTRING("Mailbox.ini"));
+  return GetMailboxINIFile(mailboxDirectory, _retval);
+}
+
+nsresult
+BeckyUtils::GetMailboxINIFile(nsIFile *aDirectory, nsIFile **_retval NS_OUTPARAM)
+{
+  nsresult rv;
+  nsCOMPtr<nsIFile> target;
+  rv = aDirectory->Clone(getter_AddRefs(target));
+  NS_ENSURE_SUCCESS(rv, rv);
+
+  rv = target->AppendNative(NS_LITERAL_CSTRING("Mailbox.ini"));
   NS_ENSURE_SUCCESS(rv, rv);
   PRBool exists;
-  rv = mailboxDirectory->Exists(&exists);
+  rv = target->Exists(&exists);
   if (exists)
-    return CallQueryInterface(mailboxDirectory, aDirectory);
+    return CallQueryInterface(target, _retval);
 
   return NS_ERROR_FILE_NOT_FOUND;
 }
