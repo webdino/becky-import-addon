@@ -164,16 +164,7 @@ BeckySettingsImporter::CreateParser(nsIINIParser **aParser)
   if (NS_FAILED(rv))
     return rv;
 
-  nsCOMPtr<nsIINIParserFactory> factory;
-  factory = do_GetService("@mozilla.org/xpcom/ini-processor-factory;1", &rv);
-  NS_ENSURE_SUCCESS(rv, rv);
-
-  nsCOMPtr<nsILocalFile> file = do_QueryInterface(mConvertedFile);
-  nsCOMPtr<nsIINIParser> parser;
-  rv = factory->CreateINIParser(file, getter_AddRefs(parser));
-  NS_IF_ADDREF(*aParser = parser);
-
-  return rv;
+  return BeckyUtils::CreateINIParserForFile(mConvertedFile, aParser);
 }
 
 static nsresult

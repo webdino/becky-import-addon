@@ -53,6 +53,7 @@
 #include <nsIInputStream.h>
 #include <nsILineInputStream.h>
 #include <nsNetUtil.h>
+#include <nsIINIParser.h>
 
 #include "BeckyUtils.h"
 
@@ -258,5 +259,35 @@ BeckyUtils::GetMailboxINIFile(nsIFile *aDirectory, nsIFile **_retval NS_OUTPARAM
     return CallQueryInterface(target, _retval);
 
   return NS_ERROR_FILE_NOT_FOUND;
+}
+
+nsresult
+BeckyUtils::CreateINIParserForFile(nsIFile *aFile,
+                                   nsIINIParser **aParser NS_OUTPARAM)
+{
+  nsresult rv;
+  nsCOMPtr<nsIINIParserFactory> factory;
+  factory = do_GetService("@mozilla.org/xpcom/ini-processor-factory;1", &rv);
+  NS_ENSURE_SUCCESS(rv, rv);
+
+  nsCOMPtr<nsILocalFile> file = do_QueryInterface(aFile);
+  nsCOMPtr<nsIINIParser> parser;
+  rv = factory->CreateINIParser(file, getter_AddRefs(parser));
+  NS_IF_ADDREF(*aParser = parser);
+
+  return rv;
+}
+
+nsresult
+BeckyUtils::GetMaiboxNameFromINIFile(nsIFile *aFile, nsCString &aName)
+{
+  nsresult rv;
+  nsCOMPtr<nsIINIParser> parser;
+  rv = BeckyUtils::CreateINIParserForFile(aFile, getter_AddRefs(parser));
+  NS_ENSURE_SUCCESS(rv, rv);
+
+  return parser->GetString(NS_LITERAL_CSTRING("Account"),
+                           NS_LITERAL_CSTRING("Name"),
+                           aName);
 }
 

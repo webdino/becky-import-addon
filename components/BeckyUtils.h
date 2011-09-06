@@ -39,6 +39,7 @@
 
 class nsIFile;
 class nsILineInputStream;
+class nsIINIParser;
 
 class BeckyUtils {
 public:
@@ -56,6 +57,9 @@ public:
                                        nsACString& name);
   static nsresult GetDefaultMailboxINIFile(nsIFile **_retval);
   static nsresult GetMailboxINIFile(nsIFile *aDirectory, nsIFile **_retval);
+  static nsresult CreateINIParserForFile(nsIFile *aFile,
+                                         nsIINIParser **aParser);
+  static nsresult GetMaiboxNameFromINIFile(nsIFile *aFile, nsCString &aName);
 };
 
 
