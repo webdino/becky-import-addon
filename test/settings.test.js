@@ -51,7 +51,6 @@ assert.equalAccount = function(expected, actual) {
   assert.equalIncomingServer(expected.incomingServer, actual.incomingServer);
   assert.equalIdentities(expected.identities, actual.identities);
   assert.equalIdentity(expected.defaultIdentity, actual.defaultIdentity);
-  assert.equals(expected.toString(), actual.toString());
 }
 
 testCreate.description = "create instance test";
