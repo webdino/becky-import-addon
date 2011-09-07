@@ -276,7 +276,7 @@ BeckyMailImporter::FindMailboxes(nsIFile *aLocation,
 }
 
 static nsresult
-GetHeaderValue (const nsCString &aHeader, nsACString &aValue)
+GetBeckyStatusValue (const nsCString &aHeader, nsACString &aValue)
 {
   PRUint32 valueStartPosition;
 
@@ -295,13 +295,32 @@ GetHeaderValue (const nsCString &aHeader, nsACString &aValue)
   return NS_OK;
 }
 
+static nsresult
+GetBeckyIncludeValue (const nsCString &aHeader, nsACString &aValue)
+{
+  PRUint32 valueStartPosition;
+
+  valueStartPosition = aHeader.FindChar(':');
+  if (valueStartPosition < 0)
+    return NS_ERROR_FAILURE;
+
+  valueStartPosition++;
+  nsDependentCSubstring value(aHeader,
+                              valueStartPosition);
+  value.Trim(" \t");
+
+  aValue.Assign(value);
+
+  return NS_OK;
+}
+
 static PRBool
 ConvertBeckyStatusToMozillaStatus(const nsCString &aHeader,
                                   nsMsgMessageFlagType *aMozillaStatusFlag)
 {
   nsresult rv;
   nsCAutoString statusString;
-  rv = GetHeaderValue(aHeader, statusString);
+  rv = GetBeckyStatusValue(aHeader, statusString);
   NS_ENSURE_SUCCESS(rv, rv);
 
   nsresult errorCode;
@@ -388,14 +407,17 @@ GetAttachmentFile(nsIFile *aMailboxFile,
   rv = attachmentFile->AppendNative(NS_LITERAL_CSTRING("#Attach"));
   NS_ENSURE_SUCCESS(rv, rv);
 
-  nsCAutoString attachmentPath;
-  rv = GetHeaderValue(aHeader, attachmentPath);
+  nsCAutoString nativeAttachmentPath;
+  rv = GetBeckyIncludeValue(aHeader, nativeAttachmentPath);
   NS_ENSURE_SUCCESS(rv, rv);
 
+  nsCAutoString utf8AttachmentPath;
+  BeckyUtils::ConvertNativeStringToUTF8(nativeAttachmentPath, utf8AttachmentPath);
+
   nsTArray<nsCAutoString> directoryNames;
-  ParseString(attachmentPath, '\\', directoryNames);
+  ParseString(utf8AttachmentPath, '\\', directoryNames);
   for (nsTArray<nsCString>::index_type i = 0; i < directoryNames.Length(); i++)
-    rv = attachmentFile->AppendNative(directoryNames[i]);
+    rv = attachmentFile->Append(NS_ConvertUTF8toUTF16(directoryNames[i]));
 
   PRBool exists = PR_FALSE;
   attachmentFile->Exists(&exists);
