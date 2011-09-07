@@ -1,7 +1,7 @@
 dnl Process this file with autoconf to produce a configure script.
 AC_PREREQ(2.56)
 
-AC_INIT(becky-import, 0.9.2, [hiikezoe@mozilla-japan.org])
+AC_INIT(becky-import, 0.9.3, [hiikezoe@mozilla-japan.org])
 AM_INIT_AUTOMAKE($PACKAGE_NAME, $PACKAGE_VERSION)
 AC_CONFIG_MACRO_DIR([m4macros])
 
