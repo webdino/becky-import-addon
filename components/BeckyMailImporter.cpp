@@ -154,9 +154,9 @@ BeckyMailImporter::CountMailboxSize(nsIFile *aMailboxFolder)
     rv = entries->GetNext(getter_AddRefs(entry));
     NS_ENSURE_SUCCESS(rv, 0);
 
-    nsCAutoString name;
-    rv = entry->GetNativeLeafName(name);
-    if (!StringEndsWith(name, NS_LITERAL_CSTRING(".bmf")))
+    nsAutoString name;
+    rv = entry->GetLeafName(name);
+    if (!StringEndsWith(name, NS_LITERAL_STRING(".bmf")))
       continue;
 
     PRInt64 size;
@@ -570,9 +570,9 @@ BeckyMailImporter::ImportMailbox(nsIImportMailboxDescriptor *aSource,
     rv = entries->GetNext(getter_AddRefs(entry));
     NS_ENSURE_SUCCESS(rv, rv);
 
-    nsCAutoString name;
-    rv = entry->GetNativeLeafName(name);
-    if (!StringEndsWith(name, NS_LITERAL_CSTRING(".bmf")))
+    nsAutoString name;
+    rv = entry->GetLeafName(name);
+    if (!StringEndsWith(name, NS_LITERAL_STRING(".bmf")))
       continue;
 
     ImportMailFile(entry, outputStream);

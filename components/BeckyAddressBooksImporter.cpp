@@ -165,9 +165,9 @@ AppendAddressBookDescriptor(nsIFile *aEntry, nsISupportsArray *aCollected)
 {
   nsresult rv;
 
-  nsCAutoString name;
-  rv = aEntry->GetNativeLeafName(name);
-  if (!StringEndsWith(name, NS_LITERAL_CSTRING(".bab")))
+  nsAutoString name;
+  rv = aEntry->GetLeafName(name);
+  if (!StringEndsWith(name, NS_LITERAL_STRING(".bab")))
     return NS_OK;
 
   nsCOMPtr<nsIImportABDescriptor> descriptor;
