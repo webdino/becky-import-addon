@@ -360,7 +360,7 @@ CreateIncomingServer(nsIINIParser *aParser,
   if (!value.IsEmpty()) {
     PRInt32 minutes = static_cast<PRInt32>(value.ToInteger(&errorCode, 10));
     if (NS_SUCCEEDED(errorCode))
-      server->SetBiffMinutes(minutes * 10);
+      server->SetBiffMinutes(minutes * 1);
   }
 
   NS_IF_ADDREF(*aServer = server);
