@@ -251,8 +251,35 @@ BeckyMailImporter::CollectMailboxesInDirectory(nsIFile *aDirectory,
   nsCOMPtr<nsIFile> folderListFile;
   rv = BeckyUtils::GetFolderListFile(aDirectory, getter_AddRefs(folderListFile));
 
-  if (NS_SUCCEEDED(rv))
-    CollectMailboxesInFolderListFile(folderListFile, ++aDepth, aCollected);
+  if (NS_SUCCEEDED(rv)) {
+    CollectMailboxesInFolderListFile(folderListFile, aDepth + 1, aCollected);
+  } else if (rv == NS_ERROR_FILE_NOT_FOUND) {
+    // The Folder.lst file is not created if there is only one sub folder,
+    // so we need to find the sub folder by our hands.
+    // The folder name does not begin with # or ! maybe. Yes, maybe...
+    nsCOMPtr<nsISimpleEnumerator> entries;
+    rv = aDirectory->GetDirectoryEntries(getter_AddRefs(entries));
+    NS_ENSURE_SUCCESS(rv, rv);
+
+    PRBool more;
+    nsCOMPtr<nsIFile> entry;
+    while (NS_SUCCEEDED(entries->HasMoreElements(&more)) && more) {
+      rv = entries->GetNext(getter_AddRefs(entry));
+      NS_ENSURE_SUCCESS(rv, rv);
+
+      nsAutoString name;
+      rv = entry->GetLeafName(name);
+      if (StringBeginsWith(name, NS_LITERAL_STRING("#")) ||
+          StringBeginsWith(name, NS_LITERAL_STRING("!")) ||
+          StringEndsWith(name, NS_LITERAL_STRING(".bmf"))) {
+        continue;
+      }
+      PRBool isDirectory;
+      rv = entry->IsDirectory(&isDirectory);
+      if (isDirectory)
+        CollectMailboxesInDirectory(entry, aDepth + 1, aCollected);
+    }
+  }
 
   return NS_OK;
 }
