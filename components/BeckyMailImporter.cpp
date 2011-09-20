@@ -556,6 +556,8 @@ BeckyMailImporter::ImportMailFile(nsIFile *aMailFile, nsIOutputStream *aOutputSt
     }
     if (StringBeginsWith(line, NS_LITERAL_CSTRING("..")))
       line.Cut(0, 1);
+    else if (CheckHeaderKey(line, "From"))
+      aOutputStream->Write(">", 1, &writtenBytes);
 
     line.AppendLiteral(MSG_LINEBREAK);
     rv = aOutputStream->Write(line.get(), line.Length(), &writtenBytes);
