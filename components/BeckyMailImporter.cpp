@@ -222,9 +222,13 @@ BeckyMailImporter::CollectMailboxesInFolderListFile(nsIFile *aListFile,
 
   PRBool more = PR_TRUE;
   nsCAutoString folderName;
+  PRBool isEmpty = PR_TRUE;
   while (more && NS_SUCCEEDED(rv)) {
     rv = lineStream->ReadLine(folderName, &more);
     NS_ENSURE_SUCCESS(rv, rv);
+
+    if (folderName.IsEmpty())
+      continue;
 
     nsCOMPtr<nsIFile> folder;
     rv = parent->Clone(getter_AddRefs(folder));
@@ -233,10 +237,11 @@ BeckyMailImporter::CollectMailboxesInFolderListFile(nsIFile *aListFile,
     rv = folder->AppendNative(folderName);
     NS_ENSURE_SUCCESS(rv, rv);
 
+    isEmpty = PR_FALSE;
     rv = CollectMailboxesInDirectory(folder, aDepth, aCollected);
   }
 
-  return rv;
+  return isEmpty ? NS_ERROR_FILE_NOT_FOUND : NS_OK;
 }
 
 nsresult
