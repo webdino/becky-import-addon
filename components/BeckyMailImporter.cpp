@@ -256,9 +256,10 @@ BeckyMailImporter::CollectMailboxesInDirectory(nsIFile *aDirectory,
   nsCOMPtr<nsIFile> folderListFile;
   rv = BeckyUtils::GetFolderListFile(aDirectory, getter_AddRefs(folderListFile));
 
-  if (NS_SUCCEEDED(rv)) {
-    CollectMailboxesInFolderListFile(folderListFile, aDepth + 1, aCollected);
-  } else if (rv == NS_ERROR_FILE_NOT_FOUND) {
+  if (NS_SUCCEEDED(rv))
+    rv = CollectMailboxesInFolderListFile(folderListFile, aDepth + 1, aCollected);
+
+  if (rv == NS_ERROR_FILE_NOT_FOUND) {
     // The Folder.lst file is not created if there is only one sub folder,
     // so we need to find the sub folder by our hands.
     // The folder name does not begin with # or ! maybe. Yes, maybe...
