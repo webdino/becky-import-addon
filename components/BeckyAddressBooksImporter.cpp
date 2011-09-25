@@ -200,6 +200,37 @@ HasAddressBookFile(nsIFile *aDirectory)
   return PR_FALSE;
 }
 
+static PRUint32
+GetAddressBookSize(nsIFile *aDirectory)
+{
+  nsresult rv;
+  PRBool isDirectory = PR_FALSE;
+  rv = aDirectory->IsDirectory(&isDirectory);
+  if (!isDirectory)
+    return 0;
+
+  nsCOMPtr<nsISimpleEnumerator> entries;
+  rv = aDirectory->GetDirectoryEntries(getter_AddRefs(entries));
+  NS_ENSURE_SUCCESS(rv, 0);
+
+  PRUint32 total = 0;
+  PRBool more;
+  nsCOMPtr<nsIFile> entry;
+  while (NS_SUCCEEDED(entries->HasMoreElements(&more)) && more) {
+    rv = entries->GetNext(getter_AddRefs(entry));
+    NS_ENSURE_SUCCESS(rv, 0);
+
+    PRInt64 size;
+    entry->GetFileSize(&size);
+    if (total + size > PR_UINT32_MAX)
+      return PR_UINT32_MAX;
+
+    total += size;
+  }
+
+  return total;
+}
+
 static nsresult
 AppendAddressBookDescriptor(nsIFile *aEntry, nsISupportsArray *aCollected)
 {
@@ -212,14 +243,8 @@ AppendAddressBookDescriptor(nsIFile *aEntry, nsISupportsArray *aCollected)
   if (NS_FAILED(rv))
     return rv;
 
-  PRInt64 size;
-  aEntry->GetFileSize(&size);
-  if (size > PR_UINT32_MAX) {
-    NS_WARNING("Overflowed file size. Could not handle over 4GB address book");
-    size = PR_UINT32_MAX;
-  }
-
-  descriptor->SetSize(static_cast<PRUint32>(size));
+  PRUint32 size = GetAddressBookSize(aEntry);
+  descriptor->SetSize(size);
   descriptor->SetAbFile(aEntry);
 
   nsAutoString name;
@@ -256,7 +281,7 @@ CollectAddressBooks(nsIFile *aTarget, nsISupportsArray *aCollected)
 
     rv = entry->IsDirectory(&isDirectory);
     if (isDirectory)
-      rv = AppendAddressBookDescriptor(entry, aCollected);
+      rv = CollectAddressBooks(entry, aCollected);
     NS_ENSURE_SUCCESS(rv, rv);
   }
 
