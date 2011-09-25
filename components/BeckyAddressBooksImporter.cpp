@@ -160,16 +160,53 @@ CreateAddressBookDescriptor(nsIImportABDescriptor **aDescriptor)
   return importService->CreateNewABDescriptor(aDescriptor);
 }
 
+static PRBool
+IsAddressBookFile(nsIFile *aFile)
+{
+  nsresult rv;
+  PRBool isDirectory = PR_FALSE;
+  rv = aFile->IsDirectory(&isDirectory);
+  if (isDirectory)
+    return PR_FALSE;
+
+  nsAutoString name;
+  rv = aFile->GetLeafName(name);
+  return StringEndsWith(name, NS_LITERAL_STRING(".bab"));
+}
+
+static PRBool
+HasAddressBookFile(nsIFile *aDirectory)
+{
+  nsresult rv;
+  PRBool isDirectory = PR_FALSE;
+  rv = aDirectory->IsDirectory(&isDirectory);
+  if (!isDirectory)
+    return PR_FALSE;
+
+  nsCOMPtr<nsISimpleEnumerator> entries;
+  rv = aDirectory->GetDirectoryEntries(getter_AddRefs(entries));
+  NS_ENSURE_SUCCESS(rv, rv);
+
+  PRBool more;
+  nsCOMPtr<nsIFile> entry;
+  while (NS_SUCCEEDED(entries->HasMoreElements(&more)) && more) {
+    rv = entries->GetNext(getter_AddRefs(entry));
+    NS_ENSURE_SUCCESS(rv, rv);
+
+    if (IsAddressBookFile(entry))
+      return PR_TRUE;
+  }
+
+  return PR_FALSE;
+}
+
 static nsresult
 AppendAddressBookDescriptor(nsIFile *aEntry, nsISupportsArray *aCollected)
 {
-  nsresult rv;
-
-  nsAutoString name;
-  rv = aEntry->GetLeafName(name);
-  if (!StringEndsWith(name, NS_LITERAL_STRING(".bab")))
+  if (!HasAddressBookFile(aEntry))
     return NS_OK;
 
+  nsresult rv;
   nsCOMPtr<nsIImportABDescriptor> descriptor;
   rv = CreateAddressBookDescriptor(getter_AddRefs(descriptor));
   if (NS_FAILED(rv))
@@ -185,12 +222,9 @@ AppendAddressBookDescriptor(nsIFile *aEntry, nsISupportsArray *aCollected)
   descriptor->SetSize(static_cast<PRUint32>(size));
   descriptor->SetAbFile(aEntry);
 
-  nsCOMPtr<nsIFile> parent;
-  rv = aEntry->GetParent(getter_AddRefs(parent));
-  NS_ENSURE_SUCCESS(rv, rv);
-  nsAutoString parentName;
-  parent->GetLeafName(parentName);
-  descriptor->SetPreferredName(parentName);
+  nsAutoString name;
+  aEntry->GetLeafName(name);
+  descriptor->SetPreferredName(name);
 
   nsCOMPtr<nsISupports> interface;
   interface = do_QueryInterface(descriptor, &rv);
@@ -205,7 +239,10 @@ CollectAddressBooks(nsIFile *aTarget, nsISupportsArray *aCollected)
   PRBool isDirectory = PR_FALSE;
   nsresult rv = aTarget->IsDirectory(&isDirectory);
   if (!isDirectory)
-    return AppendAddressBookDescriptor(aTarget, aCollected);
+    return NS_ERROR_FAILURE;
+
+  rv = AppendAddressBookDescriptor(aTarget, aCollected);
+  NS_ENSURE_SUCCESS(rv, rv);
 
   nsCOMPtr<nsISimpleEnumerator> entries;
   rv = aTarget->GetDirectoryEntries(getter_AddRefs(entries));
@@ -216,7 +253,10 @@ CollectAddressBooks(nsIFile *aTarget, nsISupportsArray *aCollected)
   while (NS_SUCCEEDED(entries->HasMoreElements(&more)) && more) {
     rv = entries->GetNext(getter_AddRefs(entry));
     NS_ENSURE_SUCCESS(rv, rv);
-    rv = CollectAddressBooks(entry, aCollected);
+
+    rv = entry->IsDirectory(&isDirectory);
+    if (isDirectory)
+      rv = AppendAddressBookDescriptor(entry, aCollected);
     NS_ENSURE_SUCCESS(rv, rv);
   }
 
@@ -276,11 +316,28 @@ BeckyAddressBooksImporter::ImportAddressBook(nsIImportABDescriptor *aSource,
   if (NS_FAILED(rv))
     return rv;
 
+  nsCOMPtr<nsISimpleEnumerator> entries;
+  rv = file->GetDirectoryEntries(getter_AddRefs(entries));
+  NS_ENSURE_SUCCESS(rv, rv);
+
+  PRBool more;
+  nsCOMPtr<nsIFile> entry;
   nsAutoString error;
-  rv = BeckyVCardAddress::ImportAddresses(file, aDestination, error, &mReadBytes);
-  if (!error.IsEmpty()) {
-    *aErrorLog = ToNewUnicode(error);
-  } else {
+  while (NS_SUCCEEDED(entries->HasMoreElements(&more)) && more) {
+    rv = entries->GetNext(getter_AddRefs(entry));
+    NS_ENSURE_SUCCESS(rv, rv);
+
+    if (!IsAddressBookFile(entry))
+      continue;
+
+    rv = BeckyVCardAddress::ImportAddresses(entry, aDestination, error, &mReadBytes);
+    if (!error.IsEmpty()) {
+      *aErrorLog = ToNewUnicode(error);
+      break;
+    }
+  }
+
+  if (error.IsEmpty()) {
     nsCOMPtr<nsIStringBundle> bundle(dont_AddRef(BeckyStringBundle::GetStringBundleProxy()));
     if (bundle) {
       nsString successMessage;

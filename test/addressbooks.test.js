@@ -140,7 +140,7 @@ function testImportAddressBook() {
   let container = {};
   destination.getCardCount(container);
   assert.isDefined(container.value);
-  assert.equals(1, container.value);
+  assert.equals(2, container.value);
 
   let cards = destination.enumerateCards(null);
   assert.isDefined(cards);
