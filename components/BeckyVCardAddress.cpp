@@ -152,7 +152,8 @@ BeckyVCardAddress::ReadRecord(nsILineInputStream *aLineStream,
       break;
     }
     rv = aLineStream->ReadLine(line, &more);
-    aRecord.AppendLiteral(MSG_LINEBREAK);
+    if (!StringBeginsWith(line, NS_LITERAL_CSTRING(" ")))
+      aRecord.AppendLiteral(MSG_LINEBREAK);
     BeckyUtils::ConvertNativeStringToUTF8(line, utf8String);
     aRecord.Append(utf8String);
   } while (!line.Equals(NS_LITERAL_CSTRING("END:VCARD"), CaseInsensitiveCompare));
