@@ -69,6 +69,7 @@ public:
 private:
   nsCOMPtr<nsIFile> mLocation;
   nsCOMPtr<nsIMsgIncomingServer> mServer;
+  nsCOMPtr<nsIFile> mConvertedFile;
 
   nsresult GetDefaultFilterFile(nsIFile **aFile);
   nsresult ParseFilterFile(nsIFile *aFile);
@@ -108,6 +109,7 @@ private:
   nsresult AppendFilter(nsIMsgFilter *aFilter);
   nsresult SetRuleAction(const nsCString &aLine, nsIMsgFilter *aFilter);
   nsresult SetSearchTerm(const nsCString &aLine, nsIMsgFilter *aFilter);
+  nsresult RemoveConvertedFile();
 };
 
 #endif /* BeckyFiltersImporter_h___ */

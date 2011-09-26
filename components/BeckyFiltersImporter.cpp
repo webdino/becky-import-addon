@@ -63,7 +63,8 @@ NS_IMPL_ISUPPORTS1(BeckyFiltersImporter, nsIImportFilters)
 
 BeckyFiltersImporter::BeckyFiltersImporter()
 : mLocation(nsnull),
-  mServer(nsnull)
+  mServer(nsnull),
+  mConvertedFile(nsnull)
 {
   /* member initializers and constructor code */
 }
@@ -221,8 +222,10 @@ BeckyFiltersImporter::ParseRuleLine(const nsCString &aLine,
   *aSearchOperator = searchOperator;
   *aSearchAttribute = searchAttribute;
   length = tabPosition - secondColonPosition - 1;
-  nsDependentCSubstring nativeString(aLine, secondColonPosition + 1, length);
-  return BeckyUtils::ConvertNativeStringToUTF16(nativeString, aSearchKeyword);
+  nsDependentCSubstring utf8String(aLine, secondColonPosition + 1, length);
+  aSearchKeyword = NS_ConvertUTF8toUTF16(utf8String);
+
+  return NS_OK;
 }
 
 nsresult
@@ -595,9 +598,15 @@ BeckyFiltersImporter::Import(PRUnichar **aError NS_OUTPARAM, PRBool *_retval NS_
   rv = CollectServers();
   NS_ENSURE_SUCCESS(rv, rv);
 
-  rv = ParseFilterFile(mLocation);
+  rv = BeckyUtils::ConvertToUTF8File(mLocation, getter_AddRefs(mConvertedFile));
+  if (NS_FAILED(rv))
+    return rv;
+
+  rv = ParseFilterFile(mConvertedFile);
   if (NS_SUCCEEDED(rv))
     *_retval = PR_TRUE;
+
+  RemoveConvertedFile();
 
   return rv;
 }
@@ -746,6 +755,19 @@ BeckyFiltersImporter::CollectServers()
 
   NS_ADDREF(mServer = server);
 
+  return NS_OK;
+}
+
+nsresult
+BeckyFiltersImporter::RemoveConvertedFile()
+{
+  if (mConvertedFile) {
+    PRBool exists;
+    mConvertedFile->Exists(&exists);
+    if (exists)
+      mConvertedFile->Remove(PR_FALSE);
+    mConvertedFile = nsnull;
+  }
   return NS_OK;
 }
 
