@@ -510,6 +510,7 @@ BeckyFiltersImporter::CreateFilter(nsIMsgFilter **_retval NS_OUTPARAM)
   rv = filterList->CreateFilter(NS_LITERAL_STRING(""), getter_AddRefs(filter));
   NS_ENSURE_SUCCESS(rv, rv);
 
+  filter->SetEnabled(PR_TRUE);
   NS_ADDREF(*_retval = filter);
 
   return NS_OK;
@@ -567,7 +568,7 @@ BeckyFiltersImporter::ParseFilterFile(nsIFile *aFile)
       SetSearchTerm(line, filter);
       break;
     case '$': // $X: disabled
-      if (line.Length() > 2 &&
+      if (line.Length() >= 2 &&
           line.CharAt(1) == 'X' &&
           filter) {
         filter->SetEnabled(PR_FALSE);
