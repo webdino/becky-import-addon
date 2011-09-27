@@ -255,7 +255,7 @@ SetPop3ServerProperties(nsIINIParser *aParser,
                      NS_LITERAL_CSTRING("POP3Auth"),
                      value); // 0: plain, 1: APOP, 2: CRAM-MD5, 3: NTLM
   nsMsgAuthMethodValue authMethod = nsMsgAuthMethod::none;
-  if (value.Equals("0")) {
+  if (value.IsEmpty || value.Equals("0")) {
     authMethod = nsMsgAuthMethod::passwordCleartext;
   } else if (value.Equals("1")) {
     authMethod = nsMsgAuthMethod::old;
