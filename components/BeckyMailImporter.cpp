@@ -637,18 +637,6 @@ NS_IMETHODIMP
 BeckyMailImporter::TranslateFolderName(const nsAString & aFolderName,
                                        nsAString & _retval NS_OUTPARAM)
 {
-  if (aFolderName.LowerCaseEqualsLiteral("trash")) {
-    _retval = NS_LITERAL_STRING(kDestTrashFolderName);
-  } else if (aFolderName.LowerCaseEqualsLiteral("inbox")) {
-    _retval = NS_LITERAL_STRING(kDestInboxFolderName);
-  } else if (aFolderName.LowerCaseEqualsLiteral("sent")) {
-    _retval = NS_LITERAL_STRING(kDestSentFolderName);
-  } else if (aFolderName.LowerCaseEqualsLiteral("unsent")) {
-    _retval = NS_LITERAL_STRING(kDestUnsentMessagesFolderName);
-  } else {
-    _retval = aFolderName;
-  }
-
-  return NS_OK;
+  return BeckyUtils::TranslateFolderName(aFolderName, _retval);
 }
 

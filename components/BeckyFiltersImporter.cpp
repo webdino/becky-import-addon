@@ -359,7 +359,7 @@ GetFolderName(const nsCString &aTarget, nsAString &aName)
   PRInt32 backslashPosition = aTarget.RFindChar('\\');
   if (backslashPosition > 0) {
     nsDependentCSubstring utf8String(aTarget, backslashPosition + 1);
-    aName.Assign(NS_ConvertUTF8toUTF16(utf8String));
+    BeckyUtils::TranslateFolderName(NS_ConvertUTF8toUTF16(utf8String), aName);
   }
 
   return NS_OK;

@@ -57,6 +57,7 @@
 #include <nsDirectoryServiceDefs.h>
 #include <nsDirectoryServiceUtils.h>
 #include <msgCore.h>
+#include <nsIImportMail.h>
 
 #include "BeckyUtils.h"
 
@@ -329,5 +330,24 @@ BeckyUtils::ConvertToUTF8File(nsIFile *aSourceFile,
     rv = destination->Write(utf8String.get(), utf8String.Length(), &writtenBytes);
   }
   return CallQueryInterface(convertedFile, _retval);
+}
+
+nsresult
+BeckyUtils::TranslateFolderName(const nsAString & aFolderName,
+                                nsAString & _retval NS_OUTPARAM)
+{
+  if (aFolderName.LowerCaseEqualsLiteral("!trash")) {
+    _retval = NS_LITERAL_STRING(kDestTrashFolderName);
+  } else if (aFolderName.LowerCaseEqualsLiteral("!!!!inbox")) {
+    _retval = NS_LITERAL_STRING(kDestInboxFolderName);
+  } else if (aFolderName.LowerCaseEqualsLiteral("!!!!outbox")) {
+    _retval = NS_LITERAL_STRING(kDestSentFolderName);
+  } else if (aFolderName.LowerCaseEqualsLiteral("!!!!unsent")) {
+    _retval = NS_LITERAL_STRING(kDestUnsentMessagesFolderName);
+  } else {
+    _retval = aFolderName;
+  }
+
+  return NS_OK;
 }
 

@@ -62,6 +62,8 @@ public:
   static nsresult GetMaiboxNameFromINIFile(nsIFile *aFile, nsCString &aName);
   static nsresult ConvertToUTF8File(nsIFile *aSourceFile,
                                     nsIFile **_retval);
+  static nsresult TranslateFolderName(const nsAString & aFolderName,
+                                      nsAString & _retval NS_OUTPARAM);
 };
 
 
