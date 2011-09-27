@@ -223,7 +223,7 @@ BeckyFiltersImporter::ParseRuleLine(const nsCString &aLine,
   *aSearchAttribute = searchAttribute;
   length = tabPosition - secondColonPosition - 1;
   nsDependentCSubstring utf8String(aLine, secondColonPosition + 1, length);
-  aSearchKeyword = NS_ConvertUTF8toUTF16(utf8String);
+  aSearchKeyword.Assign(NS_ConvertUTF8toUTF16(utf8String));
 
   return NS_OK;
 }
