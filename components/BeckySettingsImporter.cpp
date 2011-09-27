@@ -203,11 +203,14 @@ CreateSmtpServer(nsIINIParser *aParser,
   NS_ENSURE_SUCCESS(rv, rv);
 
   nsCAutoString value;
-  aParser->GetString(NS_LITERAL_CSTRING("Account"),
-                     NS_LITERAL_CSTRING("SMTPPort"),
-                     value);
-  nsresult errorCode;
-  PRInt32 port = static_cast<PRInt32>(value.ToInteger(&errorCode, 10));
+  rv = aParser->GetString(NS_LITERAL_CSTRING("Account"),
+                          NS_LITERAL_CSTRING("SMTPPort"),
+                          value);
+  PRInt32 port = 25;
+  if (NS_SUCCEEDED(rv)) {
+    nsresult errorCode;
+    port = static_cast<PRInt32>(value.ToInteger(&errorCode, 10));
+  }
   server->SetPort(port);
 
   aParser->GetString(NS_LITERAL_CSTRING("Account"),
@@ -268,14 +271,16 @@ SetPop3ServerProperties(nsIINIParser *aParser,
                      value);
   if (value.Equals("1")) {
     pop3Server->SetLeaveMessagesOnServer(PR_TRUE);
-    aParser->GetString(NS_LITERAL_CSTRING("Account"),
-                       NS_LITERAL_CSTRING("KeepDays"),
-                       value);
-    if (!value.IsEmpty()) {
+    nsresult rv = aParser->GetString(NS_LITERAL_CSTRING("Account"),
+                                     NS_LITERAL_CSTRING("KeepDays"),
+                                     value);
+    if (NS_SUCCEEDED(rv)) {
       nsresult errorCode;
       PRInt32 leftDays = static_cast<PRInt32>(value.ToInteger(&errorCode, 10));
-      if (NS_SUCCEEDED(errorCode))
+      if (NS_SUCCEEDED(errorCode)) {
         pop3Server->SetNumDaysToLeaveOnServer(leftDays);
+        pop3Server->SetDeleteByAgeFromServer(PR_TRUE);
+      }
     }
   }
 
@@ -317,27 +322,26 @@ CreateIncomingServer(nsIINIParser *aParser,
   nsresult errorCode;
   if (protocol.Equals("pop3")) {
     SetPop3ServerProperties(aParser, server);
-    aParser->GetString(NS_LITERAL_CSTRING("Account"),
-                       NS_LITERAL_CSTRING("POP3Port"),
-                       value);
-    if (value.IsEmpty())
-      port = 110;
-    else
+    rv = aParser->GetString(NS_LITERAL_CSTRING("Account"),
+                            NS_LITERAL_CSTRING("POP3Port"),
+                            value);
+    if (NS_SUCCEEDED(rv))
       port = static_cast<PRInt32>(value.ToInteger(&errorCode, 10));
+    else
+      port = 110;
     aParser->GetString(NS_LITERAL_CSTRING("Account"),
                        NS_LITERAL_CSTRING("SSLPOP"),
                        value);
-    if (value.Equals("1")) {
+    if (value.Equals("1"))
       isSecure = PR_TRUE;
-    }
   } else if (protocol.Equals("imap")) {
-    aParser->GetString(NS_LITERAL_CSTRING("Account"),
-                       NS_LITERAL_CSTRING("IMAP4Port"),
-                       value);
-    if (value.IsEmpty())
-      port = 143;
-    else
+    rv = aParser->GetString(NS_LITERAL_CSTRING("Account"),
+                            NS_LITERAL_CSTRING("IMAP4Port"),
+                            value);
+    if (NS_SUCCEEDED(rv))
       port = static_cast<PRInt32>(value.ToInteger(&errorCode, 10));
+    else
+      port = 143;
     aParser->GetString(NS_LITERAL_CSTRING("Account"),
                        NS_LITERAL_CSTRING("SSLIMAP"),
                        value);
@@ -354,10 +358,10 @@ CreateIncomingServer(nsIINIParser *aParser,
                      value);
   if (value.Equals("1"))
     server->SetDoBiff(PR_TRUE);
-  aParser->GetString(NS_LITERAL_CSTRING("Account"),
-                     NS_LITERAL_CSTRING("CheckEvery"),
-                     value);
-  if (!value.IsEmpty()) {
+  rv = aParser->GetString(NS_LITERAL_CSTRING("Account"),
+                          NS_LITERAL_CSTRING("CheckEvery"),
+                          value);
+  if (NS_SUCCEEDED(rv)) {
     PRInt32 minutes = static_cast<PRInt32>(value.ToInteger(&errorCode, 10));
     if (NS_SUCCEEDED(errorCode))
       server->SetBiffMinutes(minutes * 1);
