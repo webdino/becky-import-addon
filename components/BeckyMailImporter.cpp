@@ -513,6 +513,11 @@ _MsgNewBufferedFileOutputStream(nsIOutputStream **aResult,
 nsresult
 BeckyMailImporter::ImportMailFile(nsIFile *aMailFile, nsIOutputStream *aOutputStream)
 {
+  PRInt64 size;
+  aMailFile->GetFileSize(&size);
+  if (size == 0)
+    return NS_OK;
+
   nsresult rv;
   nsCOMPtr<nsILineInputStream> lineStream;
   rv = BeckyUtils::CreateLineInputStream(aMailFile,
