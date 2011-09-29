@@ -217,7 +217,11 @@ BeckyProfileMigrator::ImportAddressBook()
   PRBool imported;
   PRBool wantsProgress;
   mGenericImporter->WantsProgress(&wantsProgress);
+#ifdef MOZ_IMPORTGENERIC_NEED_ISADDRLOCHOME
   rv = mGenericImporter->BeginImport(nsnull, nsnull, PR_TRUE, &imported);
+#else
+  rv = mGenericImporter->BeginImport(nsnull, nsnull, &imported);
+#endif
 
   if (wantsProgress)
     ContinueImport();
@@ -252,7 +256,11 @@ BeckyProfileMigrator::ImportMailData()
   PRBool importResult;
   PRBool wantsProgress;
   mGenericImporter->WantsProgress(&wantsProgress);
+#ifdef MOZ_IMPORTGENERIC_NEED_ISADDRLOCHOME
   rv = mGenericImporter->BeginImport(nsnull, nsnull, PR_TRUE, &importResult);
+#else
+  rv = mGenericImporter->BeginImport(nsnull, nsnull, &importResult);
+#endif
 
   mProcessingMailFolders = PR_TRUE;
 

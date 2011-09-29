@@ -28,6 +28,7 @@ AC_DEFUN([AC_CHECK_THUNDERBIRD_BUILD_ENVIRONMENT],
   esac
 
   MJ_CHECK_NSIIMPORTADDRESSBOOKS_INTERFACE
+  MJ_CHECK_NSIIMPORTGENERIC_INTERFACE
   AC_SUBST(XPCOM_LIBS)
   AC_SUBST(XPCOM_LDFLAGS)
   AC_SUBST(XPCOM_CFLAGS)
@@ -60,6 +61,36 @@ AC_DEFUN([MJ_CHECK_NSIIMPORTADDRESSBOOKS_INTERFACE],
 
   if test "x$importaddressbook_need_isaddrlochome" = "xyes"; then
     THUNDERBIRD_MACROS="MOZ_IMPORTADDRESSBOOK_NEED_ISADDRLOCHOME"
+    AC_SUBST(THUNDERBIRD_MACROS)
+  fi
+
+  AC_LANG_POP([C++])
+])
+
+AC_DEFUN([MJ_CHECK_NSIIMPORTGENERIC_INTERFACE],
+[
+  AC_LANG_PUSH(C++)
+  _SAVE_CPPFLAGS=$CPPFLAGS
+  _SAVE_CXXFLAGS=$CXXFLAGS
+  _SAVE_AM_CXXFLAGS=$AM_CXXFLAGS
+  CXXFLAGS="$CXXFLAGS $AM_CXXFLAGS"
+  CPPFLAGS="$XPCOM_CFLAGS"
+
+  AC_MSG_CHECKING([nsIImportGeneric::BeginImport method arguments])
+  AC_COMPILE_IFELSE(
+        [AC_LANG_PROGRAM(
+                [[#include <nsIImportGeneric.h>]],
+                [[nsIImportGeneric *p;
+                p->BeginImport(nsnull, nsnull, PR_TRUE, nsnull);]]
+                )],
+        [AC_DEFINE([MOZ_IMPORTGENERIC_NEED_ISADDRLOCHOME],[1],[Define if BeginImport method needs isAddrLocHome]) beginimport_need_isaddrlochome=yes],
+        [beginimport_need_isaddrlochome=no])
+  AC_MSG_RESULT([$beginimport_need_isaddrlochome])
+  CPPFLAGS=$_SAVE_CPPFLAGS
+  CXXFLAGS=$_SAVE_CXXFLAGS
+
+  if test "x$beginimport_need_isaddrlochome" = "xyes"; then
+    THUNDERBIRD_MACROS="MOZ_BEGINIMPORT_NEED_ISADDRLOCHOME"
     AC_SUBST(THUNDERBIRD_MACROS)
   fi
 
