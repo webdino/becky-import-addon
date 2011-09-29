@@ -4,6 +4,12 @@ AM_CXXFLAGS =				\
 
 noinst_LTLIBRARIES = BeckyImport.la
 
+if MOZILLA_VERSION_7
+MODULE_CPP = BeckyImportModule.cpp
+else
+MODULE_CPP = BeckyImportModule_1_9_2.cpp
+endif
+
 BeckyImport_la_SOURCES = 	        \
 	BeckyMailImporter.cpp           \
 	BeckyMailImporter.h             \
@@ -23,7 +29,7 @@ BeckyImport_la_SOURCES = 	        \
 	BeckyProfileMigrator.h          \
 	BeckyImport.cpp                 \
 	BeckyImport.h                   \
-	BeckyImportModule_1_9_2.cpp
+        $(MODULE_CPP)
 
 BeckyImport_la_LIBADD = 	\
 	$(XPCOM_LIBS)
