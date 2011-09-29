@@ -104,4 +104,10 @@ AC_DEFUN([MJ_CHECK_MOZILLA_VERSION],
   mozilla_version=`cat $THUNDERBIRD_INCLUDE_PATH/mozilla-config.h | grep MOZILLA_VERSION_U | awk '{ print $[3]; }' | cut -c1`
   echo $mozilla_version
   AM_CONDITIONAL(MOZILLA_VERSION_7, test "$mozilla_version" = "7")
+  if test "$mozilla_version" = "7"; then
+    MODULE_SOURCE_CPP="BeckyImportModule.cpp"
+  else
+    MODULE_SOURCE_CPP="BeckyImportModule_1_9_2.cpp"
+  fi
+  AC_SUBST(MODULE_SOURCE_CPP)
 ])

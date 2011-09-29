@@ -213,7 +213,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\BeckyImportModule_1_9_2.cpp"
+				RelativePath="..\@MODULE_SOURCE_CPP@"
 				>
 			</File>
 		</Filter>
