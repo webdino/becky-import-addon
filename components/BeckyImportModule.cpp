@@ -42,10 +42,7 @@
 #endif /* HAVE_CONFIG_H */
 
 #include <mozilla-config.h>
-#if 0
 #include <ModuleUtils.h>
-#endif
-#include <nsIGenericFactory.h>
 
 #include "BeckyMailImporter.h"
 #include "BeckyImport.h"
@@ -53,9 +50,6 @@
 
 NS_GENERIC_FACTORY_CONSTRUCTOR(BeckyMailImporter)
 NS_GENERIC_FACTORY_CONSTRUCTOR(BeckyImport)
-#if 0
-NS_DEFINE_NAMED_CID(MJ_BECKYIMPORT_CID);
-#endif
 
 static NS_DEFINE_CID(kMJ_BECKYIMPORT_CID, MJ_BECKYIMPORT_CID);
 
