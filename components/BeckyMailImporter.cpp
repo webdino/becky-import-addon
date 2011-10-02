@@ -156,7 +156,7 @@ BeckyMailImporter::CountMailboxSize(nsIFile *aMailboxFolder)
 
     nsAutoString name;
     rv = entry->GetLeafName(name);
-    if (!StringEndsWith(name, NS_LITERAL_STRING(".bmf")))
+    if (!BeckyUtils::StringEndsWith(name, NS_LITERAL_STRING(".bmf")))
       continue;
 
     PRInt64 size;
@@ -186,7 +186,10 @@ BeckyMailImporter::AppendMailboxDescriptor(nsIFile *aEntry,
   nsAutoString mailboxName;
   rv = GetMailboxName(aEntry, mailboxName);
   NS_ENSURE_SUCCESS(rv, rv);
-  descriptor->SetDisplayName(mailboxName.get());
+
+  const PRUnichar *rawStringData;
+  NS_StringGetData(mailboxName, &rawStringData);
+  descriptor->SetDisplayName(rawStringData);
 
   nsCOMPtr<nsILocalFile> mailboxFile;
   rv = descriptor->GetFile(getter_AddRefs(mailboxFile));
@@ -275,9 +278,9 @@ BeckyMailImporter::CollectMailboxesInDirectory(nsIFile *aDirectory,
 
       nsAutoString name;
       rv = entry->GetLeafName(name);
-      if (StringBeginsWith(name, NS_LITERAL_STRING("#")) ||
-          StringBeginsWith(name, NS_LITERAL_STRING("!")) ||
-          StringEndsWith(name, NS_LITERAL_STRING(".bmf"))) {
+      if (BeckyUtils::StringBeginsWith(name, NS_LITERAL_STRING("#")) ||
+          BeckyUtils::StringBeginsWith(name, NS_LITERAL_STRING("!")) ||
+          BeckyUtils::StringEndsWith(name, NS_LITERAL_STRING(".bmf"))) {
         continue;
       }
       PRBool isDirectory;
@@ -612,7 +615,7 @@ BeckyMailImporter::ImportMailbox(nsIImportMailboxDescriptor *aSource,
 
     nsAutoString name;
     rv = entry->GetLeafName(name);
-    if (!StringEndsWith(name, NS_LITERAL_STRING(".bmf")))
+    if (!BeckyUtils::StringEndsWith(name, NS_LITERAL_STRING(".bmf")))
       continue;
 
     ImportMailFile(entry, outputStream);

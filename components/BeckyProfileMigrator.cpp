@@ -88,7 +88,10 @@ BeckyProfileMigrator::Notify(nsITimer *aTimer)
 
   nsAutoString index;
   index.AppendInt(progress);
-  mObserverService->NotifyObservers(nsnull, "Migration:Progress", index.get());
+
+  const PRUnichar *rawStringData;
+  NS_StringGetData(index, &rawStringData);
+  mObserverService->NotifyObservers(nsnull, "Migration:Progress", rawStringData);
 
   if (progress == 100) {
     if (mProcessingMailFolders)
@@ -175,9 +178,11 @@ BeckyProfileMigrator::ImportSettings()
 {
   nsAutoString index;
   index.AppendInt(nsIMailProfileMigrator::ACCOUNT_SETTINGS);
+  const PRUnichar *rawStringData;
+  NS_StringGetData(index, &rawStringData);
   mObserverService->NotifyObservers(nsnull,
                                     "Migration:ItemBeforeMigrate",
-                                    index.get());
+                                    rawStringData);
 
   nsresult rv;
   nsCOMPtr<nsIImportSettings> importer;
@@ -189,7 +194,7 @@ BeckyProfileMigrator::ImportSettings()
 
   mObserverService->NotifyObservers(nsnull,
                                     "Migration:ItemAfterMigrate",
-                                    index.get());
+                                    rawStringData);
   return rv;
 }
 
@@ -198,9 +203,11 @@ BeckyProfileMigrator::ImportAddressBook()
 {
   nsAutoString index;
   index.AppendInt(nsIMailProfileMigrator::ADDRESSBOOK_DATA);
+  const PRUnichar *rawStringData;
+  NS_StringGetData(index, &rawStringData);
   mObserverService->NotifyObservers(nsnull,
                                     "Migration:ItemBeforeMigrate",
-                                    index.get());
+                                    rawStringData);
 
   nsresult rv;
   rv = mImportModule->GetImportInterface(NS_IMPORT_ADDRESS_STR,
@@ -236,9 +243,11 @@ BeckyProfileMigrator::ImportMailData()
 {
   nsAutoString index;
   index.AppendInt(nsIMailProfileMigrator::MAILDATA);
+  const PRUnichar *rawStringData;
+  NS_StringGetData(index, &rawStringData);
   mObserverService->NotifyObservers(nsnull,
                                     "Migration:ItemBeforeMigrate",
-                                    index.get());
+                                    rawStringData);
 
   nsresult rv;
   rv = mImportModule->GetImportInterface(NS_IMPORT_MAIL_STR,
@@ -277,9 +286,11 @@ BeckyProfileMigrator::ImportFilters()
 {
   nsAutoString index;
   index.AppendInt(nsIMailProfileMigrator::MAILDATA);
+  const PRUnichar *rawStringData;
+  NS_StringGetData(index, &rawStringData);
   mObserverService->NotifyObservers(nsnull,
                                     "Migration:ItemBeforeMigrate",
-                                    index.get());
+                                    rawStringData);
 
   nsresult rv;
   nsCOMPtr<nsIImportFilters> importer;
@@ -291,7 +302,7 @@ BeckyProfileMigrator::ImportFilters()
     rv = importer->Import(&error, &imported);
     mObserverService->NotifyObservers(nsnull,
                                       "Migration:ItemAfterMigrate",
-                                      index.get());
+                                      rawStringData);
   }
 
   mObserverService->NotifyObservers(nsnull, "Migration:Ended", nsnull);
@@ -303,9 +314,11 @@ BeckyProfileMigrator::FinishCopyingAddressBookData()
 {
   nsAutoString index;
   index.AppendInt(nsIMailProfileMigrator::ADDRESSBOOK_DATA);
+  const PRUnichar *rawStringData;
+  NS_StringGetData(index, &rawStringData);
   mObserverService->NotifyObservers(nsnull,
                                     "Migration:ItemAfterMigrate",
-                                    index.get());
+                                    rawStringData);
 
   // now kick off the mail migration code
   ImportMailData();
@@ -318,9 +331,11 @@ BeckyProfileMigrator::FinishCopyingMailFolders()
 {
   nsAutoString index;
   index.AppendInt(nsIMailProfileMigrator::MAILDATA);
+  const PRUnichar *rawStringData;
+  NS_StringGetData(index, &rawStringData);
   mObserverService->NotifyObservers(nsnull,
                                     "Migration:ItemAfterMigrate",
-                                    index.get());
+                                    rawStringData);
 
   // now kick off the filters migration code
   return ImportFilters();

@@ -171,7 +171,7 @@ IsAddressBookFile(nsIFile *aFile)
 
   nsAutoString name;
   rv = aFile->GetLeafName(name);
-  return StringEndsWith(name, NS_LITERAL_STRING(".bab"));
+  return BeckyUtils::StringEndsWith(name, NS_LITERAL_STRING(".bab"));
 }
 
 static PRBool

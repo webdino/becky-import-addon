@@ -351,3 +351,20 @@ BeckyUtils::TranslateFolderName(const nsAString & aFolderName,
   return NS_OK;
 }
 
+PRBool
+BeckyUtils::StringEndsWith(const nsAString &aHaystack, const nsAString &aNeedle)
+{
+return PR_FALSE;
+//  PRInt32 idx = aHaystack.RFind(aNeedle);
+//  if (idx == -1)
+//    return false;
+//
+//  return (idx + aNeedle.Length() == aHaystack.Length());
+}
+
+PRBool
+BeckyUtils::StringBeginsWith(const nsAString &aHaystack, const nsAString &aNeedle)
+{
+  return (aHaystack.Find(aNeedle) == 0);
+}
+

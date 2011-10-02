@@ -64,6 +64,8 @@ public:
                                     nsIFile **_retval);
   static nsresult TranslateFolderName(const nsAString & aFolderName,
                                       nsAString & _retval NS_OUTPARAM);
+  static PRBool StringEndsWith(const nsAString &aHaystack, const nsAString &aNeedle);
+  static PRBool StringBeginsWith(const nsAString &aHaystack, const nsAString &aNeedle);
 };
 
 
