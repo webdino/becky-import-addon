@@ -351,20 +351,81 @@ BeckyUtils::TranslateFolderName(const nsAString & aFolderName,
   return NS_OK;
 }
 
+static PRInt32
+DefaultComparator(const PRUnichar *a, const PRUnichar *b, PRUint32 len)
+{
+  for (const PRUnichar *end = a + len; a < end;
+      ++a, ++b) {
+    if (*a == *b)
+      continue;
+
+    return *a < *b ? -1 : 1;
+  }
+
+  return 0;
+}
+
+static PRInt32
+StringRFind(const nsAString &aHaystack, const nsAString &aNeedle)
+{
+  const PRUnichar *rawHaystackData;
+  PRUint32 haystackLength = NS_StringGetData(aHaystack, &rawHaystackData);
+  const PRUnichar *begin, *end;
+  begin = rawHaystackData;
+  end = begin + haystackLength;
+
+  const PRUnichar *rawNeedleData;
+  PRUint32 needleLength = NS_StringGetData(aNeedle, &rawNeedleData);
+
+  if (haystackLength < needleLength)
+    return -1;
+
+  end -= needleLength;
+
+  for (const PRUnichar *cur = end; cur >= begin; --cur) {
+    if (!DefaultComparator(cur, rawNeedleData, needleLength))
+      return cur - begin;
+  }
+  return -1;
+}
+
+static PRInt32
+StringFind(const nsAString &aHaystack, const nsAString &aNeedle)
+{
+  const PRUnichar *rawHaystackData;
+  PRUint32 haystackLength = NS_StringGetData(aHaystack, &rawHaystackData);
+  const PRUnichar *begin, *end;
+  begin = rawHaystackData;
+  end = begin + haystackLength;
+
+  const PRUnichar *rawNeedleData;
+  PRUint32 needleLength = NS_StringGetData(aNeedle, &rawNeedleData);
+
+  if (haystackLength < needleLength)
+    return -1;
+
+  end -= needleLength;
+
+  for (const PRUnichar *cur = begin; cur <= end; ++cur) {
+    if (!DefaultComparator(cur, rawNeedleData, needleLength))
+      return cur - begin;
+  }
+  return -1;
+}
+
 PRBool
 BeckyUtils::StringEndsWith(const nsAString &aHaystack, const nsAString &aNeedle)
 {
-return PR_FALSE;
-//  PRInt32 idx = aHaystack.RFind(aNeedle);
-//  if (idx == -1)
-//    return false;
-//
-//  return (idx + aNeedle.Length() == aHaystack.Length());
+  PRInt32 idx = StringRFind(aHaystack, aNeedle);
+  if (idx == -1)
+    return false;
+
+  return (idx + aNeedle.Length() == aHaystack.Length());
 }
 
 PRBool
 BeckyUtils::StringBeginsWith(const nsAString &aHaystack, const nsAString &aNeedle)
 {
-  return (aHaystack.Find(aNeedle) == 0);
+  return (StringFind(aHaystack, aNeedle) == 0);
 }
 
