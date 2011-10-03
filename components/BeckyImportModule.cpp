@@ -43,27 +43,51 @@
 
 #include <mozilla-config.h>
 #include <ModuleUtils.h>
+#include <nsID.h>
 
-#include "BeckyMailImporter.h"
 #include "BeckyImport.h"
 #include "BeckyStringBundle.h"
+#include "BeckySettingsImporter.h"
+#include "BeckyFiltersImporter.h"
+#include "BeckyMailImporter.h"
+#include "BeckyAddressBooksImporter.h"
+#include "BeckyProfileMigrator.h"
 
-NS_GENERIC_FACTORY_CONSTRUCTOR(BeckyMailImporter)
+NS_DEFINE_NAMED_CID(MJ_BECKYIMPORT_CID);
+NS_DEFINE_NAMED_CID(MJ_BECKYIMPORT_SETTINGS_CID);
+NS_DEFINE_NAMED_CID(MJ_BECKYIMPORT_FILTERS_CID);
+NS_DEFINE_NAMED_CID(MJ_BECKYIMPORT_MAIL_CID);
+NS_DEFINE_NAMED_CID(MJ_BECKYIMPORT_ADDRESSBOOKS_CID);
+NS_DEFINE_NAMED_CID(MJ_BECKY_PROFILE_MIGRATOR_CID);
+
 NS_GENERIC_FACTORY_CONSTRUCTOR(BeckyImport)
-
-static NS_DEFINE_CID(kMJ_BECKYIMPORT_CID, MJ_BECKYIMPORT_CID);
+NS_GENERIC_FACTORY_CONSTRUCTOR(BeckySettingsImporter)
+NS_GENERIC_FACTORY_CONSTRUCTOR(BeckyFiltersImporter)
+NS_GENERIC_FACTORY_CONSTRUCTOR(BeckyMailImporter)
+NS_GENERIC_FACTORY_CONSTRUCTOR(BeckyAddressBooksImporter)
+NS_GENERIC_FACTORY_CONSTRUCTOR(BeckyProfileMigrator)
 
 static const mozilla::Module::CategoryEntry kBeckyImportCategories[] = {
-  { "mailnewsimport", "{6d3f101c-70ec-4e04-b68d-9908d1aeddf3}", kBeckySupportsString },
+  { "mailnewsimport", "{f7a0d2c3-61ea-4754-9bc3-d948f36b4cbb}", kBeckySupportsString },
   { NULL }
 };
 
 const mozilla::Module::CIDEntry kBeckyImportCIDs[] = {
   { &kMJ_BECKYIMPORT_CID, false, NULL, BeckyImportConstructor },
+  { &kMJ_BECKYIMPORT_SETTINGS_CID, false, NULL, BeckySettingsImporterConstructor },
+  { &kMJ_BECKYIMPORT_ADDRESSBOOKS_CID, false, NULL, BeckyAddressBooksImporterConstructor },
+  { &kMJ_BECKYIMPORT_FILTERS_CID, false, NULL, BeckyFiltersImporterConstructor },
+  { &kMJ_BECKYIMPORT_MAIL_CID, false, NULL, BeckyMailImporterConstructor },
+  { &kMJ_BECKY_PROFILE_MIGRATOR_CID, false, NULL, BeckyProfileMigratorConstructor },
   { NULL }
 };
 const mozilla::Module::ContractIDEntry kBeckyImportContracts[] = {
-  { "@mozilla.org/import/becky;1", &kMJ_BECKYIMPORT_CID },
+  { "@mozilla-japan.org/import/becky;1", &kMJ_BECKYIMPORT_CID },
+  { MJ_BECKYIMPORT_SETTINGS_CONTRACT_ID, &kMJ_BECKYIMPORT_SETTINGS_CID },
+  { MJ_BECKYIMPORT_FILTERS_CONTRACT_ID, &kMJ_BECKYIMPORT_FILTERS_CID },
+  { MJ_BECKYIMPORT_MAIL_CONTRACT_ID, &kMJ_BECKYIMPORT_MAIL_CID },
+  { MJ_BECKYIMPORT_ADDRESSBOOKS_CONTRACT_ID, &kMJ_BECKYIMPORT_ADDRESSBOOKS_CID },
+  { MJ_BECKY_PROFILE_MIGRATOR_CONTRACT_ID, &kMJ_BECKY_PROFILE_MIGRATOR_CID },
   { NULL }
 };
 
@@ -83,5 +107,5 @@ static const mozilla::Module kBeckyImportModule = {
   importModuleDtor
 };
 
-NSMODULE_DEFN(nsImportServiceModule) = &kBeckyImportModule;
+NSMODULE_DEFN(mjBeckyImportServiceModule) = &kBeckyImportModule;
 
