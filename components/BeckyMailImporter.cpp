@@ -447,13 +447,22 @@ GetAttachmentFile(nsIFile *aMailboxFile,
   rv = GetBeckyIncludeValue(aHeader, nativeAttachmentPath);
   NS_ENSURE_SUCCESS(rv, rv);
 
-  nsCAutoString utf8AttachmentPath;
-  BeckyUtils::ConvertNativeStringToUTF8(nativeAttachmentPath, utf8AttachmentPath);
+  nsAutoString attachmentPath;
+  BeckyUtils::ConvertNativeStringToUTF16(nativeAttachmentPath, attachmentPath);
 
-  nsTArray<nsCAutoString> directoryNames;
-  ParseString(utf8AttachmentPath, '\\', directoryNames);
-  for (nsTArray<nsCString>::index_type i = 0; i < directoryNames.Length(); i++)
-    rv = attachmentFile->Append(NS_ConvertUTF8toUTF16(directoryNames[i]));
+  const PRUnichar *begin;
+  PRUint32 length = NS_StringGetData(attachmentPath, &begin);
+  const PRUnichar *end = begin + length;
+  const PRUnichar *startOfDirectoryName = begin;
+
+  for (const PRUnichar *cur = begin; cur <= end; ++cur) {
+    if (*cur == '\\') {
+      nsAutoString directoryName;
+      directoryName.Assign(startOfDirectoryName, cur - startOfDirectoryName);
+      rv = attachmentFile->Append(directoryName);
+      startOfDirectoryName = cur + 1;
+    }
+  }
 
   PRBool exists = PR_FALSE;
   attachmentFile->Exists(&exists);
