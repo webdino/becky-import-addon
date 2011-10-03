@@ -58,6 +58,7 @@
 #include <nsDirectoryServiceUtils.h>
 #include <msgCore.h>
 #include <nsIImportMail.h>
+#include <prmem.h>
 
 #include "BeckyUtils.h"
 
@@ -129,11 +130,13 @@ BeckyUtils::ConvertNativeStringToUTF16(const nsACString& aOriginal,
     resultLen += n;
 
   // allocate sufficient space
-  if (!EnsureStringLength(_retval, resultLen))
-    return NS_ERROR_OUT_OF_MEMORY;
   if (resultLen > 0) {
-    PRUnichar *result = _retval.BeginWriting();
+    PRUnichar *result = (PRUnichar *) PR_MALLOC(resultLen * sizeof(PRUnichar));
+    if (!result)
+      return NS_ERROR_OUT_OF_MEMORY;
     ::MultiByteToWideChar(CP_ACP, 0, buf, inputLen, result, resultLen);
+    _retval.Assign(result);
+    PR_Free(result);
   }
 
   return NS_OK;
