@@ -13,7 +13,8 @@ XPI_TARGET_FILES = 				\
 	install.rdf				\
 	platform				\
 	chrome				        \
-	chrome.manifest
+	chrome.manifest                         \
+	components/BeckyImport$(SHARED_LIBRARY_SUFFIX)
 
 if PLATFORM_WINNT
 BINARY_SOURCE_DIR = components/BeckyImport/Release
@@ -22,9 +23,8 @@ BINARY_SOURCE_DIR = components/.libs
 endif
 
 deploy:
-	(mkdir -p platform/$(PLATFORM)_$(CPU)-$(COMPILER)/components && \
-	 cp $(BINARY_SOURCE_DIR)/BeckyImport$(SHARED_LIBRARY_SUFFIX) \
-	 platform/$(PLATFORM)_$(CPU)-$(COMPILER)/components/)
+	(cp $(BINARY_SOURCE_DIR)/BeckyImport$(SHARED_LIBRARY_SUFFIX) \
+	 components/)
 
 xpi:
 	(rm -rf chrome && \

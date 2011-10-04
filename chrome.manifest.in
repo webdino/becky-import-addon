@@ -5,3 +5,5 @@ overlay chrome://messenger/content/migration/migration.xul chrome://@PACKAGE_NAM
 locale @PACKAGE_NAME@ en-US jar:chrome/@PACKAGE_NAME@.jar!/locale/en-US/
 
 resource @PACKAGE_NAME@-modules modules/
+
+binary-component components/BeckyImport.dll ABI=WINNT_x86-MSVC
